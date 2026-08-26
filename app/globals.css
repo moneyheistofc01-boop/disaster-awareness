@@ -7,10 +7,10 @@ html {
 }
 
 body {
-  @apply antialiased select-none; /* Text highlight වීම නවත්වයි */
-  -webkit-tap-highlight-color: transparent; /* Mobile tap නිල් පාට වීම නවත්වයි */
+  @apply antialiased select-none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 img {
-  pointer-events: none; /* Image zoom සහ save කිරීම නවත්වයි */
+  pointer-events: none;
 }
