@@ -8,7 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function Header() {
   const { lang, setLang, t } = useLanguage();
-  const { theme, setTheme } = useTheme();
+  // මෙතනින් අපි resolvedTheme එකත් ගන්නවා
+  const { theme, setTheme, resolvedTheme } = useTheme(); 
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -21,8 +22,9 @@ export default function Header() {
     setIsLangOpen(false);
   };
 
+  // theme වෙනුවට resolvedTheme එකෙන් check කරලා මාරු කරනවා
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
 
   return (
@@ -84,13 +86,13 @@ export default function Header() {
             {mounted ? (
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
-                  key={theme}
+                  key={resolvedTheme} // මෙතන key එකටත් resolvedTheme දුන්නා animation එක හරියට වෙන්න
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: 20, opacity: 0 }}
                   transition={{ duration: 0.15 }}
                 >
-                  {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+                  {resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
                 </motion.div>
               </AnimatePresence>
             ) : (
@@ -131,7 +133,8 @@ export default function Header() {
                   onClick={toggleTheme}
                   className="p-3 rounded-full bg-gray-100 dark:bg-gray-900 active:scale-90 transition-transform"
                 >
-                  {mounted && theme === "dark" ? <Sun size={22} className="text-amber-500" /> : <Moon size={22} className="text-indigo-500" />}
+                  {/* මෙතනත් resolvedTheme පාවිච්චි කලා */}
+                  {mounted && resolvedTheme === "dark" ? <Sun size={22} className="text-amber-500" /> : <Moon size={22} className="text-indigo-500" />}
                 </button>
               </div>
             </div>
