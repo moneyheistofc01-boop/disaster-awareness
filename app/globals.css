@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/* Tailwind v4 වල Dark Mode එක බටන් එකෙන් වැඩ කරන්න මේ පේළිය අනිවාර්යයි! */
+@variant dark (&:where(.dark, .dark *));
+
+/* Scrollbars වල පාටත් theme එකට අනුව වෙනස් වෙන්න */
+:root {
+  color-scheme: light;
+}
+.dark {
+  color-scheme: dark;
+}
+
 html {
   scroll-behavior: smooth;
 }
