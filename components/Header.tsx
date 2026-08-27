@@ -17,10 +17,8 @@ export default function Header() {
 
   useEffect(() => setMounted(true), []);
 
-  // Background Click & Scroll Event Listeners (Fixed)
+  // 1. Background Click (එළිය click කරාම Close වීම)
   useEffect(() => {
-    let startScrollY = window.scrollY; // Menu එක open කරද්දි page එක තියෙන තැන සටහන් කරගන්නවා
-
     const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
       if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
         setIsMobileMenuOpen(false);
@@ -28,24 +26,41 @@ export default function Header() {
       }
     };
 
-    const handleScroll = () => {
-      // පොඩි micro-scrolls වලට close වෙන්නේ නැති වෙන්න 50px limit එකක් දැම්මා
-      if (Math.abs(window.scrollY - startScrollY) > 50) {
-        if (isMobileMenuOpen) setIsMobileMenuOpen(false);
-        if (isLangOpen) setIsLangOpen(false);
-      }
-    };
-
     if (isMobileMenuOpen || isLangOpen) {
-      startScrollY = window.scrollY; // Open කරන මොහොතේ scroll තැන අප්ඩේට් කරනවා
       document.addEventListener("mousedown", handleOutsideClick);
       document.addEventListener("touchstart", handleOutsideClick);
-      window.addEventListener("scroll", handleScroll, { passive: true });
     }
 
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
       document.removeEventListener("touchstart", handleOutsideClick);
+    };
+  }, [isMobileMenuOpen, isLangOpen]);
+
+  // 2. Scroll Bug Fix (Scroll කරද්දි Close වීම - Layout Shift එක හදලා තියෙන්නේ)
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    let startScrollY = 0;
+
+    const handleScroll = () => {
+      // යන්තම් ඇඟිල්ල වැදුණට close වෙන්නේ නෑ, 50px ට වඩා scroll කරොත් විතරක් close වෙනවා.
+      if (Math.abs(window.scrollY - startScrollY) > 50) {
+        setIsMobileMenuOpen(false);
+        setIsLangOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen || isLangOpen) {
+      // Menu එක open වෙන animation එක (150ms) ඉවර වෙනකන් ඉඳලා තමයි scroll වෙයිද කියලා බලන්නේ. 
+      // මේකෙන් අර එකපාරට open-close වෙන ලෙඩේ 100% ක් නැති වෙනවා!
+      timeoutId = setTimeout(() => {
+        startScrollY = window.scrollY; // හරියටම open වුණාට පස්සේ තියෙන scroll position එක ගන්නවා
+        window.addEventListener("scroll", handleScroll, { passive: true });
+      }, 250); 
+    }
+
+    return () => {
+      clearTimeout(timeoutId);
       window.removeEventListener("scroll", handleScroll);
     };
   }, [isMobileMenuOpen, isLangOpen]);
@@ -102,7 +117,7 @@ export default function Header() {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }} 
                   animate={{ opacity: 1, y: 0, scale: 1 }} 
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  transition={{ duration: 0.1, ease: "easeOut" }} // Super fast
+                  transition={{ duration: 0.1, ease: "easeOut" }} 
                   className="absolute right-0 mt-3 w-32 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-50"
                 >
                   <button onClick={() => toggleLang("si")} className={`px-4 py-3 text-sm font-bold text-left transition-colors ${lang === 'si' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}>සිංහල (Si)</button>
@@ -112,7 +127,7 @@ export default function Header() {
             </AnimatePresence>
           </div>
 
-          {/* Theme Toggle Button (Instant Animation) */}
+          {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
             className="relative p-2.5 rounded-full bg-gray-100/80 dark:bg-gray-900/80 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 transition-all active:scale-90 overflow-hidden"
@@ -152,7 +167,7 @@ export default function Header() {
             initial={{ height: 0, opacity: 0 }} 
             animate={{ height: "auto", opacity: 1 }} 
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.15, ease: "easeInOut" }} // Smooth & Super fast
+            transition={{ duration: 0.15, ease: "easeInOut" }} 
             className="md:hidden border-t border-gray-200/50 dark:border-gray-800/50 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl overflow-hidden"
           >
             <div className="flex flex-col p-6 gap-6">
