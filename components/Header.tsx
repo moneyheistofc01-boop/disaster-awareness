@@ -3,36 +3,71 @@ import Link from "next/link";
 import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "next-themes";
 import { Moon, Sun, Menu, X, ChevronDown, Leaf } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Header() {
   const { lang, setLang, t } = useLanguage();
-  // මෙතනින් අපි resolvedTheme එකත් ගන්නවා
   const { theme, setTheme, resolvedTheme } = useTheme(); 
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
+  
+  // Header එකෙන් එළිය click කරාද බලන්න ref එකක් හදාගන්නවා
+  const headerRef = useRef<HTMLElement>(null);
 
   // Hydration fix for next-themes
   useEffect(() => setMounted(true), []);
+
+  // Background Click & Scroll Event Listeners
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
+      // Header එකෙන් පිටත click/touch කරොත් menu close කරනවා
+      if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
+        setIsMobileMenuOpen(false);
+        setIsLangOpen(false);
+      }
+    };
+
+    const handleScroll = () => {
+      // Scroll කරද්දි menu open වෙලා තියෙනව නම් close කරනවා
+      if (isMobileMenuOpen) setIsMobileMenuOpen(false);
+      if (isLangOpen) setIsLangOpen(false);
+    };
+
+    // Menu එකක් open වෙලා තියෙනවා නම් විතරක් Listeners on කරනවා (Performance වලට හොඳයි)
+    if (isMobileMenuOpen || isLangOpen) {
+      document.addEventListener("mousedown", handleOutsideClick);
+      document.addEventListener("touchstart", handleOutsideClick);
+      window.addEventListener("scroll", handleScroll, { passive: true });
+    }
+
+    // Component එක unmount වෙද්දි Listeners අයින් කරනවා
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isMobileMenuOpen, isLangOpen]);
 
   const toggleLang = (newLang: "en" | "si") => {
     setLang(newLang);
     setIsLangOpen(false);
   };
 
-  // theme වෙනුවට resolvedTheme එකෙන් check කරලා මාරු කරනවා
   const toggleTheme = () => {
     setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200/40 dark:border-gray-800/40 bg-white/70 dark:bg-gray-950/70 backdrop-blur-2xl transition-all duration-300">
+    <header 
+      ref={headerRef} 
+      className="sticky top-0 z-50 w-full border-b border-gray-200/40 dark:border-gray-800/40 bg-white/70 dark:bg-gray-950/70 backdrop-blur-2xl transition-all duration-300"
+    >
       <div className="container mx-auto px-6 h-20 flex items-center justify-between">
         
         {/* Logo Section */}
-        <Link href="/" className="flex items-center gap-2 group">
+        <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 group">
           <div className="bg-emerald-100 dark:bg-emerald-900/30 p-1.5 rounded-xl text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
             <Leaf size={22} strokeWidth={2.5} />
           </div>
@@ -59,15 +94,15 @@ export default function Header() {
               className="flex items-center gap-1.5 text-sm font-semibold bg-gray-100/80 dark:bg-gray-900/80 px-4 py-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-all active:scale-95"
             >
               <span className="text-emerald-600 dark:text-emerald-400">{lang === "en" ? "EN" : "SI"}</span> 
-              <ChevronDown size={14} className={`transition-transform duration-300 ${isLangOpen ? "rotate-180" : ""}`} />
+              <ChevronDown size={14} className={`transition-transform duration-200 ${isLangOpen ? "rotate-180" : ""}`} />
             </button>
             <AnimatePresence>
               {isLangOpen && (
                 <motion.div 
-                  initial={{ opacity: 0, y: 15, scale: 0.95 }} 
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }} 
                   animate={{ opacity: 1, y: 0, scale: 1 }} 
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  transition={{ duration: 0.15, ease: "easeOut" }} // Super fast animation
                   className="absolute right-0 mt-3 w-32 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-50"
                 >
                   <button onClick={() => toggleLang("si")} className={`px-4 py-3 text-sm font-bold text-left transition-colors ${lang === 'si' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}>සිංහල (Si)</button>
@@ -86,17 +121,17 @@ export default function Header() {
             {mounted ? (
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
-                  key={resolvedTheme} // මෙතන key එකටත් resolvedTheme දුන්නා animation එක හරියට වෙන්න
+                  key={resolvedTheme} 
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: 20, opacity: 0 }}
-                  transition={{ duration: 0.15 }}
+                  transition={{ duration: 0.15 }} // Fast switch
                 >
                   {resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
                 </motion.div>
               </AnimatePresence>
             ) : (
-              <div className="w-[18px] h-[18px]" /> // Placeholder to prevent layout shift
+              <div className="w-[18px] h-[18px]" />
             )}
           </button>
         </div>
@@ -117,6 +152,7 @@ export default function Header() {
             initial={{ height: 0, opacity: 0 }} 
             animate={{ height: "auto", opacity: 1 }} 
             exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }} // Smooth & Super fast
             className="md:hidden border-t border-gray-200/50 dark:border-gray-800/50 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl overflow-hidden"
           >
             <div className="flex flex-col p-6 gap-6">
@@ -133,7 +169,6 @@ export default function Header() {
                   onClick={toggleTheme}
                   className="p-3 rounded-full bg-gray-100 dark:bg-gray-900 active:scale-90 transition-transform"
                 >
-                  {/* මෙතනත් resolvedTheme පාවිච්චි කලා */}
                   {mounted && resolvedTheme === "dark" ? <Sun size={22} className="text-amber-500" /> : <Moon size={22} className="text-indigo-500" />}
                 </button>
               </div>
