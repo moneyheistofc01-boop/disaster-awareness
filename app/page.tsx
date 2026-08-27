@@ -94,7 +94,7 @@ export default function Home() {
         >
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
           <Image 
-            src="https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=1000&auto=format&fit=crop" 
+            src="https://pin.it/2C4LQjh5D?q=80&w=1000&auto=format&fit=crop" 
             alt="Landslide Disaster" fill className="object-cover transition-transform duration-700 hover:scale-105"
           />
         </motion.div>
