@@ -13,16 +13,15 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   
-  // Header එකෙන් එළිය click කරාද බලන්න ref එකක් හදාගන්නවා
   const headerRef = useRef<HTMLElement>(null);
 
-  // Hydration fix for next-themes
   useEffect(() => setMounted(true), []);
 
-  // Background Click & Scroll Event Listeners
+  // Background Click & Scroll Event Listeners (Fixed)
   useEffect(() => {
+    let startScrollY = window.scrollY; // Menu එක open කරද්දි page එක තියෙන තැන සටහන් කරගන්නවා
+
     const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
-      // Header එකෙන් පිටත click/touch කරොත් menu close කරනවා
       if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
         setIsMobileMenuOpen(false);
         setIsLangOpen(false);
@@ -30,19 +29,20 @@ export default function Header() {
     };
 
     const handleScroll = () => {
-      // Scroll කරද්දි menu open වෙලා තියෙනව නම් close කරනවා
-      if (isMobileMenuOpen) setIsMobileMenuOpen(false);
-      if (isLangOpen) setIsLangOpen(false);
+      // පොඩි micro-scrolls වලට close වෙන්නේ නැති වෙන්න 50px limit එකක් දැම්මා
+      if (Math.abs(window.scrollY - startScrollY) > 50) {
+        if (isMobileMenuOpen) setIsMobileMenuOpen(false);
+        if (isLangOpen) setIsLangOpen(false);
+      }
     };
 
-    // Menu එකක් open වෙලා තියෙනවා නම් විතරක් Listeners on කරනවා (Performance වලට හොඳයි)
     if (isMobileMenuOpen || isLangOpen) {
+      startScrollY = window.scrollY; // Open කරන මොහොතේ scroll තැන අප්ඩේට් කරනවා
       document.addEventListener("mousedown", handleOutsideClick);
       document.addEventListener("touchstart", handleOutsideClick);
       window.addEventListener("scroll", handleScroll, { passive: true });
     }
 
-    // Component එක unmount වෙද්දි Listeners අයින් කරනවා
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
       document.removeEventListener("touchstart", handleOutsideClick);
@@ -102,7 +102,7 @@ export default function Header() {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }} 
                   animate={{ opacity: 1, y: 0, scale: 1 }} 
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  transition={{ duration: 0.15, ease: "easeOut" }} // Super fast animation
+                  transition={{ duration: 0.1, ease: "easeOut" }} // Super fast
                   className="absolute right-0 mt-3 w-32 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-50"
                 >
                   <button onClick={() => toggleLang("si")} className={`px-4 py-3 text-sm font-bold text-left transition-colors ${lang === 'si' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}>සිංහල (Si)</button>
@@ -125,7 +125,7 @@ export default function Header() {
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: 20, opacity: 0 }}
-                  transition={{ duration: 0.15 }} // Fast switch
+                  transition={{ duration: 0.15 }}
                 >
                   {resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
                 </motion.div>
@@ -152,7 +152,7 @@ export default function Header() {
             initial={{ height: 0, opacity: 0 }} 
             animate={{ height: "auto", opacity: 1 }} 
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: "easeInOut" }} // Smooth & Super fast
+            transition={{ duration: 0.15, ease: "easeInOut" }} // Smooth & Super fast
             className="md:hidden border-t border-gray-200/50 dark:border-gray-800/50 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl overflow-hidden"
           >
             <div className="flex flex-col p-6 gap-6">
