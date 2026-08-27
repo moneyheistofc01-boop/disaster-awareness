@@ -5,10 +5,7 @@ const nextConfig = {
     unoptimized: true,
   },
   typescript: {
-    ignoreBuildErrors: true, // Errors ආවත් අනිවාර්යයෙන් Build කරයි
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
+    ignoreBuildErrors: true,
   },
 };
 export default nextConfig;
