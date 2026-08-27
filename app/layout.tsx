@@ -16,7 +16,7 @@ export const viewport: Viewport = {
 
 // SEO සඳහා අවශ්‍ය සම්පූර්ණ Meta Data
 export const metadata: Metadata = {
-  metadataBase: new URL("https://disaster-awareness.pages.dev/"),
+  metadataBase: new URL("https://ecoguard-srilanka.pages.dev/"),
   title: {
     default: "EcoGuard | Protect Nature & Survive Disasters",
     template: "%s | EcoGuard",
