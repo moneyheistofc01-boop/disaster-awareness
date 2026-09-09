@@ -165,7 +165,9 @@ export default function AdminDashboardPage() {
     }));
   };
 
-  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSave = async (
+    event: FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
 
     setError("");
@@ -292,8 +294,11 @@ export default function AdminDashboardPage() {
           action: "logout",
         }),
       });
+    } catch {
+      // Even if the request fails, send the user back to login.
     } finally {
       router.replace("/admin");
+      router.refresh();
     }
   };
 
@@ -305,6 +310,7 @@ export default function AdminDashboardPage() {
             size={32}
             className="animate-spin text-emerald-400"
           />
+
           <p className="text-sm text-slate-400">
             Checking admin session...
           </p>
@@ -362,7 +368,7 @@ export default function AdminDashboardPage() {
 
       {/* Main */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
-        {/* Top Stats */}
+        {/* Stats */}
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
             <div className="flex items-center justify-between">
@@ -443,7 +449,7 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Announcement Section */}
+        {/* Announcement section */}
         <section className="rounded-3xl border border-white/10 bg-white/[0.035] overflow-hidden">
           <div className="p-5 sm:p-6 border-b border-white/10">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -512,7 +518,8 @@ export default function AdminDashboardPage() {
                           alt={announcement.title}
                           className="w-full h-full object-cover"
                           onError={(event) => {
-                            event.currentTarget.style.display = "none";
+                            event.currentTarget.style.display =
+                              "none";
                           }}
                         />
                       </div>
@@ -578,6 +585,7 @@ export default function AdminDashboardPage() {
                               ) : (
                                 <Trash2 size={16} />
                               )}
+
                               Delete
                             </button>
                           </div>
@@ -821,4 +829,4 @@ export default function AdminDashboardPage() {
       )}
     </main>
   );
-}
+            }
