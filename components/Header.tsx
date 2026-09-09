@@ -3,328 +3,581 @@
 import Link from "next/link";
 import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "next-themes";
+
 import {
+  ChevronDown,
+  Leaf,
+  Menu,
   Moon,
   Sun,
-  Menu,
   X,
-  ChevronDown,
+  ArrowRight,
+  Sparkles,
+  ShieldCheck,
+  Users,
+  MessageCircle,
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import {
+  AnimatePresence,
+  motion,
+} from "framer-motion";
+
+/* =========================================================
+   HEADER
+========================================================= */
 
 export default function Header() {
-  const { lang, setLang, t } = useLanguage();
-  const { setTheme, resolvedTheme } = useTheme();
+  const {
+    lang,
+    setLang,
+  } = useLanguage();
 
-  const [mounted, setMounted] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLangOpen, setIsLangOpen] = useState(false);
+  const {
+    setTheme,
+    resolvedTheme,
+  } = useTheme();
 
-  const headerRef = useRef<HTMLElement>(null);
+  const [
+    mounted,
+    setMounted,
+  ] = useState(false);
+
+  const [
+    isMobileOpen,
+    setIsMobileOpen,
+  ] = useState(false);
+
+  const [
+    isLanguageOpen,
+    setIsLanguageOpen,
+  ] = useState(false);
+
+  const [
+    isExploreOpen,
+    setIsExploreOpen,
+  ] = useState(false);
+
+  const [
+    scrolled,
+    setScrolled,
+  ] = useState(false);
+
+  const headerRef =
+    useRef<HTMLElement>(null);
+
+  /* =======================================================
+     MOUNT
+  ======================================================== */
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  /* Close menus when clicking outside */
+  /* =======================================================
+     SCROLL EFFECT
+  ======================================================== */
+
   useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
-      if (
-        headerRef.current &&
-        !headerRef.current.contains(event.target as Node)
-      ) {
-        setIsMobileMenuOpen(false);
-        setIsLangOpen(false);
-      }
-    };
+    const handleScroll =
+      () => {
+        setScrolled(
+          window.scrollY > 12
+        );
+      };
 
-    if (isMobileMenuOpen || isLangOpen) {
-      document.addEventListener("mousedown", handleOutsideClick);
-      document.addEventListener("touchstart", handleOutsideClick);
-    }
+    handleScroll();
 
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-      document.removeEventListener("touchstart", handleOutsideClick);
-    };
-  }, [isMobileMenuOpen, isLangOpen]);
-
-  /* Close mobile menu after meaningful scroll */
-  useEffect(() => {
-    if (!isMobileMenuOpen && !isLangOpen) return;
-
-    const startScrollY = window.scrollY;
-
-    const handleScroll = () => {
-      if (Math.abs(window.scrollY - startScrollY) > 50) {
-        setIsMobileMenuOpen(false);
-        setIsLangOpen(false);
-      }
-    };
-
-    const timer = setTimeout(() => {
-      window.addEventListener("scroll", handleScroll, {
+    window.addEventListener(
+      "scroll",
+      handleScroll,
+      {
         passive: true,
-      });
-    }, 250);
+      }
+    );
 
     return () => {
-      clearTimeout(timer);
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener(
+        "scroll",
+        handleScroll
+      );
     };
-  }, [isMobileMenuOpen, isLangOpen]);
+  }, []);
 
-  /* Prevent body scrolling while mobile menu is open */
+  /* =======================================================
+     OUTSIDE CLICK
+  ======================================================== */
+
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = "hidden";
+    const handleOutside =
+      (
+        event:
+          | MouseEvent
+          | TouchEvent
+      ) => {
+        const target =
+          event.target as Node;
+
+        if (
+          headerRef.current &&
+          !headerRef.current.contains(
+            target
+          )
+        ) {
+          setIsLanguageOpen(
+            false
+          );
+
+          setIsExploreOpen(
+            false
+          );
+
+          setIsMobileOpen(
+            false
+          );
+        }
+      };
+
+    document.addEventListener(
+      "mousedown",
+      handleOutside
+    );
+
+    document.addEventListener(
+      "touchstart",
+      handleOutside
+    );
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleOutside
+      );
+
+      document.removeEventListener(
+        "touchstart",
+        handleOutside
+      );
+    };
+  }, []);
+
+  /* =======================================================
+     MOBILE SCROLL LOCK
+  ======================================================== */
+
+  useEffect(() => {
+    if (isMobileOpen) {
+      document.body.style.overflow =
+        "hidden";
     } else {
-      document.body.style.overflow = "";
+      document.body.style.overflow =
+        "";
     }
 
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow =
+        "";
     };
-  }, [isMobileMenuOpen]);
+  }, [isMobileOpen]);
 
-  const toggleTheme = () => {
-    setTheme(resolvedTheme === "dark" ? "light" : "dark");
-  };
+  /* =======================================================
+     HELPERS
+  ======================================================== */
 
-  const changeLanguage = (newLang: "si" | "en") => {
-    setLang(newLang);
-    setIsLangOpen(false);
-  };
+  const closeAll =
+    () => {
+      setIsMobileOpen(
+        false
+      );
 
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-    setIsLangOpen(false);
-  };
+      setIsLanguageOpen(
+        false
+      );
 
-  const navigation = [
-    {
-      href: "/",
-      label: lang === "si" ? "මුල් පිටුව" : "Home",
-    },
+      setIsExploreOpen(
+        false
+      );
+    };
+
+  const toggleTheme =
+    () => {
+      setTheme(
+        resolvedTheme ===
+          "dark"
+          ? "light"
+          : "dark"
+      );
+    };
+
+  const changeLanguage =
+    (
+      newLang:
+        | "si"
+        | "en"
+    ) => {
+      setLang(newLang);
+
+      setIsLanguageOpen(
+        false
+      );
+    };
+
+  /*
+   * Same-page anchor helper.
+   */
+  const handleAnchorClick =
+    () => {
+      closeAll();
+    };
+
+  /* =======================================================
+     MAIN NAVIGATION
+  ======================================================== */
+
+  const mainNavigation = [
     {
       href: "#about",
-      label: lang === "si" ? "හැඳින්වීම" : "Introduction",
+      si: "හැඳින්වීම",
+      en: "Introduction",
     },
     {
       href: "#vision",
-      label: lang === "si" ? "දැක්ම" : "Vision",
+      si: "දැක්ම",
+      en: "Vision",
     },
     {
       href: "#mission",
-      label: lang === "si" ? "මෙහෙවර" : "Mission",
+      si: "මෙහෙවර",
+      en: "Mission",
     },
     {
       href: "#objectives",
-      label: lang === "si" ? "අරමුණු" : "Objectives",
+      si: "අරමුණු",
+      en: "Objectives",
     },
+  ];
+
+  const exploreNavigation = [
     {
       href: "#action",
-      label: lang === "si" ? "ක්‍රියාකාරීත්වය" : "Activities",
+      si: "ක්‍රියාකාරීත්වය",
+      en: "Activities",
+      icon: Leaf,
     },
     {
       href: "#membership",
-      label: lang === "si" ? "සාමාජිකත්වය" : "Membership",
+      si: "සාමාජිකත්වය",
+      en: "Membership",
+      icon: Users,
     },
     {
       href: "#message",
-      label:
-        lang === "si"
-          ? "ස්වභාවධර්මයේ පණිවිඩය"
-          : "Message of Nature",
+      si: "ස්වභාවධර්මයේ පණිවිඩය",
+      en: "Message of Nature",
+      icon: ShieldCheck,
     },
     {
       href: "#comments",
-      label:
-        lang === "si"
-          ? "අදහස් හා යෝජනා"
-          : "Ideas & Suggestions",
+      si: "අදහස් හා යෝජනා",
+      en: "Ideas & Suggestions",
+      icon: MessageCircle,
     },
   ];
+
+  /* =======================================================
+     RENDER
+  ======================================================== */
 
   return (
     <header
       ref={headerRef}
-      className="
-        sticky top-0 z-[100]
+      className={`
+        sticky
+        top-0
+        z-[500]
         w-full
-        border-b border-slate-200/60
-        bg-white/85
-        backdrop-blur-2xl
-        dark:border-white/10
-        dark:bg-[#050c09]/85
-      "
+        transition-all
+        duration-500
+        ${
+          scrolled
+            ? "border-b border-white/[0.08] bg-[#04100b]/95 shadow-[0_14px_45px_rgba(0,0,0,0.18)] backdrop-blur-2xl"
+            : "border-b border-white/[0.05] bg-[#04100b]/82 backdrop-blur-xl"
+        }
+      `}
     >
+      {/* ===================================================
+          TOP HEADER
+      ==================================================== */}
+
       <div
         className="
           mx-auto
           flex
-          h-[68px]
+          h-[64px]
           w-full
           max-w-7xl
           items-center
           justify-between
           gap-3
           px-4
+          sm:h-[70px]
           sm:px-6
-          md:h-[76px]
           lg:px-8
         "
       >
-        {/* ================= LOGO ================= */}
+        {/* =================================================
+            BRAND
+        ================================================== */}
 
         <Link
           href="/"
-          onClick={closeMobileMenu}
+          onClick={
+            closeAll
+          }
           className="
+            group
             flex
             min-w-0
-            shrink
             items-center
-            gap-2.5
-            sm:gap-3
+            gap-3
           "
         >
-          <div
+          {/* Logo */}
+          <motion.div
+            whileHover={{
+              scale: 1.04,
+            }}
+            transition={{
+              duration: 0.25,
+            }}
             className="
               relative
-              h-11
-              w-11
+              flex
+              h-10
+              w-10
               shrink-0
+              items-center
+              justify-center
               overflow-hidden
               rounded-full
               border
-              border-emerald-500/30
-              bg-white
-              shadow-md
-              sm:h-12
-              sm:w-12
+              border-emerald-300/30
+              bg-black/20
+              p-1
+              shadow-[0_0_26px_rgba(16,185,129,0.12)]
+              sm:h-11
+              sm:w-11
             "
           >
+            <motion.div
+              animate={{
+                rotate: [0, 2, 0, -2, 0],
+              }}
+              transition={{
+                duration: 6,
+                repeat:
+                  Infinity,
+                ease: "easeInOut",
+              }}
+              className="
+                absolute
+                inset-0
+                rounded-full
+                border
+                border-emerald-400/10
+              "
+            />
+
             <img
               src="/logo.png"
-              alt="සොබා සේනාංකය"
+              alt={
+                lang ===
+                "si"
+                  ? "සොබා සේනාංකය"
+                  : "Soba Senankaya"
+              }
+              draggable={false}
               className="
+                relative
                 h-full
                 w-full
+                rounded-full
                 object-contain
               "
             />
-          </div>
+          </motion.div>
 
+          {/* Brand text */}
           <div className="min-w-0">
-            <span
-              className="
-                block
-                truncate
-                text-[17px]
-                font-black
-                tracking-tight
-                text-slate-900
-                dark:text-white
-                sm:text-xl
-                md:text-2xl
-              "
-            >
-              සොබා සේනාංකය
-            </span>
+            <div className="flex items-center gap-2">
+              <span
+                className="
+                  block
+                  truncate
+                  text-[17px]
+                  font-black
+                  tracking-[-0.025em]
+                  text-white
+                  sm:text-xl
+                "
+              >
+                {lang ===
+                "si"
+                  ? "සොබා සේනාංකය"
+                  : "Soba Senankaya"}
+              </span>
 
-            <span
+              <Sparkles
+                size={13}
+                className="
+                  hidden
+                  shrink-0
+                  text-emerald-300/80
+                  sm:block
+                "
+              />
+            </div>
+
+            <motion.span
+              key={lang}
+              initial={{
+                opacity: 0,
+                y: 3,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              transition={{
+                duration: 0.25,
+              }}
               className="
                 hidden
                 truncate
                 text-[8px]
-                font-semibold
+                font-bold
                 uppercase
                 tracking-[0.18em]
-                text-emerald-600
-                dark:text-emerald-400
+                text-emerald-300/60
                 sm:block
                 md:text-[9px]
               "
             >
-              NATURE • HUMANITY • RESPONSIBILITY
-            </span>
+              {lang ===
+              "si"
+                ? "ස්වභාවය • මනුෂ්‍යත්වය • වගකීම"
+                : "NATURE • HUMANITY • RESPONSIBILITY"}
+            </motion.span>
           </div>
         </Link>
 
-        {/* ================= DESKTOP NAV ================= */}
+        {/* =================================================
+            DESKTOP NAV
+        ================================================== */}
 
-        <nav className="hidden items-center gap-5 lg:flex xl:gap-7">
-          {navigation.slice(0, 7).map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="
-                whitespace-nowrap
-                text-[13px]
-                font-semibold
-                text-slate-600
-                transition-colors
-                hover:text-emerald-600
-                dark:text-slate-300
-                dark:hover:text-emerald-400
-              "
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <nav className="hidden items-center gap-1 xl:flex">
+          {mainNavigation.map(
+            (
+              item
+            ) => (
+              <a
+                key={
+                  item.href
+                }
+                href={
+                  item.href
+                }
+                onClick={
+                  handleAnchorClick
+                }
+                className="
+                  relative
+                  rounded-xl
+                  px-3
+                  py-2
+                  text-[12px]
+                  font-bold
+                  text-white/65
+                  transition-all
+                  duration-300
+                  hover:bg-white/[0.05]
+                  hover:text-emerald-300
+                "
+              >
+                {lang ===
+                "si"
+                  ? item.si
+                  : item.en}
+              </a>
+            )
+          )}
 
-        {/* ================= DESKTOP CONTROLS ================= */}
-
-        <div className="hidden shrink-0 items-center gap-2 md:flex">
-          {/* Language */}
-
+          {/* Explore dropdown */}
           <div className="relative">
             <button
               type="button"
               onClick={() => {
-                setIsLangOpen(!isLangOpen);
-                setIsMobileMenuOpen(false);
+                setIsExploreOpen(
+                  (
+                    value
+                  ) =>
+                    !value
+                );
+
+                setIsLanguageOpen(
+                  false
+                );
               }}
               className="
-                flex
+                inline-flex
                 items-center
                 gap-1.5
-                rounded-full
-                bg-slate-100
-                px-3.5
+                rounded-xl
+                px-3
                 py-2
-                text-xs
+                text-[12px]
                 font-bold
-                transition
-                hover:bg-slate-200
-                active:scale-95
-                dark:bg-white/10
-                dark:hover:bg-white/15
+                text-white/65
+                transition-all
+                duration-300
+                hover:bg-white/[0.05]
+                hover:text-emerald-300
               "
             >
-              <span className="text-emerald-600 dark:text-emerald-400">
-                {lang === "en" ? "EN" : "SI"}
-              </span>
+              {lang ===
+              "si"
+                ? "තවත්"
+                : "Explore"}
 
               <ChevronDown
-                size={14}
+                size={
+                  13
+                }
                 className={`
                   transition-transform
-                  ${isLangOpen ? "rotate-180" : ""}
+                  duration-300
+                  ${
+                    isExploreOpen
+                      ? "rotate-180"
+                      : ""
+                  }
                 `}
               />
             </button>
 
             <AnimatePresence>
-              {isLangOpen && (
+              {isExploreOpen && (
                 <motion.div
                   initial={{
                     opacity: 0,
                     y: 8,
-                    scale: 0.96,
+                    scale: 0.97,
                   }}
                   animate={{
                     opacity: 1,
@@ -334,64 +587,383 @@ export default function Header() {
                   exit={{
                     opacity: 0,
                     y: 8,
-                    scale: 0.96,
+                    scale: 0.97,
+                  }}
+                  transition={{
+                    duration:
+                      0.2,
+                    ease: "easeOut",
                   }}
                   className="
                     absolute
                     right-0
-                    top-full
-                    mt-3
-                    w-32
+                    top-[calc(100%+10px)]
+                    w-[260px]
                     overflow-hidden
-                    rounded-2xl
+                    rounded-[22px]
                     border
-                    border-slate-200
-                    bg-white
-                    shadow-2xl
-                    dark:border-white/10
-                    dark:bg-slate-900
+                    border-white/10
+                    bg-[#07130e]/97
+                    p-2
+                    shadow-[0_25px_70px_rgba(0,0,0,0.35)]
+                    backdrop-blur-2xl
                   "
                 >
+                  <div className="px-3 pb-2 pt-2">
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-300/60">
+                      {lang ===
+                      "si"
+                        ? "සොබා සේනාංකය"
+                        : "Soba Senankaya"}
+                    </p>
+                  </div>
+
+                  <div className="space-y-1">
+                    {exploreNavigation.map(
+                      (
+                        item
+                      ) => {
+                        const Icon =
+                          item.icon;
+
+                        return (
+                          <a
+                            key={
+                              item.href
+                            }
+                            href={
+                              item.href
+                            }
+                            onClick={
+                              handleAnchorClick
+                            }
+                            className="
+                              group
+                              flex
+                              items-center
+                              gap-3
+                              rounded-2xl
+                              px-3
+                              py-3
+                              transition
+                              hover:bg-emerald-400/[0.08]
+                            "
+                          >
+                            <span
+                              className="
+                                flex
+                                h-9
+                                w-9
+                                shrink-0
+                                items-center
+                                justify-center
+                                rounded-xl
+                                bg-emerald-400/[0.07]
+                                text-emerald-300
+                                transition
+                                group-hover:bg-emerald-400/15
+                              "
+                            >
+                              <Icon
+                                size={
+                                  17
+                                }
+                              />
+                            </span>
+
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate text-sm font-bold text-white/85">
+                                {lang ===
+                                "si"
+                                  ? item.si
+                                  : item.en}
+                              </span>
+                            </span>
+
+                            <ArrowRight
+                              size={
+                                15
+                              }
+                              className="
+                                shrink-0
+                                text-white/20
+                                transition-all
+                                group-hover:translate-x-1
+                                group-hover:text-emerald-300
+                              "
+                            />
+                          </a>
+                        );
+                      }
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </nav>
+
+        {/* =================================================
+            DESKTOP CONTROLS
+        ================================================== */}
+
+        <div className="hidden items-center gap-2 md:flex">
+          {/* Language */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setIsLanguageOpen(
+                  (
+                    value
+                  ) =>
+                    !value
+                );
+
+                setIsExploreOpen(
+                  false
+                );
+              }}
+              className="
+                group
+                inline-flex
+                items-center
+                gap-2
+                rounded-full
+                border
+                border-white/10
+                bg-white/[0.045]
+                px-3
+                py-2
+                text-[11px]
+                font-black
+                text-white/80
+                transition-all
+                duration-300
+                hover:border-emerald-300/20
+                hover:bg-white/[0.07]
+              "
+            >
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/10 text-[9px] font-black text-emerald-300">
+                {lang ===
+                "si"
+                  ? "සි"
+                  : "EN"}
+              </span>
+
+              <span>
+                {lang ===
+                "si"
+                  ? "සිංහල"
+                  : "English"}
+              </span>
+
+              <ChevronDown
+                size={
+                  13
+                }
+                className={`
+                  text-white/45
+                  transition-transform
+                  duration-300
+                  ${
+                    isLanguageOpen
+                      ? "rotate-180"
+                      : ""
+                  }
+                `}
+              />
+            </button>
+
+            <AnimatePresence>
+              {isLanguageOpen && (
+                <motion.div
+                  initial={{
+                    opacity: 0,
+                    y: 8,
+                    scale: 0.97,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: 8,
+                    scale: 0.97,
+                  }}
+                  transition={{
+                    duration:
+                      0.2,
+                  }}
+                  className="
+                    absolute
+                    right-0
+                    top-[calc(100%+10px)]
+                    w-[190px]
+                    overflow-hidden
+                    rounded-[22px]
+                    border
+                    border-white/10
+                    bg-[#07130e]/98
+                    p-2
+                    shadow-[0_25px_70px_rgba(0,0,0,0.35)]
+                    backdrop-blur-2xl
+                  "
+                >
+                  <div className="px-3 pb-2 pt-2">
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-300/55">
+                      Language
+                    </p>
+                  </div>
+
                   <button
                     type="button"
-                    onClick={() => changeLanguage("si")}
+                    onClick={() =>
+                      changeLanguage(
+                        "si"
+                      )
+                    }
                     className={`
+                      flex
                       w-full
-                      px-4
+                      items-center
+                      gap-3
+                      rounded-2xl
+                      px-3
                       py-3
                       text-left
-                      text-sm
-                      font-bold
                       transition
                       ${
-                        lang === "si"
-                          ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
-                          : "hover:bg-slate-50 dark:hover:bg-white/5"
+                        lang ===
+                        "si"
+                          ? "bg-emerald-400/10"
+                          : "hover:bg-white/[0.05]"
                       }
                     `}
                   >
-                    සිංහල
+                    <span
+                      className={`
+                        flex
+                        h-9
+                        w-9
+                        items-center
+                        justify-center
+                        rounded-xl
+                        text-xs
+                        font-black
+                        ${
+                          lang ===
+                          "si"
+                            ? "bg-emerald-400 text-emerald-950"
+                            : "bg-white/[0.06] text-white/60"
+                        }
+                      `}
+                    >
+                      සි
+                    </span>
+
+                    <span className="flex-1">
+                      <span
+                        className={`
+                          block
+                          text-sm
+                          font-bold
+                          ${
+                            lang ===
+                            "si"
+                              ? "text-white"
+                              : "text-white/65"
+                          }
+                        `}
+                      >
+                        සිංහල
+                      </span>
+
+                      <span className="text-[10px] text-white/35">
+                        Sinhala
+                      </span>
+                    </span>
+
+                    {lang ===
+                      "si" && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+                    )}
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => changeLanguage("en")}
+                    onClick={() =>
+                      changeLanguage(
+                        "en"
+                      )
+                    }
                     className={`
+                      flex
                       w-full
-                      px-4
+                      items-center
+                      gap-3
+                      rounded-2xl
+                      px-3
                       py-3
                       text-left
-                      text-sm
-                      font-bold
                       transition
                       ${
-                        lang === "en"
-                          ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
-                          : "hover:bg-slate-50 dark:hover:bg-white/5"
+                        lang ===
+                        "en"
+                          ? "bg-emerald-400/10"
+                          : "hover:bg-white/[0.05]"
                       }
                     `}
                   >
-                    English
+                    <span
+                      className={`
+                        flex
+                        h-9
+                        w-9
+                        items-center
+                        justify-center
+                        rounded-xl
+                        text-[10px]
+                        font-black
+                        ${
+                          lang ===
+                          "en"
+                            ? "bg-emerald-400 text-emerald-950"
+                            : "bg-white/[0.06] text-white/60"
+                        }
+                      `}
+                    >
+                      EN
+                    </span>
+
+                    <span className="flex-1">
+                      <span
+                        className={`
+                          block
+                          text-sm
+                          font-bold
+                          ${
+                            lang ===
+                            "en"
+                              ? "text-white"
+                              : "text-white/65"
+                          }
+                        `}
+                      >
+                        English
+                      </span>
+
+                      <span className="text-[10px] text-white/35">
+                        English
+                      </span>
+                    </span>
+
+                    {lang ===
+                      "en" && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+                    )}
                   </button>
                 </motion.div>
               )}
@@ -399,11 +971,20 @@ export default function Header() {
           </div>
 
           {/* Theme */}
-
-          <button
+          <motion.button
             type="button"
-            onClick={toggleTheme}
-            aria-label="Toggle dark mode"
+            whileTap={{
+              scale: 0.9,
+            }}
+            onClick={
+              toggleTheme
+            }
+            aria-label={
+              lang ===
+              "si"
+                ? "තේමාව වෙනස් කරන්න"
+                : "Toggle theme"
+            }
             className="
               flex
               h-9
@@ -411,14 +992,14 @@ export default function Header() {
               items-center
               justify-center
               rounded-full
-              bg-slate-100
-              text-slate-600
+              border
+              border-white/10
+              bg-white/[0.045]
+              text-white/65
               transition
-              hover:bg-slate-200
-              active:scale-90
-              dark:bg-white/10
-              dark:text-slate-300
-              dark:hover:bg-white/15
+              hover:border-emerald-300/20
+              hover:bg-white/[0.07]
+              hover:text-emerald-300
             "
           >
             {mounted ? (
@@ -427,11 +1008,15 @@ export default function Header() {
                 initial={false}
               >
                 <motion.div
-                  key={resolvedTheme}
+                  key={
+                    resolvedTheme
+                  }
                   initial={{
                     opacity: 0,
-                    rotate: -45,
-                    scale: 0.7,
+                    rotate:
+                      -45,
+                    scale:
+                      0.7,
                   }}
                   animate={{
                     opacity: 1,
@@ -440,36 +1025,68 @@ export default function Header() {
                   }}
                   exit={{
                     opacity: 0,
-                    rotate: 45,
-                    scale: 0.7,
+                    rotate:
+                      45,
+                    scale:
+                      0.7,
+                  }}
+                  transition={{
+                    duration:
+                      0.2,
                   }}
                 >
-                  {resolvedTheme === "dark" ? (
-                    <Sun size={17} />
+                  {resolvedTheme ===
+                  "dark" ? (
+                    <Sun
+                      size={
+                        16
+                      }
+                    />
                   ) : (
-                    <Moon size={17} />
+                    <Moon
+                      size={
+                        16
+                      }
+                    />
                   )}
                 </motion.div>
               </AnimatePresence>
             ) : (
-              <div className="h-[17px] w-[17px]" />
+              <div className="h-4 w-4" />
             )}
-          </button>
+          </motion.button>
         </div>
 
-        {/* ================= MOBILE BUTTON ================= */}
+        {/* =================================================
+            MOBILE MENU BUTTON
+        ================================================== */}
 
-        <button
+        <motion.button
           type="button"
+          whileTap={{
+            scale: 0.9,
+          }}
+          onClick={() => {
+            setIsMobileOpen(
+              (
+                value
+              ) =>
+                !value
+            );
+
+            setIsLanguageOpen(
+              false
+            );
+
+            setIsExploreOpen(
+              false
+            );
+          }}
           aria-label={
-            isMobileMenuOpen
+            isMobileOpen
               ? "Close menu"
               : "Open menu"
           }
-          onClick={() => {
-            setIsMobileMenuOpen(!isMobileMenuOpen);
-            setIsLangOpen(false);
-          }}
           className="
             flex
             h-10
@@ -478,25 +1095,77 @@ export default function Header() {
             items-center
             justify-center
             rounded-full
-            text-slate-900
-            transition
-            active:scale-90
+            border
+            border-white/10
+            bg-white/[0.04]
+            text-white
             md:hidden
-            dark:text-white
           "
         >
-          {isMobileMenuOpen ? (
-            <X size={25} />
-          ) : (
-            <Menu size={25} />
-          )}
-        </button>
+          <AnimatePresence
+            mode="wait"
+            initial={false}
+          >
+            {isMobileOpen ? (
+              <motion.div
+                key="close"
+                initial={{
+                  opacity: 0,
+                  rotate:
+                    -90,
+                  scale:
+                    0.7,
+                }}
+                animate={{
+                  opacity: 1,
+                  rotate: 0,
+                  scale: 1,
+                }}
+                exit={{
+                  opacity: 0,
+                  rotate:
+                    90,
+                  scale:
+                    0.7,
+                }}
+              >
+                <X size={23} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="menu"
+                initial={{
+                  opacity: 0,
+                  rotate: 90,
+                  scale:
+                    0.7,
+                }}
+                animate={{
+                  opacity: 1,
+                  rotate: 0,
+                  scale: 1,
+                }}
+                exit={{
+                  opacity: 0,
+                  rotate:
+                    -90,
+                  scale:
+                    0.7,
+                }}
+              >
+                <Menu size={24} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.button>
       </div>
 
-      {/* ================= MOBILE MENU ================= */}
+      {/* =====================================================
+          MOBILE MENU
+      ====================================================== */}
 
       <AnimatePresence>
-        {isMobileMenuOpen && (
+        {isMobileOpen && (
           <motion.div
             initial={{
               opacity: 0,
@@ -511,105 +1180,214 @@ export default function Header() {
               height: 0,
             }}
             transition={{
-              duration: 0.2,
+              duration: 0.28,
               ease: "easeOut",
             }}
             className="
-              max-h-[calc(100vh-68px)]
-              overflow-y-auto
+              overflow-hidden
               border-t
-              border-slate-200/70
-              bg-white
+              border-white/[0.07]
+              bg-[#06110c]/98
+              backdrop-blur-2xl
               md:hidden
-              dark:border-white/10
-              dark:bg-[#07110d]
             "
           >
-            <div className="px-5 pb-7 pt-4">
-              <nav className="flex flex-col">
-                {navigation.map((item, index) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={closeMobileMenu}
-                    className="
-                      flex
-                      items-center
-                      justify-between
-                      border-b
-                      border-slate-100
-                      py-4
-                      text-[16px]
-                      font-bold
-                      text-slate-800
-                      transition-colors
-                      hover:text-emerald-600
-                      dark:border-white/5
-                      dark:text-slate-200
-                      dark:hover:text-emerald-400
-                    "
-                  >
-                    <span>
-                      {item.label}
-                    </span>
+            <div className="max-h-[calc(100vh-64px)] overflow-y-auto px-4 pb-6 pt-3">
+              {/* =================================================
+                  HOME
+              ================================================== */}
 
-                    <span
-                      className="
-                        text-xs
-                        font-bold
-                        text-slate-300
-                        dark:text-slate-600
-                      "
-                    >
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                  </Link>
-                ))}
-              </nav>
-
-              {/* Mobile Controls */}
-
-              <div
+              <Link
+                href="/"
+                onClick={
+                  closeAll
+                }
                 className="
-                  mt-5
                   flex
                   items-center
                   justify-between
-                  gap-4
                   rounded-2xl
-                  bg-slate-50
-                  p-3
-                  dark:bg-white/[0.04]
+                  px-4
+                  py-3.5
+                  text-[15px]
+                  font-black
+                  text-white
+                  transition
+                  hover:bg-white/[0.05]
                 "
               >
-                {/* Language */}
+                <span>
+                  {lang ===
+                  "si"
+                    ? "මුල් පිටුව"
+                    : "Home"}
+                </span>
 
-                <div
-                  className="
-                    flex
-                    items-center
-                    gap-1
-                    rounded-full
-                    bg-white
-                    p-1
-                    shadow-sm
-                    dark:bg-slate-900
-                  "
-                >
+                <ArrowRight
+                  size={
+                    16
+                  }
+                  className="text-emerald-300/60"
+                />
+              </Link>
+
+              {/* =================================================
+                  MAIN NAV
+              ================================================== */}
+
+              <div className="mt-2 space-y-1">
+                {mainNavigation.map(
+                  (
+                    item,
+                    index
+                  ) => (
+                    <a
+                      key={
+                        item.href
+                      }
+                      href={
+                        item.href
+                      }
+                      onClick={
+                        handleAnchorClick
+                      }
+                      className="
+                        flex
+                        items-center
+                        justify-between
+                        rounded-2xl
+                        px-4
+                        py-3.5
+                        transition
+                        hover:bg-white/[0.05]
+                      "
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-black text-emerald-300/40">
+                          {String(
+                            index +
+                              1
+                          ).padStart(
+                            2,
+                            "0"
+                          )}
+                        </span>
+
+                        <span className="text-[15px] font-bold text-white/80">
+                          {lang ===
+                          "si"
+                            ? item.si
+                            : item.en}
+                        </span>
+                      </div>
+
+                      <ArrowRight
+                        size={
+                          15
+                        }
+                        className="text-white/20"
+                      />
+                    </a>
+                  )
+                )}
+              </div>
+
+              {/* =================================================
+                  EXPLORE SECTION
+              ================================================== */}
+
+              <div className="mt-3 border-t border-white/[0.06] pt-3">
+                <p className="px-4 pb-2 text-[9px] font-black uppercase tracking-[0.22em] text-emerald-300/50">
+                  {lang ===
+                  "si"
+                    ? "තවත් කොටස්"
+                    : "More sections"}
+                </p>
+
+                <div className="grid gap-1">
+                  {exploreNavigation.map(
+                    (
+                      item
+                    ) => {
+                      const Icon =
+                        item.icon;
+
+                      return (
+                        <a
+                          key={
+                            item.href
+                          }
+                          href={
+                            item.href
+                          }
+                          onClick={
+                            handleAnchorClick
+                          }
+                          className="
+                            flex
+                            items-center
+                            gap-3
+                            rounded-2xl
+                            px-4
+                            py-3.5
+                            transition
+                            hover:bg-emerald-400/[0.06]
+                          "
+                        >
+                          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-400/[0.07] text-emerald-300">
+                            <Icon
+                              size={
+                                17
+                              }
+                            />
+                          </span>
+
+                          <span className="flex-1 text-[14px] font-bold text-white/75">
+                            {lang ===
+                            "si"
+                              ? item.si
+                              : item.en}
+                          </span>
+
+                          <ArrowRight
+                            size={
+                              15
+                            }
+                            className="text-white/20"
+                          />
+                        </a>
+                      );
+                    }
+                  )}
+                </div>
+              </div>
+
+              {/* =================================================
+                  CONTROLS
+              ================================================== */}
+
+              <div className="mt-4 flex items-center justify-between rounded-[22px] border border-white/[0.06] bg-white/[0.025] p-3">
+                {/* Language */}
+                <div className="flex items-center gap-1 rounded-full bg-black/20 p-1">
                   <button
                     type="button"
-                    onClick={() => setLang("si")}
+                    onClick={() =>
+                      setLang(
+                        "si"
+                      )
+                    }
                     className={`
                       rounded-full
                       px-4
                       py-2
                       text-xs
-                      font-bold
+                      font-black
                       transition
                       ${
-                        lang === "si"
-                          ? "bg-emerald-500 text-white shadow"
-                          : "text-slate-500 dark:text-slate-400"
+                        lang ===
+                        "si"
+                          ? "bg-emerald-400 text-emerald-950 shadow-[0_6px_20px_rgba(52,211,153,0.15)]"
+                          : "text-white/45"
                       }
                     `}
                   >
@@ -618,18 +1396,23 @@ export default function Header() {
 
                   <button
                     type="button"
-                    onClick={() => setLang("en")}
+                    onClick={() =>
+                      setLang(
+                        "en"
+                      )
+                    }
                     className={`
                       rounded-full
                       px-4
                       py-2
                       text-xs
-                      font-bold
+                      font-black
                       transition
                       ${
-                        lang === "en"
-                          ? "bg-emerald-500 text-white shadow"
-                          : "text-slate-500 dark:text-slate-400"
+                        lang ===
+                        "en"
+                          ? "bg-emerald-400 text-emerald-950 shadow-[0_6px_20px_rgba(52,211,153,0.15)]"
+                          : "text-white/45"
                       }
                     `}
                   >
@@ -638,11 +1421,11 @@ export default function Header() {
                 </div>
 
                 {/* Theme */}
-
                 <button
                   type="button"
-                  onClick={toggleTheme}
-                  aria-label="Toggle dark mode"
+                  onClick={
+                    toggleTheme
+                  }
                   className="
                     flex
                     h-10
@@ -650,57 +1433,74 @@ export default function Header() {
                     items-center
                     justify-center
                     rounded-full
-                    bg-white
-                    shadow-sm
-                    active:scale-90
-                    dark:bg-slate-900
+                    bg-white/[0.05]
+                    text-white/65
+                    transition
+                    hover:bg-white/[0.08]
                   "
                 >
                   {mounted &&
-                  resolvedTheme === "dark" ? (
+                  resolvedTheme ===
+                    "dark" ? (
                     <Sun
-                      size={20}
-                      className="text-amber-500"
+                      size={
+                        18
+                      }
+                      className="text-amber-300"
                     />
                   ) : (
                     <Moon
-                      size={20}
-                      className="text-indigo-500"
+                      size={
+                        18
+                      }
+                      className="text-indigo-300"
                     />
                   )}
                 </button>
               </div>
 
-              {/* Join Button */}
+              {/* =================================================
+                  CTA
+              ================================================== */}
 
-              <Link
+              <a
                 href="#membership"
-                onClick={closeMobileMenu}
+                onClick={
+                  handleAnchorClick
+                }
                 className="
                   mt-4
-                  block
+                  flex
+                  items-center
+                  justify-center
+                  gap-2
                   rounded-2xl
-                  bg-emerald-600
+                  bg-emerald-400
                   px-5
                   py-3.5
-                  text-center
                   text-sm
                   font-black
-                  text-white
-                  shadow-lg
-                  shadow-emerald-600/20
+                  text-emerald-950
+                  shadow-[0_12px_40px_rgba(52,211,153,0.14)]
                   transition
-                  active:scale-[0.98]
+                  hover:bg-emerald-300
                 "
               >
-                {lang === "si"
+                {lang ===
+                "si"
                   ? "සොබා ආරක්ෂකයෙක් වන්න"
                   : "Become a Guardian"}
-              </Link>
+
+                <ArrowRight
+                  size={
+                    17
+                  }
+                />
+              </a>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </header>
   );
-            }
+                          }
