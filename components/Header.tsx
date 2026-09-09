@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "next-themes";
 
@@ -30,6 +31,74 @@ import {
 } from "framer-motion";
 
 /* =========================================================
+   TYPES
+========================================================= */
+
+type SectionItem = {
+  id: string;
+  si: string;
+  en: string;
+};
+
+type ExploreItem = SectionItem & {
+  icon: typeof Leaf;
+};
+
+/* =========================================================
+   CONSTANTS
+========================================================= */
+
+const mainNavigation: SectionItem[] = [
+  {
+    id: "about",
+    si: "හැඳින්වීම",
+    en: "Introduction",
+  },
+  {
+    id: "vision",
+    si: "දැක්ම",
+    en: "Vision",
+  },
+  {
+    id: "mission",
+    si: "මෙහෙවර",
+    en: "Mission",
+  },
+  {
+    id: "objectives",
+    si: "අරමුණු",
+    en: "Objectives",
+  },
+];
+
+const exploreNavigation: ExploreItem[] = [
+  {
+    id: "action",
+    si: "ක්‍රියාකාරීත්වය",
+    en: "Activities",
+    icon: Leaf,
+  },
+  {
+    id: "membership",
+    si: "සාමාජිකත්වය",
+    en: "Membership",
+    icon: Users,
+  },
+  {
+    id: "message",
+    si: "ස්වභාවධර්මයේ පණිවිඩය",
+    en: "Message of Nature",
+    icon: ShieldCheck,
+  },
+  {
+    id: "comments",
+    si: "අදහස් හා යෝජනා",
+    en: "Ideas & Suggestions",
+    icon: MessageCircle,
+  },
+];
+
+/* =========================================================
    HEADER
 ========================================================= */
 
@@ -43,6 +112,12 @@ export default function Header() {
     setTheme,
     resolvedTheme,
   } = useTheme();
+
+  const pathname =
+    usePathname();
+
+  const router =
+    useRouter();
 
   const [
     mounted,
@@ -73,6 +148,16 @@ export default function Header() {
     useRef<HTMLElement>(null);
 
   /* =======================================================
+     FONT STYLE
+  ======================================================== */
+
+  const sinhalaFont =
+    "'Noto Sans Sinhala', 'Iskoola Pota', 'Nirmala UI', sans-serif";
+
+  const englishFont =
+    "'Inter', 'Segoe UI', system-ui, sans-serif";
+
+  /* =======================================================
      MOUNT
   ======================================================== */
 
@@ -81,14 +166,15 @@ export default function Header() {
   }, []);
 
   /* =======================================================
-     SCROLL EFFECT
+     HEADER SCROLL STATE
   ======================================================== */
 
   useEffect(() => {
     const handleScroll =
       () => {
         setScrolled(
-          window.scrollY > 12
+          window.scrollY >
+            12
         );
       };
 
@@ -187,7 +273,7 @@ export default function Header() {
   }, [isMobileOpen]);
 
   /* =======================================================
-     HELPERS
+     CLOSE ALL MENUS
   ======================================================== */
 
   const closeAll =
@@ -205,6 +291,10 @@ export default function Header() {
       );
     };
 
+  /* =======================================================
+     THEME
+  ======================================================== */
+
   const toggleTheme =
     () => {
       setTheme(
@@ -214,6 +304,10 @@ export default function Header() {
           : "dark"
       );
     };
+
+  /* =======================================================
+     LANGUAGE
+  ======================================================== */
 
   const changeLanguage =
     (
@@ -228,67 +322,122 @@ export default function Header() {
       );
     };
 
-  /*
-   * Same-page anchor helper.
-   */
-  const handleAnchorClick =
-    () => {
+  /* =======================================================
+     EXACT SECTION SCROLL
+  ======================================================== */
+
+  const scrollToSection =
+    async (
+      id: string
+    ) => {
+      /*
+       * Close menus first.
+       */
       closeAll();
+
+      /*
+       * Small timeout allows the
+       * mobile menu animation/state
+       * to begin closing before scroll.
+       */
+      await new Promise(
+        (resolve) =>
+          window.setTimeout(
+            resolve,
+            40
+          )
+      );
+
+      /*
+       * If user is on another page,
+       * go home first and preserve hash.
+       */
+      if (
+        pathname !== "/"
+      ) {
+        router.push(
+          `/#${id}`
+        );
+
+        return;
+      }
+
+      const element =
+        document.getElementById(
+          id
+        );
+
+      if (!element) {
+        return;
+      }
+
+      /*
+       * Read actual sticky header height.
+       */
+      const headerHeight =
+        headerRef.current?.getBoundingClientRect()
+          .height ?? 68;
+
+      /*
+       * Extra breathing room.
+       */
+      const extraSpace = 14;
+
+      /*
+       * Exact absolute position.
+       */
+      const targetY =
+        element.getBoundingClientRect()
+          .top +
+        window.scrollY -
+        headerHeight -
+        extraSpace;
+
+      window.scrollTo({
+        top: Math.max(
+          0,
+          targetY
+        ),
+        behavior:
+          "smooth",
+      });
+
+      /*
+       * Update URL hash without
+       * triggering native browser jump.
+       */
+      try {
+        window.history.replaceState(
+          null,
+          "",
+          `#${id}`
+        );
+      } catch {
+        // Ignore history errors.
+      }
     };
 
   /* =======================================================
-     MAIN NAVIGATION
+     MOBILE HOME
   ======================================================== */
 
-  const mainNavigation = [
-    {
-      href: "#about",
-      si: "හැඳින්වීම",
-      en: "Introduction",
-    },
-    {
-      href: "#vision",
-      si: "දැක්ම",
-      en: "Vision",
-    },
-    {
-      href: "#mission",
-      si: "මෙහෙවර",
-      en: "Mission",
-    },
-    {
-      href: "#objectives",
-      si: "අරමුණු",
-      en: "Objectives",
-    },
-  ];
+  const handleHome =
+    () => {
+      closeAll();
 
-  const exploreNavigation = [
-    {
-      href: "#action",
-      si: "ක්‍රියාකාරීත්වය",
-      en: "Activities",
-      icon: Leaf,
-    },
-    {
-      href: "#membership",
-      si: "සාමාජිකත්වය",
-      en: "Membership",
-      icon: Users,
-    },
-    {
-      href: "#message",
-      si: "ස්වභාවධර්මයේ පණිවිඩය",
-      en: "Message of Nature",
-      icon: ShieldCheck,
-    },
-    {
-      href: "#comments",
-      si: "අදහස් හා යෝජනා",
-      en: "Ideas & Suggestions",
-      icon: MessageCircle,
-    },
-  ];
+      if (
+        pathname !== "/"
+      ) {
+        router.push("/");
+        return;
+      }
+
+      window.scrollTo({
+        top: 0,
+        behavior:
+          "smooth",
+      });
+    };
 
   /* =======================================================
      RENDER
@@ -306,14 +455,25 @@ export default function Header() {
         duration-500
         ${
           scrolled
-            ? "border-b border-white/[0.08] bg-[#04100b]/95 shadow-[0_14px_45px_rgba(0,0,0,0.18)] backdrop-blur-2xl"
-            : "border-b border-white/[0.05] bg-[#04100b]/82 backdrop-blur-xl"
+            ? `
+              border-b
+              border-white/[0.09]
+              bg-[#04100b]/96
+              shadow-[0_14px_45px_rgba(0,0,0,0.20)]
+              backdrop-blur-2xl
+            `
+            : `
+              border-b
+              border-white/[0.05]
+              bg-[#04100b]/88
+              backdrop-blur-xl
+            `
         }
       `}
     >
-      {/* ===================================================
-          TOP HEADER
-      ==================================================== */}
+      {/* =====================================================
+          MAIN BAR
+      ====================================================== */}
 
       <div
         className="
@@ -335,26 +495,36 @@ export default function Header() {
             BRAND
         ================================================== */}
 
-        <Link
-          href="/"
+        <button
+          type="button"
           onClick={
-            closeAll
+            handleHome
           }
           className="
             group
             flex
             min-w-0
+            shrink
             items-center
             gap-3
+            text-left
           "
+          aria-label={
+            lang === "si"
+              ? "මුල් පිටුව"
+              : "Home"
+          }
         >
           {/* Logo */}
           <motion.div
             whileHover={{
-              scale: 1.04,
+              scale: 1.045,
+            }}
+            whileTap={{
+              scale: 0.97,
             }}
             transition={{
-              duration: 0.25,
+              duration: 0.22,
             }}
             className="
               relative
@@ -370,27 +540,34 @@ export default function Header() {
               border-emerald-300/30
               bg-black/20
               p-1
-              shadow-[0_0_26px_rgba(16,185,129,0.12)]
+              shadow-[0_0_28px_rgba(16,185,129,0.10)]
               sm:h-11
               sm:w-11
             "
           >
             <motion.div
               animate={{
-                rotate: [0, 2, 0, -2, 0],
+                rotate: [
+                  0,
+                  1.5,
+                  0,
+                  -1.5,
+                  0,
+                ],
               }}
               transition={{
-                duration: 6,
+                duration: 7,
                 repeat:
                   Infinity,
-                ease: "easeInOut",
+                ease:
+                  "easeInOut",
               }}
               className="
                 absolute
                 inset-0
                 rounded-full
                 border
-                border-emerald-400/10
+                border-emerald-300/10
               "
             />
 
@@ -416,55 +593,84 @@ export default function Header() {
           {/* Brand text */}
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span
+              <motion.span
+                key={`brand-${lang}`}
+                initial={{
+                  opacity: 0,
+                  y: 3,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                transition={{
+                  duration:
+                    0.3,
+                }}
                 className="
                   block
+                  max-w-[190px]
                   truncate
                   text-[17px]
-                  font-black
-                  tracking-[-0.025em]
+                  font-bold
+                  leading-tight
+                  tracking-[-0.02em]
                   text-white
+                  sm:max-w-none
                   sm:text-xl
                 "
+                style={{
+                  fontFamily:
+                    lang ===
+                    "si"
+                      ? sinhalaFont
+                      : englishFont,
+                  fontWeight:
+                    lang ===
+                    "si"
+                      ? 700
+                      : 800,
+                }}
               >
                 {lang ===
                 "si"
                   ? "සොබා සේනාංකය"
                   : "Soba Senankaya"}
-              </span>
+              </motion.span>
 
               <Sparkles
                 size={13}
                 className="
                   hidden
                   shrink-0
-                  text-emerald-300/80
+                  text-emerald-300/75
                   sm:block
                 "
               />
             </div>
 
             <motion.span
-              key={lang}
+              key={`tag-${lang}`}
               initial={{
                 opacity: 0,
-                y: 3,
+                y: 2,
               }}
               animate={{
                 opacity: 1,
                 y: 0,
               }}
               transition={{
-                duration: 0.25,
+                duration:
+                  0.3,
               }}
               className="
                 hidden
                 truncate
                 text-[8px]
-                font-bold
+                font-semibold
                 uppercase
-                tracking-[0.18em]
-                text-emerald-300/60
+                tracking-[0.19em]
+                text-emerald-300/55
                 sm:block
                 md:text-[9px]
               "
@@ -475,26 +681,26 @@ export default function Header() {
                 : "NATURE • HUMANITY • RESPONSIBILITY"}
             </motion.span>
           </div>
-        </Link>
+        </button>
 
         {/* =================================================
             DESKTOP NAV
         ================================================== */}
 
-        <nav className="hidden items-center gap-1 xl:flex">
+        <nav className="hidden items-center gap-0.5 xl:flex">
           {mainNavigation.map(
             (
               item
             ) => (
-              <a
+              <button
                 key={
-                  item.href
+                  item.id
                 }
-                href={
-                  item.href
-                }
-                onClick={
-                  handleAnchorClick
+                type="button"
+                onClick={() =>
+                  scrollToSection(
+                    item.id
+                  )
                 }
                 className="
                   relative
@@ -502,23 +708,33 @@ export default function Header() {
                   px-3
                   py-2
                   text-[12px]
-                  font-bold
-                  text-white/65
+                  font-semibold
+                  text-white/62
                   transition-all
                   duration-300
-                  hover:bg-white/[0.05]
+                  hover:bg-white/[0.055]
                   hover:text-emerald-300
                 "
+                style={{
+                  fontFamily:
+                    lang ===
+                    "si"
+                      ? sinhalaFont
+                      : englishFont,
+                }}
               >
                 {lang ===
                 "si"
                   ? item.si
                   : item.en}
-              </a>
+              </button>
             )
           )}
 
-          {/* Explore dropdown */}
+          {/* =================================================
+              EXPLORE
+          ================================================== */}
+
           <div className="relative">
             <button
               type="button"
@@ -542,33 +758,40 @@ export default function Header() {
                 px-3
                 py-2
                 text-[12px]
-                font-bold
-                text-white/65
+                font-semibold
+                text-white/62
                 transition-all
                 duration-300
-                hover:bg-white/[0.05]
+                hover:bg-white/[0.055]
                 hover:text-emerald-300
               "
+              style={{
+                fontFamily:
+                  lang ===
+                  "si"
+                    ? sinhalaFont
+                    : englishFont,
+              }}
             >
               {lang ===
               "si"
                 ? "තවත්"
                 : "Explore"}
 
-              <ChevronDown
-                size={
-                  13
-                }
-                className={`
-                  transition-transform
-                  duration-300
-                  ${
+              <motion.span
+                animate={{
+                  rotate:
                     isExploreOpen
-                      ? "rotate-180"
-                      : ""
+                      ? 180
+                      : 0,
+                }}
+              >
+                <ChevronDown
+                  size={
+                    13
                   }
-                `}
-              />
+                />
+              </motion.span>
             </button>
 
             <AnimatePresence>
@@ -576,7 +799,7 @@ export default function Header() {
                 <motion.div
                   initial={{
                     opacity: 0,
-                    y: 8,
+                    y: 10,
                     scale: 0.97,
                   }}
                   animate={{
@@ -591,30 +814,38 @@ export default function Header() {
                   }}
                   transition={{
                     duration:
-                      0.2,
+                      0.22,
                     ease: "easeOut",
                   }}
                   className="
                     absolute
                     right-0
                     top-[calc(100%+10px)]
-                    w-[260px]
+                    w-[270px]
                     overflow-hidden
-                    rounded-[22px]
+                    rounded-[24px]
                     border
                     border-white/10
-                    bg-[#07130e]/97
+                    bg-[#07140e]/98
                     p-2
-                    shadow-[0_25px_70px_rgba(0,0,0,0.35)]
+                    shadow-[0_25px_80px_rgba(0,0,0,0.38)]
                     backdrop-blur-2xl
                   "
                 >
                   <div className="px-3 pb-2 pt-2">
-                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-300/60">
+                    <p
+                      className="
+                        text-[9px]
+                        font-bold
+                        uppercase
+                        tracking-[0.22em]
+                        text-emerald-300/50
+                      "
+                    >
                       {lang ===
                       "si"
-                        ? "සොබා සේනාංකය"
-                        : "Soba Senankaya"}
+                        ? "වේගවත් ප්‍රවේශය"
+                        : "Quick Access"}
                     </p>
                   </div>
 
@@ -627,26 +858,31 @@ export default function Header() {
                           item.icon;
 
                         return (
-                          <a
+                          <motion.button
                             key={
-                              item.href
+                              item.id
                             }
-                            href={
-                              item.href
-                            }
-                            onClick={
-                              handleAnchorClick
+                            type="button"
+                            whileHover={{
+                              x: 2,
+                            }}
+                            onClick={() =>
+                              scrollToSection(
+                                item.id
+                              )
                             }
                             className="
                               group
                               flex
+                              w-full
                               items-center
                               gap-3
                               rounded-2xl
                               px-3
                               py-3
+                              text-left
                               transition
-                              hover:bg-emerald-400/[0.08]
+                              hover:bg-emerald-400/[0.07]
                             "
                           >
                             <span
@@ -672,7 +908,22 @@ export default function Header() {
                             </span>
 
                             <span className="min-w-0 flex-1">
-                              <span className="block truncate text-sm font-bold text-white/85">
+                              <span
+                                className="
+                                  block
+                                  truncate
+                                  text-[13px]
+                                  font-semibold
+                                  text-white/82
+                                "
+                                style={{
+                                  fontFamily:
+                                    lang ===
+                                    "si"
+                                      ? sinhalaFont
+                                      : englishFont,
+                                }}
+                              >
                                 {lang ===
                                 "si"
                                   ? item.si
@@ -692,7 +943,7 @@ export default function Header() {
                                 group-hover:text-emerald-300
                               "
                             />
-                          </a>
+                          </motion.button>
                         );
                       }
                     )}
@@ -725,7 +976,6 @@ export default function Header() {
                 );
               }}
               className="
-                group
                 inline-flex
                 items-center
                 gap-2
@@ -736,13 +986,19 @@ export default function Header() {
                 px-3
                 py-2
                 text-[11px]
-                font-black
-                text-white/80
-                transition-all
-                duration-300
+                font-bold
+                text-white/78
+                transition
                 hover:border-emerald-300/20
                 hover:bg-white/[0.07]
               "
+              style={{
+                fontFamily:
+                  lang ===
+                  "si"
+                    ? sinhalaFont
+                    : englishFont,
+              }}
             >
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/10 text-[9px] font-black text-emerald-300">
                 {lang ===
@@ -762,16 +1018,11 @@ export default function Header() {
                 size={
                   13
                 }
-                className={`
-                  text-white/45
-                  transition-transform
-                  duration-300
-                  ${
-                    isLanguageOpen
-                      ? "rotate-180"
-                      : ""
-                  }
-                `}
+                className={`text-white/40 transition-transform duration-300 ${
+                  isLanguageOpen
+                    ? "rotate-180"
+                    : ""
+                }`}
               />
             </button>
 
@@ -801,23 +1052,27 @@ export default function Header() {
                     absolute
                     right-0
                     top-[calc(100%+10px)]
-                    w-[190px]
+                    w-[200px]
                     overflow-hidden
                     rounded-[22px]
                     border
                     border-white/10
-                    bg-[#07130e]/98
+                    bg-[#07140e]/98
                     p-2
                     shadow-[0_25px_70px_rgba(0,0,0,0.35)]
                     backdrop-blur-2xl
                   "
                 >
                   <div className="px-3 pb-2 pt-2">
-                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-300/55">
-                      Language
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-emerald-300/50">
+                      {lang ===
+                      "si"
+                        ? "භාෂාව"
+                        : "Language"}
                     </p>
                   </div>
 
+                  {/* Sinhala */}
                   <button
                     type="button"
                     onClick={() =>
@@ -838,7 +1093,7 @@ export default function Header() {
                       ${
                         lang ===
                         "si"
-                          ? "bg-emerald-400/10"
+                          ? "bg-emerald-400/[0.09]"
                           : "hover:bg-white/[0.05]"
                       }
                     `}
@@ -852,7 +1107,7 @@ export default function Header() {
                         justify-center
                         rounded-xl
                         text-xs
-                        font-black
+                        font-bold
                         ${
                           lang ===
                           "si"
@@ -868,20 +1123,23 @@ export default function Header() {
                       <span
                         className={`
                           block
-                          text-sm
-                          font-bold
+                          text-[13px]
                           ${
                             lang ===
                             "si"
-                              ? "text-white"
-                              : "text-white/65"
+                              ? "font-bold text-white"
+                              : "font-semibold text-white/60"
                           }
                         `}
+                        style={{
+                          fontFamily:
+                            sinhalaFont,
+                        }}
                       >
                         සිංහල
                       </span>
 
-                      <span className="text-[10px] text-white/35">
+                      <span className="text-[10px] text-white/30">
                         Sinhala
                       </span>
                     </span>
@@ -892,6 +1150,7 @@ export default function Header() {
                     )}
                   </button>
 
+                  {/* English */}
                   <button
                     type="button"
                     onClick={() =>
@@ -912,7 +1171,7 @@ export default function Header() {
                       ${
                         lang ===
                         "en"
-                          ? "bg-emerald-400/10"
+                          ? "bg-emerald-400/[0.09]"
                           : "hover:bg-white/[0.05]"
                       }
                     `}
@@ -942,20 +1201,23 @@ export default function Header() {
                       <span
                         className={`
                           block
-                          text-sm
-                          font-bold
+                          text-[13px]
                           ${
                             lang ===
                             "en"
-                              ? "text-white"
-                              : "text-white/65"
+                              ? "font-bold text-white"
+                              : "font-semibold text-white/60"
                           }
                         `}
+                        style={{
+                          fontFamily:
+                            englishFont,
+                        }}
                       >
                         English
                       </span>
 
-                      <span className="text-[10px] text-white/35">
+                      <span className="text-[10px] text-white/30">
                         English
                       </span>
                     </span>
@@ -995,7 +1257,7 @@ export default function Header() {
               border
               border-white/10
               bg-white/[0.045]
-              text-white/65
+              text-white/60
               transition
               hover:border-emerald-300/20
               hover:bg-white/[0.07]
@@ -1136,7 +1398,8 @@ export default function Header() {
                 key="menu"
                 initial={{
                   opacity: 0,
-                  rotate: 90,
+                  rotate:
+                    90,
                   scale:
                     0.7,
                 }}
@@ -1180,7 +1443,7 @@ export default function Header() {
               height: 0,
             }}
             transition={{
-              duration: 0.28,
+              duration: 0.3,
               ease: "easeOut",
             }}
             className="
@@ -1193,30 +1456,34 @@ export default function Header() {
             "
           >
             <div className="max-h-[calc(100vh-64px)] overflow-y-auto px-4 pb-6 pt-3">
-              {/* =================================================
-                  HOME
-              ================================================== */}
-
-              <Link
-                href="/"
+              {/* Home */}
+              <button
+                type="button"
                 onClick={
-                  closeAll
+                  handleHome
                 }
                 className="
                   flex
+                  w-full
                   items-center
                   justify-between
                   rounded-2xl
                   px-4
                   py-3.5
-                  text-[15px]
-                  font-black
+                  text-left
                   text-white
                   transition
                   hover:bg-white/[0.05]
                 "
+                style={{
+                  fontFamily:
+                    lang ===
+                    "si"
+                      ? sinhalaFont
+                      : englishFont,
+                }}
               >
-                <span>
+                <span className="text-[15px] font-bold">
                   {lang ===
                   "si"
                     ? "මුල් පිටුව"
@@ -1229,41 +1496,40 @@ export default function Header() {
                   }
                   className="text-emerald-300/60"
                 />
-              </Link>
+              </button>
 
-              {/* =================================================
-                  MAIN NAV
-              ================================================== */}
-
+              {/* Main navigation */}
               <div className="mt-2 space-y-1">
                 {mainNavigation.map(
                   (
                     item,
                     index
                   ) => (
-                    <a
+                    <button
                       key={
-                        item.href
+                        item.id
                       }
-                      href={
-                        item.href
-                      }
-                      onClick={
-                        handleAnchorClick
+                      type="button"
+                      onClick={() =>
+                        scrollToSection(
+                          item.id
+                        )
                       }
                       className="
                         flex
+                        w-full
                         items-center
                         justify-between
                         rounded-2xl
                         px-4
                         py-3.5
+                        text-left
                         transition
                         hover:bg-white/[0.05]
                       "
                     >
                       <div className="flex items-center gap-3">
-                        <span className="text-[10px] font-black text-emerald-300/40">
+                        <span className="text-[10px] font-black text-emerald-300/35">
                           {String(
                             index +
                               1
@@ -1273,7 +1539,16 @@ export default function Header() {
                           )}
                         </span>
 
-                        <span className="text-[15px] font-bold text-white/80">
+                        <span
+                          className="text-[15px] font-semibold text-white/80"
+                          style={{
+                            fontFamily:
+                              lang ===
+                              "si"
+                                ? sinhalaFont
+                                : englishFont,
+                          }}
+                        >
                           {lang ===
                           "si"
                             ? item.si
@@ -1287,17 +1562,24 @@ export default function Header() {
                         }
                         className="text-white/20"
                       />
-                    </a>
+                    </button>
                   )
                 )}
               </div>
 
-              {/* =================================================
-                  EXPLORE SECTION
-              ================================================== */}
-
+              {/* Explore */}
               <div className="mt-3 border-t border-white/[0.06] pt-3">
-                <p className="px-4 pb-2 text-[9px] font-black uppercase tracking-[0.22em] text-emerald-300/50">
+                <p
+                  className="
+                    px-4
+                    pb-2
+                    text-[9px]
+                    font-bold
+                    uppercase
+                    tracking-[0.22em]
+                    text-emerald-300/45
+                  "
+                >
                   {lang ===
                   "si"
                     ? "තවත් කොටස්"
@@ -1313,28 +1595,41 @@ export default function Header() {
                         item.icon;
 
                       return (
-                        <a
+                        <button
                           key={
-                            item.href
+                            item.id
                           }
-                          href={
-                            item.href
-                          }
-                          onClick={
-                            handleAnchorClick
+                          type="button"
+                          onClick={() =>
+                            scrollToSection(
+                              item.id
+                            )
                           }
                           className="
+                            group
                             flex
+                            w-full
                             items-center
                             gap-3
                             rounded-2xl
                             px-4
                             py-3.5
+                            text-left
                             transition
                             hover:bg-emerald-400/[0.06]
                           "
                         >
-                          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-400/[0.07] text-emerald-300">
+                          <span className="
+                            flex
+                            h-9
+                            w-9
+                            shrink-0
+                            items-center
+                            justify-center
+                            rounded-xl
+                            bg-emerald-400/[0.07]
+                            text-emerald-300
+                          ">
                             <Icon
                               size={
                                 17
@@ -1342,7 +1637,21 @@ export default function Header() {
                             />
                           </span>
 
-                          <span className="flex-1 text-[14px] font-bold text-white/75">
+                          <span
+                            className="
+                              flex-1
+                              text-[14px]
+                              font-semibold
+                              text-white/75
+                            "
+                            style={{
+                              fontFamily:
+                                lang ===
+                                "si"
+                                  ? sinhalaFont
+                                  : englishFont,
+                            }}
+                          >
                             {lang ===
                             "si"
                               ? item.si
@@ -1355,17 +1664,14 @@ export default function Header() {
                             }
                             className="text-white/20"
                           />
-                        </a>
+                        </button>
                       );
                     }
                   )}
                 </div>
               </div>
 
-              {/* =================================================
-                  CONTROLS
-              ================================================== */}
-
+              {/* Controls */}
               <div className="mt-4 flex items-center justify-between rounded-[22px] border border-white/[0.06] bg-white/[0.025] p-3">
                 {/* Language */}
                 <div className="flex items-center gap-1 rounded-full bg-black/20 p-1">
@@ -1381,15 +1687,18 @@ export default function Header() {
                       px-4
                       py-2
                       text-xs
-                      font-black
                       transition
                       ${
                         lang ===
                         "si"
-                          ? "bg-emerald-400 text-emerald-950 shadow-[0_6px_20px_rgba(52,211,153,0.15)]"
-                          : "text-white/45"
+                          ? "bg-emerald-400 font-bold text-emerald-950 shadow-[0_6px_20px_rgba(52,211,153,0.15)]"
+                          : "font-semibold text-white/45"
                       }
                     `}
+                    style={{
+                      fontFamily:
+                        sinhalaFont,
+                    }}
                   >
                     සිං
                   </button>
@@ -1406,15 +1715,18 @@ export default function Header() {
                       px-4
                       py-2
                       text-xs
-                      font-black
                       transition
                       ${
                         lang ===
                         "en"
-                          ? "bg-emerald-400 text-emerald-950 shadow-[0_6px_20px_rgba(52,211,153,0.15)]"
-                          : "text-white/45"
+                          ? "bg-emerald-400 font-bold text-emerald-950 shadow-[0_6px_20px_rgba(52,211,153,0.15)]"
+                          : "font-semibold text-white/45"
                       }
                     `}
+                    style={{
+                      fontFamily:
+                        englishFont,
+                    }}
                   >
                     EN
                   </button>
@@ -1425,6 +1737,12 @@ export default function Header() {
                   type="button"
                   onClick={
                     toggleTheme
+                  }
+                  aria-label={
+                    lang ===
+                    "si"
+                      ? "තේමාව වෙනස් කරන්න"
+                      : "Toggle theme"
                   }
                   className="
                     flex
@@ -1459,18 +1777,18 @@ export default function Header() {
                 </button>
               </div>
 
-              {/* =================================================
-                  CTA
-              ================================================== */}
-
-              <a
-                href="#membership"
-                onClick={
-                  handleAnchorClick
+              {/* CTA */}
+              <button
+                type="button"
+                onClick={() =>
+                  scrollToSection(
+                    "membership"
+                  )
                 }
                 className="
                   mt-4
                   flex
+                  w-full
                   items-center
                   justify-center
                   gap-2
@@ -1479,12 +1797,20 @@ export default function Header() {
                   px-5
                   py-3.5
                   text-sm
-                  font-black
+                  font-bold
                   text-emerald-950
                   shadow-[0_12px_40px_rgba(52,211,153,0.14)]
                   transition
                   hover:bg-emerald-300
+                  active:scale-[0.98]
                 "
+                style={{
+                  fontFamily:
+                    lang ===
+                    "si"
+                      ? sinhalaFont
+                      : englishFont,
+                }}
               >
                 {lang ===
                 "si"
@@ -1496,11 +1822,11 @@ export default function Header() {
                     17
                   }
                 />
-              </a>
+              </button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </header>
   );
-                          }
+                  }
