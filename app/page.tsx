@@ -15,7 +15,7 @@ import {
   Scale,
   TreePine,
   MessageCircle,
-  Facebook,
+  Globe2,
   MessageSquare,
   ArrowRight,
 } from "lucide-react";
@@ -289,6 +289,7 @@ export default function HomePage() {
                 className="shrink-0 text-emerald-600 dark:text-emerald-400"
                 size={24}
               />
+
               <p className="text-sm font-semibold leading-6 text-emerald-800 dark:text-emerald-300">
                 {lang === "si"
                   ? "තනි තනිව වෙනස් වෙමු. අවසානයේ සුන්දර ලොවක් ගොඩනැගේවි."
@@ -308,7 +309,9 @@ export default function HomePage() {
             </span>
 
             <h2 className="mt-2 text-2xl font-black sm:text-3xl">
-              {lang === "si" ? "දැක්ම • මෙහෙවර • අරමුණ" : "Vision • Mission • Purpose"}
+              {lang === "si"
+                ? "දැක්ම • මෙහෙවර • අරමුණ"
+                : "Vision • Mission • Purpose"}
             </h2>
           </div>
 
@@ -530,7 +533,10 @@ export default function HomePage() {
               </h2>
             </div>
 
-            <ArrowRight className="hidden text-emerald-500 sm:block" size={24} />
+            <ArrowRight
+              className="hidden text-emerald-500 sm:block"
+              size={24}
+            />
           </div>
 
           <LatestAnnouncements />
@@ -580,13 +586,14 @@ export default function HomePage() {
           >
             <div className="flex items-center gap-3">
               <div className="rounded-xl bg-blue-100 p-2 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
-                <Facebook size={22} />
+                <Globe2 size={22} />
               </div>
 
               <div>
                 <p className="font-bold">
                   {lang === "si" ? "Facebook පිටුව" : "Facebook Page"}
                 </p>
+
                 <p className="text-xs text-gray-500">
                   {lang === "si"
                     ? "අප සමඟ සම්බන්ධ වන්න"
@@ -611,6 +618,7 @@ export default function HomePage() {
                 <p className="font-bold">
                   {lang === "si" ? "WhatsApp" : "WhatsApp"}
                 </p>
+
                 <p className="text-xs text-gray-500">
                   {lang === "si"
                     ? "අප සමඟ සම්බන්ධ වන්න"
@@ -640,4 +648,4 @@ export default function HomePage() {
       </footer>
     </main>
   );
-              }
+}
