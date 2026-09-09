@@ -26,7 +26,9 @@ interface D1Database {
       run(): Promise<D1RunResult>;
       all<T = unknown>(): Promise<D1AllResult<T>>;
     };
+
     run(): Promise<D1RunResult>;
+    all<T = unknown>(): Promise<D1AllResult<T>>;
   };
 }
 
@@ -39,17 +41,16 @@ interface PagesFunctionContext {
   env: Env;
 }
 
-const SESSION_COOKIE = "ecoguard_admin_session";
+const SESSION_COOKIE =
+  "ecoguard_admin_session";
 
-/*
- * Maximum lengths
- */
 const MAX_NAME_LENGTH = 80;
 const MAX_COMMENT_LENGTH = 1000;
 
-/*
- * JSON helper
- */
+/* =========================================================
+   JSON RESPONSE
+========================================================= */
+
 function json(
   data: unknown,
   status = 200,
@@ -64,25 +65,27 @@ function json(
   });
 }
 
-/*
- * Cookie reader
- */
+/* =========================================================
+   COOKIE
+========================================================= */
+
 function getCookie(
   request: Request,
   name: string
 ): string | null {
-  const cookieHeader = request.headers.get("Cookie");
+  const cookieHeader =
+    request.headers.get("Cookie");
 
   if (!cookieHeader) {
     return null;
   }
 
-  const cookies = cookieHeader.split(";");
+  const cookies =
+    cookieHeader.split(";");
 
   for (const cookie of cookies) {
-    const [key, ...valueParts] = cookie
-      .trim()
-      .split("=");
+    const [key, ...valueParts] =
+      cookie.trim().split("=");
 
     if (key === name) {
       return decodeURIComponent(
@@ -94,9 +97,10 @@ function getCookie(
   return null;
 }
 
-/*
- * Check admin session
- */
+/* =========================================================
+   ADMIN SESSION
+========================================================= */
+
 async function getValidAdminSession(
   DB: D1Database,
   token: string | null
@@ -106,7 +110,10 @@ async function getValidAdminSession(
   }
 
   const result = await DB.prepare(`
-    SELECT token, username, expires_at
+    SELECT
+      token,
+      username,
+      expires_at
     FROM admin_sessions
     WHERE token = ?
     LIMIT 1
@@ -114,15 +121,17 @@ async function getValidAdminSession(
     .bind(token)
     .all<AdminSession>();
 
-  const session = result.results[0];
+  const session =
+    result.results[0];
 
   if (!session) {
     return null;
   }
 
-  const expiresAt = new Date(
-    session.expires_at
-  ).getTime();
+  const expiresAt =
+    new Date(
+      session.expires_at
+    ).getTime();
 
   if (
     Number.isNaN(expiresAt) ||
@@ -141,9 +150,6 @@ async function getValidAdminSession(
   return session;
 }
 
-/*
- * Check whether request is from logged-in admin
- */
 async function requireAdmin(
   request: Request,
   DB: D1Database
@@ -153,27 +159,28 @@ async function requireAdmin(
     SESSION_COOKIE
   );
 
-  return getValidAdminSession(DB, token);
+  return getValidAdminSession(
+    DB,
+    token
+  );
 }
 
-/*
- * Clean text
- */
-function cleanText(value: unknown): string {
+/* =========================================================
+   TEXT CLEANING
+========================================================= */
+
+function cleanText(
+  value: unknown
+): string {
   return String(value ?? "")
     .replace(/\s+/g, " ")
     .trim();
 }
 
-/*
- * GET
- *
- * Public:
- * Returns ALL live comments.
- *
- * Admin:
- * Also returns all comments.
- */
+/* =========================================================
+   GET COMMENTS
+========================================================= */
+
 export async function onRequestGet(
   context: PagesFunctionContext
 ): Promise<Response> {
@@ -192,6 +199,18 @@ export async function onRequestGet(
       );
     }
 
+    /*
+     * All comments are live.
+     *
+     * Old pending comments are also changed
+     * to live automatically here.
+     */
+    await DB.prepare(`
+      UPDATE comments
+      SET status = 'approved'
+      WHERE status != 'approved'
+    `).run();
+
     const result = await DB.prepare(`
       SELECT
         id,
@@ -200,6 +219,7 @@ export async function onRequestGet(
         status,
         created_at
       FROM comments
+      WHERE status = 'approved'
       ORDER BY id DESC
     `).all<Comment>();
 
@@ -223,13 +243,10 @@ export async function onRequestGet(
   }
 }
 
-/*
- * POST
- *
- * Public comment submission.
- *
- * Comment becomes LIVE immediately.
- */
+/* =========================================================
+   POST COMMENT
+========================================================= */
+
 export async function onRequestPost(
   context: PagesFunctionContext
 ): Promise<Response> {
@@ -259,29 +276,37 @@ export async function onRequestPost(
       return json(
         {
           success: false,
-          message: "Invalid JSON request.",
+          message:
+            "Invalid JSON request.",
         },
         400
       );
     }
 
-    const name = cleanText(body.name);
-    const comment = cleanText(body.comment);
+    const name = cleanText(
+      body.name
+    );
 
-    /*
-     * Name validation
-     */
+    const comment = cleanText(
+      body.comment
+    );
+
+    /* Name */
     if (!name) {
       return json(
         {
           success: false,
-          message: "Name is required.",
+          message:
+            "Name is required.",
         },
         400
       );
     }
 
-    if (name.length > MAX_NAME_LENGTH) {
+    if (
+      name.length >
+      MAX_NAME_LENGTH
+    ) {
       return json(
         {
           success: false,
@@ -292,20 +317,22 @@ export async function onRequestPost(
       );
     }
 
-    /*
-     * Comment validation
-     */
+    /* Comment */
     if (!comment) {
       return json(
         {
           success: false,
-          message: "Comment is required.",
+          message:
+            "Comment is required.",
         },
         400
       );
     }
 
-    if (comment.length > MAX_COMMENT_LENGTH) {
+    if (
+      comment.length >
+      MAX_COMMENT_LENGTH
+    ) {
       return json(
         {
           success: false,
@@ -317,51 +344,75 @@ export async function onRequestPost(
     }
 
     /*
-     * Insert directly as LIVE.
-     *
-     * We intentionally do NOT use pending moderation.
+     * Direct LIVE insert.
      */
-    const result = await DB.prepare(`
-      INSERT INTO comments (
-        name,
-        comment,
-        status
-      )
-      VALUES (?, ?, 'approved')
-    `)
-      .bind(name, comment)
-      .run();
+    const insertResult =
+      await DB.prepare(`
+        INSERT INTO comments (
+          name,
+          comment,
+          status
+        )
+        VALUES (?, ?, 'approved')
+      `)
+        .bind(
+          name,
+          comment
+        )
+        .run();
 
-    if (!result.success) {
+    if (
+      !insertResult ||
+      insertResult.success !== true
+    ) {
+      console.error(
+        "D1 insert failed:",
+        insertResult
+      );
+
       return json(
         {
           success: false,
-          message: "Failed to save comment.",
+          message:
+            "Failed to save comment.",
         },
         500
       );
     }
 
     /*
-     * Get the newly created comment
+     * Get latest comment.
      */
-    const latest = await DB.prepare(`
-      SELECT
-        id,
-        name,
-        comment,
-        status,
-        created_at
-      FROM comments
-      ORDER BY id DESC
-      LIMIT 1
-    `).all<Comment>();
+    const latest =
+      await DB.prepare(`
+        SELECT
+          id,
+          name,
+          comment,
+          status,
+          created_at
+        FROM comments
+        WHERE name = ?
+          AND comment = ?
+          AND status = 'approved'
+        ORDER BY id DESC
+        LIMIT 1
+      `)
+        .bind(
+          name,
+          comment
+        )
+        .all<Comment>();
+
+    const savedComment =
+      latest.results[0] ?? null;
 
     return json(
       {
         success: true,
-        message: "Comment added successfully.",
-        comment: latest.results[0] ?? null,
+        message:
+          "Comment added successfully.",
+        comment: savedComment,
       },
       201
     );
@@ -381,13 +432,10 @@ export async function onRequestPost(
   }
 }
 
-/*
- * PUT
- *
- * Admin only.
- *
- * Edit comment.
- */
+/* =========================================================
+   PUT - ADMIN EDIT
+========================================================= */
+
 export async function onRequestPut(
   context: PagesFunctionContext
 ): Promise<Response> {
@@ -406,15 +454,13 @@ export async function onRequestPut(
       );
     }
 
-    /*
-     * Admin authentication
-     */
-    const session = await requireAdmin(
-      request,
-      DB
-    );
+    const admin =
+      await requireAdmin(
+        request,
+        DB
+      );
 
-    if (!session) {
+    if (!admin) {
       return json(
         {
           success: false,
@@ -436,19 +482,25 @@ export async function onRequestPut(
       return json(
         {
           success: false,
-          message: "Invalid JSON request.",
+          message:
+            "Invalid JSON request.",
         },
         400
       );
     }
 
-    const id = Number(body.id);
-    const name = cleanText(body.name);
-    const comment = cleanText(body.comment);
+    const id = Number(
+      body.id
+    );
 
-    /*
-     * ID validation
-     */
+    const name = cleanText(
+      body.name
+    );
+
+    const comment = cleanText(
+      body.comment
+    );
+
     if (
       !Number.isInteger(id) ||
       id <= 0
@@ -456,26 +508,28 @@ export async function onRequestPut(
       return json(
         {
           success: false,
-          message: "Invalid comment ID.",
+          message:
+            "Invalid comment ID.",
         },
         400
       );
     }
 
-    /*
-     * Name validation
-     */
     if (!name) {
       return json(
         {
           success: false,
-          message: "Name is required.",
+          message:
+            "Name is required.",
         },
         400
       );
     }
 
-    if (name.length > MAX_NAME_LENGTH) {
+    if (
+      name.length >
+      MAX_NAME_LENGTH
+    ) {
       return json(
         {
           success: false,
@@ -486,20 +540,21 @@ export async function onRequestPut(
       );
     }
 
-    /*
-     * Comment validation
-     */
     if (!comment) {
       return json(
         {
           success: false,
-          message: "Comment is required.",
+          message:
+            "Comment is required.",
         },
         400
       );
     }
 
-    if (comment.length > MAX_COMMENT_LENGTH) {
+    if (
+      comment.length >
+      MAX_COMMENT_LENGTH
+    ) {
       return json(
         {
           success: false,
@@ -510,51 +565,59 @@ export async function onRequestPut(
       );
     }
 
-    /*
-     * Update
-     */
-    const result = await DB.prepare(`
-      UPDATE comments
-      SET
-        name = ?,
-        comment = ?
-      WHERE id = ?
-    `)
-      .bind(name, comment, id)
-      .run();
+    const updateResult =
+      await DB.prepare(`
+        UPDATE comments
+        SET
+          name = ?,
+          comment = ?,
+          status = 'approved'
+        WHERE id = ?
+      `)
+        .bind(
+          name,
+          comment,
+          id
+        )
+        .run();
 
-    if (!result.success) {
+    if (
+      !updateResult ||
+      updateResult.success !== true
+    ) {
       return json(
         {
           success: false,
-          message: "Failed to update comment.",
+          message:
+            "Failed to update comment.",
         },
         500
       );
     }
 
-    /*
-     * Get updated comment
-     */
-    const updated = await DB.prepare(`
-      SELECT
-        id,
-        name,
-        comment,
-        status,
-        created_at
-      FROM comments
-      WHERE id = ?
-      LIMIT 1
-    `)
-      .bind(id)
-      .all<Comment>();
+    const updated =
+      await DB.prepare(`
+        SELECT
+          id,
+          name,
+          comment,
+          status,
+          created_at
+        FROM comments
+        WHERE id = ?
+        LIMIT 1
+      `)
+        .bind(id)
+        .all<Comment>();
 
-    if (!updated.results[0]) {
+    if (
+      !updated.results[0]
+    ) {
       return json(
         {
           success: false,
-          message: "Comment not found.",
+          message:
+            "Comment not found.",
         },
         404
       );
@@ -562,8 +625,10 @@ export async function onRequestPut(
 
     return json({
       success: true,
-      message: "Comment updated successfully.",
-      comment: updated.results[0],
+      message:
+        "Comment updated successfully.",
+      comment:
+        updated.results[0],
     });
   } catch (error) {
     console.error(
@@ -581,18 +646,17 @@ export async function onRequestPut(
   }
 }
 
-/*
- * DELETE
- *
- * Admin only.
- *
- * Delete comment.
- */
+/* =========================================================
+   DELETE - ADMIN ONLY
+========================================================= */
+
 export async function onRequestDelete(
   context: PagesFunctionContext
 ): Promise<Response> {
   try {
-    const { request, env } = context;
+    const { request, env } =
+      context;
+
     const { DB } = env;
 
     if (!DB) {
@@ -606,15 +670,13 @@ export async function onRequestDelete(
       );
     }
 
-    /*
-     * Admin authentication
-     */
-    const session = await requireAdmin(
-      request,
-      DB
-    );
+    const admin =
+      await requireAdmin(
+        request,
+        DB
+      );
 
-    if (!session) {
+    if (!admin) {
       return json(
         {
           success: false,
@@ -624,18 +686,14 @@ export async function onRequestDelete(
       );
     }
 
-    /*
-     * Read ID
-     *
-     * Supports:
-     * /api/comments?id=123
-     */
     const url = new URL(
       request.url
     );
 
     const id = Number(
-      url.searchParams.get("id")
+      url.searchParams.get(
+        "id"
+      )
     );
 
     if (
@@ -645,49 +703,55 @@ export async function onRequestDelete(
       return json(
         {
           success: false,
-          message: "Invalid comment ID.",
+          message:
+            "Invalid comment ID.",
         },
         400
       );
     }
 
-    /*
-     * Check comment exists
-     */
-    const existing = await DB.prepare(`
-      SELECT id
-      FROM comments
-      WHERE id = ?
-      LIMIT 1
-    `)
-      .bind(id)
-      .all<{ id: number }>();
+    const existing =
+      await DB.prepare(`
+        SELECT id
+        FROM comments
+        WHERE id = ?
+        LIMIT 1
+      `)
+        .bind(id)
+        .all<{
+          id: number;
+        }>();
 
-    if (!existing.results[0]) {
+    if (
+      !existing.results[0]
+    ) {
       return json(
         {
           success: false,
-          message: "Comment not found.",
+          message:
+            "Comment not found.",
         },
         404
       );
     }
 
-    /*
-     * Delete
-     */
-    const result = await DB.prepare(`
-      DELETE FROM comments
-      WHERE id = ?
-    `)
-      .bind(id)
-      .run();
+    const deleteResult =
+      await DB.prepare(`
+        DELETE FROM comments
+        WHERE id = ?
+      `)
+        .bind(id)
+        .run();
 
-    if (!result.success) {
+    if (
+      !deleteResult ||
+      deleteResult.success !== true
+    ) {
       return json(
         {
           success: false,
-          message: "Failed to delete comment.",
+          message:
+            "Failed to delete comment.",
         },
         500
       );
@@ -695,7 +759,8 @@ export async function onRequestDelete(
 
     return json({
       success: true,
-      message: "Comment deleted successfully.",
+      message:
+        "Comment deleted successfully.",
     });
   } catch (error) {
     console.error(
@@ -711,4 +776,4 @@ export async function onRequestDelete(
       500
     );
   }
-}
+  }
