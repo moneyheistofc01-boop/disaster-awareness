@@ -1,26 +1,39 @@
 "use client";
+
 import Link from "next/link";
 import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "next-themes";
-import { Moon, Sun, Menu, X, ChevronDown, Leaf } from "lucide-react";
+import {
+  Moon,
+  Sun,
+  Menu,
+  X,
+  ChevronDown,
+} from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Header() {
   const { lang, setLang, t } = useLanguage();
-  const { theme, setTheme, resolvedTheme } = useTheme(); 
+  const { setTheme, resolvedTheme } = useTheme();
+
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
-  
+
   const headerRef = useRef<HTMLElement>(null);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  // 1. Background Click (එළිය click කරාම Close වීම)
+  /* Close menus when clicking outside */
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
-      if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
+      if (
+        headerRef.current &&
+        !headerRef.current.contains(event.target as Node)
+      ) {
         setIsMobileMenuOpen(false);
         setIsLangOpen(false);
       }
@@ -37,160 +50,657 @@ export default function Header() {
     };
   }, [isMobileMenuOpen, isLangOpen]);
 
-  // 2. Scroll Bug Fix (Scroll කරද්දි Close වීම - Layout Shift එක හදලා තියෙන්නේ)
+  /* Close mobile menu after meaningful scroll */
   useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
-    let startScrollY = 0;
+    if (!isMobileMenuOpen && !isLangOpen) return;
+
+    const startScrollY = window.scrollY;
 
     const handleScroll = () => {
-      // යන්තම් ඇඟිල්ල වැදුණට close වෙන්නේ නෑ, 50px ට වඩා scroll කරොත් විතරක් close වෙනවා.
       if (Math.abs(window.scrollY - startScrollY) > 50) {
         setIsMobileMenuOpen(false);
         setIsLangOpen(false);
       }
     };
 
-    if (isMobileMenuOpen || isLangOpen) {
-      // Menu එක open වෙන animation එක (150ms) ඉවර වෙනකන් ඉඳලා තමයි scroll වෙයිද කියලා බලන්නේ. 
-      // මේකෙන් අර එකපාරට open-close වෙන ලෙඩේ 100% ක් නැති වෙනවා!
-      timeoutId = setTimeout(() => {
-        startScrollY = window.scrollY; // හරියටම open වුණාට පස්සේ තියෙන scroll position එක ගන්නවා
-        window.addEventListener("scroll", handleScroll, { passive: true });
-      }, 250); 
-    }
+    const timer = setTimeout(() => {
+      window.addEventListener("scroll", handleScroll, {
+        passive: true,
+      });
+    }, 250);
 
     return () => {
-      clearTimeout(timeoutId);
+      clearTimeout(timer);
       window.removeEventListener("scroll", handleScroll);
     };
   }, [isMobileMenuOpen, isLangOpen]);
 
-  const toggleLang = (newLang: "en" | "si") => {
-    setLang(newLang);
-    setIsLangOpen(false);
-  };
+  /* Prevent body scrolling while mobile menu is open */
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
 
   const toggleTheme = () => {
     setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
 
+  const changeLanguage = (newLang: "si" | "en") => {
+    setLang(newLang);
+    setIsLangOpen(false);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+    setIsLangOpen(false);
+  };
+
+  const navigation = [
+    {
+      href: "/",
+      label: lang === "si" ? "මුල් පිටුව" : "Home",
+    },
+    {
+      href: "#about",
+      label: lang === "si" ? "හැඳින්වීම" : "Introduction",
+    },
+    {
+      href: "#vision",
+      label: lang === "si" ? "දැක්ම" : "Vision",
+    },
+    {
+      href: "#mission",
+      label: lang === "si" ? "මෙහෙවර" : "Mission",
+    },
+    {
+      href: "#objectives",
+      label: lang === "si" ? "අරමුණු" : "Objectives",
+    },
+    {
+      href: "#action",
+      label: lang === "si" ? "ක්‍රියාකාරීත්වය" : "Activities",
+    },
+    {
+      href: "#membership",
+      label: lang === "si" ? "සාමාජිකත්වය" : "Membership",
+    },
+    {
+      href: "#message",
+      label:
+        lang === "si"
+          ? "ස්වභාවධර්මයේ පණිවිඩය"
+          : "Message of Nature",
+    },
+    {
+      href: "#comments",
+      label:
+        lang === "si"
+          ? "අදහස් හා යෝජනා"
+          : "Ideas & Suggestions",
+    },
+  ];
+
   return (
-    <header 
-      ref={headerRef} 
-      className="sticky top-0 z-50 w-full border-b border-gray-200/40 dark:border-gray-800/40 bg-white/70 dark:bg-gray-950/70 backdrop-blur-2xl transition-all duration-300"
+    <header
+      ref={headerRef}
+      className="
+        sticky top-0 z-[100]
+        w-full
+        border-b border-slate-200/60
+        bg-white/85
+        backdrop-blur-2xl
+        dark:border-white/10
+        dark:bg-[#050c09]/85
+      "
     >
-      <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-        
-        {/* Logo Section */}
-        <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 group">
-          <div className="bg-emerald-100 dark:bg-emerald-900/30 p-1.5 rounded-xl text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
-            <Leaf size={22} strokeWidth={2.5} />
+      <div
+        className="
+          mx-auto
+          flex
+          h-[68px]
+          w-full
+          max-w-7xl
+          items-center
+          justify-between
+          gap-3
+          px-4
+          sm:px-6
+          md:h-[76px]
+          lg:px-8
+        "
+      >
+        {/* ================= LOGO ================= */}
+
+        <Link
+          href="/"
+          onClick={closeMobileMenu}
+          className="
+            flex
+            min-w-0
+            shrink
+            items-center
+            gap-2.5
+            sm:gap-3
+          "
+        >
+          <div
+            className="
+              relative
+              h-11
+              w-11
+              shrink-0
+              overflow-hidden
+              rounded-full
+              border
+              border-emerald-500/30
+              bg-white
+              shadow-md
+              sm:h-12
+              sm:w-12
+            "
+          >
+            <img
+              src="/logo.png"
+              alt="සොබා සේනාංකය"
+              className="
+                h-full
+                w-full
+                object-contain
+              "
+            />
           </div>
-          <span className="text-2xl font-black tracking-tighter text-gray-900 dark:text-white">
-            EcoGuard
-          </span>
+
+          <div className="min-w-0">
+            <span
+              className="
+                block
+                truncate
+                text-[17px]
+                font-black
+                tracking-tight
+                text-slate-900
+                dark:text-white
+                sm:text-xl
+                md:text-2xl
+              "
+            >
+              සොබා සේනාංකය
+            </span>
+
+            <span
+              className="
+                hidden
+                truncate
+                text-[8px]
+                font-semibold
+                uppercase
+                tracking-[0.18em]
+                text-emerald-600
+                dark:text-emerald-400
+                sm:block
+                md:text-[9px]
+              "
+            >
+              NATURE • HUMANITY • RESPONSIBILITY
+            </span>
+          </div>
         </Link>
-        
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex gap-8 items-center">
-          <Link href="/" className="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
-            {t("home")}
-          </Link>
-          <Link href="/about" className="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
-            {t("about")}
-          </Link>
+
+        {/* ================= DESKTOP NAV ================= */}
+
+        <nav className="hidden items-center gap-5 lg:flex xl:gap-7">
+          {navigation.slice(0, 7).map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="
+                whitespace-nowrap
+                text-[13px]
+                font-semibold
+                text-slate-600
+                transition-colors
+                hover:text-emerald-600
+                dark:text-slate-300
+                dark:hover:text-emerald-400
+              "
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-5">
-          {/* Custom Lang Dropdown */}
+        {/* ================= DESKTOP CONTROLS ================= */}
+
+        <div className="hidden shrink-0 items-center gap-2 md:flex">
+          {/* Language */}
+
           <div className="relative">
-            <button 
-              onClick={() => setIsLangOpen(!isLangOpen)}
-              className="flex items-center gap-1.5 text-sm font-semibold bg-gray-100/80 dark:bg-gray-900/80 px-4 py-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-all active:scale-95"
+            <button
+              type="button"
+              onClick={() => {
+                setIsLangOpen(!isLangOpen);
+                setIsMobileMenuOpen(false);
+              }}
+              className="
+                flex
+                items-center
+                gap-1.5
+                rounded-full
+                bg-slate-100
+                px-3.5
+                py-2
+                text-xs
+                font-bold
+                transition
+                hover:bg-slate-200
+                active:scale-95
+                dark:bg-white/10
+                dark:hover:bg-white/15
+              "
             >
-              <span className="text-emerald-600 dark:text-emerald-400">{lang === "en" ? "EN" : "SI"}</span> 
-              <ChevronDown size={14} className={`transition-transform duration-200 ${isLangOpen ? "rotate-180" : ""}`} />
+              <span className="text-emerald-600 dark:text-emerald-400">
+                {lang === "en" ? "EN" : "SI"}
+              </span>
+
+              <ChevronDown
+                size={14}
+                className={`
+                  transition-transform
+                  ${isLangOpen ? "rotate-180" : ""}
+                `}
+              />
             </button>
+
             <AnimatePresence>
               {isLangOpen && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }} 
-                  animate={{ opacity: 1, y: 0, scale: 1 }} 
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  transition={{ duration: 0.1, ease: "easeOut" }} 
-                  className="absolute right-0 mt-3 w-32 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-50"
+                <motion.div
+                  initial={{
+                    opacity: 0,
+                    y: 8,
+                    scale: 0.96,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: 8,
+                    scale: 0.96,
+                  }}
+                  className="
+                    absolute
+                    right-0
+                    top-full
+                    mt-3
+                    w-32
+                    overflow-hidden
+                    rounded-2xl
+                    border
+                    border-slate-200
+                    bg-white
+                    shadow-2xl
+                    dark:border-white/10
+                    dark:bg-slate-900
+                  "
                 >
-                  <button onClick={() => toggleLang("si")} className={`px-4 py-3 text-sm font-bold text-left transition-colors ${lang === 'si' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}>සිංහල (Si)</button>
-                  <button onClick={() => toggleLang("en")} className={`px-4 py-3 text-sm font-bold text-left transition-colors ${lang === 'en' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}>English (En)</button>
+                  <button
+                    type="button"
+                    onClick={() => changeLanguage("si")}
+                    className={`
+                      w-full
+                      px-4
+                      py-3
+                      text-left
+                      text-sm
+                      font-bold
+                      transition
+                      ${
+                        lang === "si"
+                          ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
+                          : "hover:bg-slate-50 dark:hover:bg-white/5"
+                      }
+                    `}
+                  >
+                    සිංහල
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => changeLanguage("en")}
+                    className={`
+                      w-full
+                      px-4
+                      py-3
+                      text-left
+                      text-sm
+                      font-bold
+                      transition
+                      ${
+                        lang === "en"
+                          ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
+                          : "hover:bg-slate-50 dark:hover:bg-white/5"
+                      }
+                    `}
+                  >
+                    English
+                  </button>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          {/* Theme Toggle Button */}
+          {/* Theme */}
+
           <button
+            type="button"
             onClick={toggleTheme}
-            className="relative p-2.5 rounded-full bg-gray-100/80 dark:bg-gray-900/80 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 transition-all active:scale-90 overflow-hidden"
-            aria-label="Toggle Dark Mode"
+            aria-label="Toggle dark mode"
+            className="
+              flex
+              h-9
+              w-9
+              items-center
+              justify-center
+              rounded-full
+              bg-slate-100
+              text-slate-600
+              transition
+              hover:bg-slate-200
+              active:scale-90
+              dark:bg-white/10
+              dark:text-slate-300
+              dark:hover:bg-white/15
+            "
           >
             {mounted ? (
-              <AnimatePresence mode="wait" initial={false}>
+              <AnimatePresence
+                mode="wait"
+                initial={false}
+              >
                 <motion.div
-                  key={resolvedTheme} 
-                  initial={{ y: -20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 20, opacity: 0 }}
-                  transition={{ duration: 0.15 }}
+                  key={resolvedTheme}
+                  initial={{
+                    opacity: 0,
+                    rotate: -45,
+                    scale: 0.7,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    rotate: 0,
+                    scale: 1,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    rotate: 45,
+                    scale: 0.7,
+                  }}
                 >
-                  {resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+                  {resolvedTheme === "dark" ? (
+                    <Sun size={17} />
+                  ) : (
+                    <Moon size={17} />
+                  )}
                 </motion.div>
               </AnimatePresence>
             ) : (
-              <div className="w-[18px] h-[18px]" />
+              <div className="h-[17px] w-[17px]" />
             )}
           </button>
         </div>
 
-        {/* Mobile Menu Toggle */}
-        <button 
-          className="md:hidden p-2 text-gray-900 dark:text-white active:scale-90 transition-transform"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        {/* ================= MOBILE BUTTON ================= */}
+
+        <button
+          type="button"
+          aria-label={
+            isMobileMenuOpen
+              ? "Close menu"
+              : "Open menu"
+          }
+          onClick={() => {
+            setIsMobileMenuOpen(!isMobileMenuOpen);
+            setIsLangOpen(false);
+          }}
+          className="
+            flex
+            h-10
+            w-10
+            shrink-0
+            items-center
+            justify-center
+            rounded-full
+            text-slate-900
+            transition
+            active:scale-90
+            md:hidden
+            dark:text-white
+          "
         >
-          {isMobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+          {isMobileMenuOpen ? (
+            <X size={25} />
+          ) : (
+            <Menu size={25} />
+          )}
         </button>
       </div>
 
-      {/* Mobile Nav */}
+      {/* ================= MOBILE MENU ================= */}
+
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div 
-            initial={{ height: 0, opacity: 0 }} 
-            animate={{ height: "auto", opacity: 1 }} 
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.15, ease: "easeInOut" }} 
-            className="md:hidden border-t border-gray-200/50 dark:border-gray-800/50 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl overflow-hidden"
+          <motion.div
+            initial={{
+              opacity: 0,
+              height: 0,
+            }}
+            animate={{
+              opacity: 1,
+              height: "auto",
+            }}
+            exit={{
+              opacity: 0,
+              height: 0,
+            }}
+            transition={{
+              duration: 0.2,
+              ease: "easeOut",
+            }}
+            className="
+              max-h-[calc(100vh-68px)]
+              overflow-y-auto
+              border-t
+              border-slate-200/70
+              bg-white
+              md:hidden
+              dark:border-white/10
+              dark:bg-[#07110d]
+            "
           >
-            <div className="flex flex-col p-6 gap-6">
-              <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-800 dark:text-gray-200 hover:text-emerald-500 transition-colors">{t("home")}</Link>
-              <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-800 dark:text-gray-200 hover:text-emerald-500 transition-colors">{t("about")}</Link>
-              
-              <div className="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-800/60">
-                <div className="flex gap-3 bg-gray-100 dark:bg-gray-900 p-1 rounded-full">
-                  <button onClick={() => setLang("si")} className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${lang === 'si' ? 'bg-emerald-500 text-white shadow-md' : 'text-gray-600 dark:text-gray-400'}`}>Si</button>
-                  <button onClick={() => setLang("en")} className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${lang === 'en' ? 'bg-emerald-500 text-white shadow-md' : 'text-gray-600 dark:text-gray-400'}`}>En</button>
-                </div>
-                
-                <button
-                  onClick={toggleTheme}
-                  className="p-3 rounded-full bg-gray-100 dark:bg-gray-900 active:scale-90 transition-transform"
+            <div className="px-5 pb-7 pt-4">
+              <nav className="flex flex-col">
+                {navigation.map((item, index) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={closeMobileMenu}
+                    className="
+                      flex
+                      items-center
+                      justify-between
+                      border-b
+                      border-slate-100
+                      py-4
+                      text-[16px]
+                      font-bold
+                      text-slate-800
+                      transition-colors
+                      hover:text-emerald-600
+                      dark:border-white/5
+                      dark:text-slate-200
+                      dark:hover:text-emerald-400
+                    "
+                  >
+                    <span>
+                      {item.label}
+                    </span>
+
+                    <span
+                      className="
+                        text-xs
+                        font-bold
+                        text-slate-300
+                        dark:text-slate-600
+                      "
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </Link>
+                ))}
+              </nav>
+
+              {/* Mobile Controls */}
+
+              <div
+                className="
+                  mt-5
+                  flex
+                  items-center
+                  justify-between
+                  gap-4
+                  rounded-2xl
+                  bg-slate-50
+                  p-3
+                  dark:bg-white/[0.04]
+                "
+              >
+                {/* Language */}
+
+                <div
+                  className="
+                    flex
+                    items-center
+                    gap-1
+                    rounded-full
+                    bg-white
+                    p-1
+                    shadow-sm
+                    dark:bg-slate-900
+                  "
                 >
-                  {mounted && resolvedTheme === "dark" ? <Sun size={22} className="text-amber-500" /> : <Moon size={22} className="text-indigo-500" />}
+                  <button
+                    type="button"
+                    onClick={() => setLang("si")}
+                    className={`
+                      rounded-full
+                      px-4
+                      py-2
+                      text-xs
+                      font-bold
+                      transition
+                      ${
+                        lang === "si"
+                          ? "bg-emerald-500 text-white shadow"
+                          : "text-slate-500 dark:text-slate-400"
+                      }
+                    `}
+                  >
+                    සිං
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setLang("en")}
+                    className={`
+                      rounded-full
+                      px-4
+                      py-2
+                      text-xs
+                      font-bold
+                      transition
+                      ${
+                        lang === "en"
+                          ? "bg-emerald-500 text-white shadow"
+                          : "text-slate-500 dark:text-slate-400"
+                      }
+                    `}
+                  >
+                    EN
+                  </button>
+                </div>
+
+                {/* Theme */}
+
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  aria-label="Toggle dark mode"
+                  className="
+                    flex
+                    h-10
+                    w-10
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-white
+                    shadow-sm
+                    active:scale-90
+                    dark:bg-slate-900
+                  "
+                >
+                  {mounted &&
+                  resolvedTheme === "dark" ? (
+                    <Sun
+                      size={20}
+                      className="text-amber-500"
+                    />
+                  ) : (
+                    <Moon
+                      size={20}
+                      className="text-indigo-500"
+                    />
+                  )}
                 </button>
               </div>
+
+              {/* Join Button */}
+
+              <Link
+                href="#membership"
+                onClick={closeMobileMenu}
+                className="
+                  mt-4
+                  block
+                  rounded-2xl
+                  bg-emerald-600
+                  px-5
+                  py-3.5
+                  text-center
+                  text-sm
+                  font-black
+                  text-white
+                  shadow-lg
+                  shadow-emerald-600/20
+                  transition
+                  active:scale-[0.98]
+                "
+              >
+                {lang === "si"
+                  ? "සොබා ආරක්ෂකයෙක් වන්න"
+                  : "Become a Guardian"}
+              </Link>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </header>
   );
-}
+            }
