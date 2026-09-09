@@ -1,7 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import {
+  usePathname,
+  useRouter,
+} from "next/navigation";
+
 import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "next-themes";
 
@@ -40,12 +43,13 @@ type SectionItem = {
   en: string;
 };
 
-type ExploreItem = SectionItem & {
-  icon: typeof Leaf;
-};
+type ExploreItem =
+  SectionItem & {
+    icon: typeof Leaf;
+  };
 
 /* =========================================================
-   CONSTANTS
+   NAVIGATION
 ========================================================= */
 
 const mainNavigation: SectionItem[] = [
@@ -148,7 +152,7 @@ export default function Header() {
     useRef<HTMLElement>(null);
 
   /* =======================================================
-     FONT STYLE
+     FONT STACK
   ======================================================== */
 
   const sinhalaFont =
@@ -166,15 +170,14 @@ export default function Header() {
   }, []);
 
   /* =======================================================
-     HEADER SCROLL STATE
+     SCROLL STATE
   ======================================================== */
 
   useEffect(() => {
     const handleScroll =
       () => {
         setScrolled(
-          window.scrollY >
-            12
+          window.scrollY > 12
         );
       };
 
@@ -254,7 +257,7 @@ export default function Header() {
   }, []);
 
   /* =======================================================
-     MOBILE SCROLL LOCK
+     MOBILE BODY LOCK
   ======================================================== */
 
   useEffect(() => {
@@ -273,7 +276,7 @@ export default function Header() {
   }, [isMobileOpen]);
 
   /* =======================================================
-     CLOSE ALL MENUS
+     CLOSE MENUS
   ======================================================== */
 
   const closeAll =
@@ -323,34 +326,25 @@ export default function Header() {
     };
 
   /* =======================================================
-     EXACT SECTION SCROLL
+     EXACT SCROLL
   ======================================================== */
 
   const scrollToSection =
     async (
       id: string
     ) => {
-      /*
-       * Close menus first.
-       */
       closeAll();
 
-      /*
-       * Small timeout allows the
-       * mobile menu animation/state
-       * to begin closing before scroll.
-       */
       await new Promise(
         (resolve) =>
           window.setTimeout(
             resolve,
-            40
+            45
           )
       );
 
       /*
-       * If user is on another page,
-       * go home first and preserve hash.
+       * Different page -> go to home.
        */
       if (
         pathname !== "/"
@@ -358,7 +352,6 @@ export default function Header() {
         router.push(
           `/#${id}`
         );
-
         return;
       }
 
@@ -371,21 +364,12 @@ export default function Header() {
         return;
       }
 
-      /*
-       * Read actual sticky header height.
-       */
       const headerHeight =
         headerRef.current?.getBoundingClientRect()
           .height ?? 68;
 
-      /*
-       * Extra breathing room.
-       */
       const extraSpace = 14;
 
-      /*
-       * Exact absolute position.
-       */
       const targetY =
         element.getBoundingClientRect()
           .top +
@@ -402,10 +386,6 @@ export default function Header() {
           "smooth",
       });
 
-      /*
-       * Update URL hash without
-       * triggering native browser jump.
-       */
       try {
         window.history.replaceState(
           null,
@@ -413,12 +393,12 @@ export default function Header() {
           `#${id}`
         );
       } catch {
-        // Ignore history errors.
+        // Ignore.
       }
     };
 
   /* =======================================================
-     MOBILE HOME
+     HOME
   ======================================================== */
 
   const handleHome =
@@ -453,20 +433,28 @@ export default function Header() {
         w-full
         transition-all
         duration-500
+
         ${
           scrolled
             ? `
               border-b
-              border-white/[0.09]
-              bg-[#04100b]/96
-              shadow-[0_14px_45px_rgba(0,0,0,0.20)]
+              border-slate-200/60
+              bg-white/95
+              shadow-[0_14px_45px_rgba(15,23,42,0.08)]
               backdrop-blur-2xl
+
+              dark:border-white/[0.09]
+              dark:bg-[#04100b]/96
+              dark:shadow-[0_14px_45px_rgba(0,0,0,0.20)]
             `
             : `
               border-b
-              border-white/[0.05]
-              bg-[#04100b]/88
+              border-slate-200/40
+              bg-white/90
               backdrop-blur-xl
+
+              dark:border-white/[0.05]
+              dark:bg-[#04100b]/88
             `
         }
       `}
@@ -486,6 +474,7 @@ export default function Header() {
           justify-between
           gap-3
           px-4
+
           sm:h-[70px]
           sm:px-6
           lg:px-8
@@ -500,6 +489,11 @@ export default function Header() {
           onClick={
             handleHome
           }
+          aria-label={
+            lang === "si"
+              ? "මුල් පිටුව"
+              : "Home"
+          }
           className="
             group
             flex
@@ -509,11 +503,6 @@ export default function Header() {
             gap-3
             text-left
           "
-          aria-label={
-            lang === "si"
-              ? "මුල් පිටුව"
-              : "Home"
-          }
         >
           {/* Logo */}
           <motion.div
@@ -537,10 +526,16 @@ export default function Header() {
               overflow-hidden
               rounded-full
               border
-              border-emerald-300/30
-              bg-black/20
+              border-emerald-500/25
+              bg-white
               p-1
-              shadow-[0_0_28px_rgba(16,185,129,0.10)]
+
+              shadow-[0_0_25px_rgba(16,185,129,0.10)]
+
+              dark:border-emerald-300/30
+              dark:bg-black/20
+              dark:shadow-[0_0_28px_rgba(16,185,129,0.10)]
+
               sm:h-11
               sm:w-11
             "
@@ -567,7 +562,9 @@ export default function Header() {
                 inset-0
                 rounded-full
                 border
-                border-emerald-300/10
+                border-emerald-500/10
+
+                dark:border-emerald-300/10
               "
             />
 
@@ -590,7 +587,7 @@ export default function Header() {
             />
           </motion.div>
 
-          {/* Brand text */}
+          {/* Brand */}
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <motion.span
@@ -615,7 +612,10 @@ export default function Header() {
                   font-bold
                   leading-tight
                   tracking-[-0.02em]
-                  text-white
+
+                  text-slate-900
+                  dark:text-white
+
                   sm:max-w-none
                   sm:text-xl
                 "
@@ -639,11 +639,16 @@ export default function Header() {
               </motion.span>
 
               <Sparkles
-                size={13}
+                size={
+                  13
+                }
                 className="
                   hidden
                   shrink-0
-                  text-emerald-300/75
+
+                  text-emerald-600/70
+                  dark:text-emerald-300/75
+
                   sm:block
                 "
               />
@@ -670,7 +675,10 @@ export default function Header() {
                 font-semibold
                 uppercase
                 tracking-[0.19em]
-                text-emerald-300/55
+
+                text-emerald-700/65
+                dark:text-emerald-300/55
+
                 sm:block
                 md:text-[9px]
               "
@@ -703,17 +711,22 @@ export default function Header() {
                   )
                 }
                 className="
-                  relative
                   rounded-xl
                   px-3
                   py-2
                   text-[12px]
                   font-semibold
-                  text-white/62
+
+                  text-slate-600
+                  hover:bg-slate-100
+                  hover:text-emerald-700
+
+                  dark:text-white/62
+                  dark:hover:bg-white/[0.055]
+                  dark:hover:text-emerald-300
+
                   transition-all
                   duration-300
-                  hover:bg-white/[0.055]
-                  hover:text-emerald-300
                 "
                 style={{
                   fontFamily:
@@ -759,11 +772,17 @@ export default function Header() {
                 py-2
                 text-[12px]
                 font-semibold
-                text-white/62
+
+                text-slate-600
+                hover:bg-slate-100
+                hover:text-emerald-700
+
+                dark:text-white/62
+                dark:hover:bg-white/[0.055]
+                dark:hover:text-emerald-300
+
                 transition-all
                 duration-300
-                hover:bg-white/[0.055]
-                hover:text-emerald-300
               "
               style={{
                 fontFamily:
@@ -825,23 +844,29 @@ export default function Header() {
                     overflow-hidden
                     rounded-[24px]
                     border
-                    border-white/10
-                    bg-[#07140e]/98
                     p-2
-                    shadow-[0_25px_80px_rgba(0,0,0,0.38)]
+
+                    border-slate-200
+                    bg-white
+                    shadow-[0_25px_70px_rgba(15,23,42,0.16)]
+
+                    dark:border-white/10
+                    dark:bg-[#07140e]/98
+                    dark:shadow-[0_25px_80px_rgba(0,0,0,0.38)]
+
                     backdrop-blur-2xl
                   "
                 >
                   <div className="px-3 pb-2 pt-2">
-                    <p
-                      className="
-                        text-[9px]
-                        font-bold
-                        uppercase
-                        tracking-[0.22em]
-                        text-emerald-300/50
-                      "
-                    >
+                    <p className="
+                      text-[9px]
+                      font-bold
+                      uppercase
+                      tracking-[0.22em]
+
+                      text-emerald-700/60
+                      dark:text-emerald-300/50
+                    ">
                       {lang ===
                       "si"
                         ? "වේගවත් ප්‍රවේශය"
@@ -881,25 +906,32 @@ export default function Header() {
                               px-3
                               py-3
                               text-left
+
+                              hover:bg-emerald-50
+                              dark:hover:bg-emerald-400/[0.07]
+
                               transition
-                              hover:bg-emerald-400/[0.07]
                             "
                           >
-                            <span
-                              className="
-                                flex
-                                h-9
-                                w-9
-                                shrink-0
-                                items-center
-                                justify-center
-                                rounded-xl
-                                bg-emerald-400/[0.07]
-                                text-emerald-300
-                                transition
-                                group-hover:bg-emerald-400/15
-                              "
-                            >
+                            <span className="
+                              flex
+                              h-9
+                              w-9
+                              shrink-0
+                              items-center
+                              justify-center
+                              rounded-xl
+
+                              bg-emerald-50
+                              text-emerald-700
+
+                              dark:bg-emerald-400/[0.07]
+                              dark:text-emerald-300
+
+                              transition
+                              group-hover:bg-emerald-100
+                              dark:group-hover:bg-emerald-400/15
+                            ">
                               <Icon
                                 size={
                                   17
@@ -914,7 +946,9 @@ export default function Header() {
                                   truncate
                                   text-[13px]
                                   font-semibold
-                                  text-white/82
+
+                                  text-slate-700
+                                  dark:text-white/82
                                 "
                                 style={{
                                   fontFamily:
@@ -937,10 +971,14 @@ export default function Header() {
                               }
                               className="
                                 shrink-0
-                                text-white/20
+
+                                text-slate-300
+                                dark:text-white/20
+
                                 transition-all
                                 group-hover:translate-x-1
-                                group-hover:text-emerald-300
+                                group-hover:text-emerald-500
+                                dark:group-hover:text-emerald-300
                               "
                             />
                           </motion.button>
@@ -981,16 +1019,22 @@ export default function Header() {
                 gap-2
                 rounded-full
                 border
-                border-white/10
-                bg-white/[0.045]
                 px-3
                 py-2
                 text-[11px]
                 font-bold
-                text-white/78
                 transition
-                hover:border-emerald-300/20
-                hover:bg-white/[0.07]
+
+                border-slate-200
+                bg-slate-100
+                text-slate-700
+
+                hover:bg-slate-200
+
+                dark:border-white/10
+                dark:bg-white/[0.045]
+                dark:text-white/78
+                dark:hover:bg-white/[0.07]
               "
               style={{
                 fontFamily:
@@ -1000,7 +1044,21 @@ export default function Header() {
                     : englishFont,
               }}
             >
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/10 text-[9px] font-black text-emerald-300">
+              <span className="
+                flex
+                h-5
+                w-5
+                items-center
+                justify-center
+                rounded-full
+                bg-emerald-100
+                text-[9px]
+                font-black
+                text-emerald-700
+
+                dark:bg-emerald-400/10
+                dark:text-emerald-300
+              ">
                 {lang ===
                 "si"
                   ? "සි"
@@ -1018,11 +1076,18 @@ export default function Header() {
                 size={
                   13
                 }
-                className={`text-white/40 transition-transform duration-300 ${
-                  isLanguageOpen
-                    ? "rotate-180"
-                    : ""
-                }`}
+                className={`
+                  text-slate-400
+                  dark:text-white/40
+                  transition-transform
+                  duration-300
+
+                  ${
+                    isLanguageOpen
+                      ? "rotate-180"
+                      : ""
+                  }
+                `}
               />
             </button>
 
@@ -1056,15 +1121,29 @@ export default function Header() {
                     overflow-hidden
                     rounded-[22px]
                     border
-                    border-white/10
-                    bg-[#07140e]/98
                     p-2
-                    shadow-[0_25px_70px_rgba(0,0,0,0.35)]
+                    shadow-2xl
                     backdrop-blur-2xl
+
+                    border-slate-200
+                    bg-white
+                    shadow-slate-900/10
+
+                    dark:border-white/10
+                    dark:bg-[#07140e]/98
+                    dark:shadow-black/35
                   "
                 >
                   <div className="px-3 pb-2 pt-2">
-                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-emerald-300/50">
+                    <p className="
+                      text-[9px]
+                      font-bold
+                      uppercase
+                      tracking-[0.2em]
+
+                      text-slate-400
+                      dark:text-emerald-300/50
+                    ">
                       {lang ===
                       "si"
                         ? "භාෂාව"
@@ -1090,11 +1169,20 @@ export default function Header() {
                       py-3
                       text-left
                       transition
+
                       ${
                         lang ===
                         "si"
-                          ? "bg-emerald-400/[0.09]"
-                          : "hover:bg-white/[0.05]"
+                          ? `
+                            bg-emerald-50
+
+                            dark:bg-emerald-400/[0.09]
+                          `
+                          : `
+                            hover:bg-slate-50
+
+                            dark:hover:bg-white/[0.05]
+                          `
                       }
                     `}
                   >
@@ -1108,13 +1196,28 @@ export default function Header() {
                         rounded-xl
                         text-xs
                         font-bold
+
                         ${
                           lang ===
                           "si"
-                            ? "bg-emerald-400 text-emerald-950"
-                            : "bg-white/[0.06] text-white/60"
+                            ? `
+                              bg-emerald-500
+                              text-white
+                              dark:bg-emerald-400
+                              dark:text-emerald-950
+                            `
+                            : `
+                              bg-slate-100
+                              text-slate-500
+                              dark:bg-white/[0.06]
+                              dark:text-white/60
+                            `
                         }
                       `}
+                      style={{
+                        fontFamily:
+                          sinhalaFont,
+                      }}
                     >
                       සි
                     </span>
@@ -1124,11 +1227,20 @@ export default function Header() {
                         className={`
                           block
                           text-[13px]
+
                           ${
                             lang ===
                             "si"
-                              ? "font-bold text-white"
-                              : "font-semibold text-white/60"
+                              ? `
+                                font-bold
+                                text-slate-900
+                                dark:text-white
+                              `
+                              : `
+                                font-semibold
+                                text-slate-500
+                                dark:text-white/60
+                              `
                           }
                         `}
                         style={{
@@ -1139,14 +1251,18 @@ export default function Header() {
                         සිංහල
                       </span>
 
-                      <span className="text-[10px] text-white/30">
+                      <span className="
+                        text-[10px]
+                        text-slate-400
+                        dark:text-white/30
+                      ">
                         Sinhala
                       </span>
                     </span>
 
                     {lang ===
                       "si" && (
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 dark:bg-emerald-300" />
                     )}
                   </button>
 
@@ -1168,11 +1284,18 @@ export default function Header() {
                       py-3
                       text-left
                       transition
+
                       ${
                         lang ===
                         "en"
-                          ? "bg-emerald-400/[0.09]"
-                          : "hover:bg-white/[0.05]"
+                          ? `
+                            bg-emerald-50
+                            dark:bg-emerald-400/[0.09]
+                          `
+                          : `
+                            hover:bg-slate-50
+                            dark:hover:bg-white/[0.05]
+                          `
                       }
                     `}
                   >
@@ -1186,13 +1309,28 @@ export default function Header() {
                         rounded-xl
                         text-[10px]
                         font-black
+
                         ${
                           lang ===
                           "en"
-                            ? "bg-emerald-400 text-emerald-950"
-                            : "bg-white/[0.06] text-white/60"
+                            ? `
+                              bg-emerald-500
+                              text-white
+                              dark:bg-emerald-400
+                              dark:text-emerald-950
+                            `
+                            : `
+                              bg-slate-100
+                              text-slate-500
+                              dark:bg-white/[0.06]
+                              dark:text-white/60
+                            `
                         }
                       `}
+                      style={{
+                        fontFamily:
+                          englishFont,
+                      }}
                     >
                       EN
                     </span>
@@ -1202,11 +1340,20 @@ export default function Header() {
                         className={`
                           block
                           text-[13px]
+
                           ${
                             lang ===
                             "en"
-                              ? "font-bold text-white"
-                              : "font-semibold text-white/60"
+                              ? `
+                                font-bold
+                                text-slate-900
+                                dark:text-white
+                              `
+                              : `
+                                font-semibold
+                                text-slate-500
+                                dark:text-white/60
+                              `
                           }
                         `}
                         style={{
@@ -1217,14 +1364,18 @@ export default function Header() {
                         English
                       </span>
 
-                      <span className="text-[10px] text-white/30">
+                      <span className="
+                        text-[10px]
+                        text-slate-400
+                        dark:text-white/30
+                      ">
                         English
                       </span>
                     </span>
 
                     {lang ===
                       "en" && (
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 dark:bg-emerald-300" />
                     )}
                   </button>
                 </motion.div>
@@ -1255,13 +1406,21 @@ export default function Header() {
               justify-center
               rounded-full
               border
-              border-white/10
-              bg-white/[0.045]
-              text-white/60
               transition
-              hover:border-emerald-300/20
-              hover:bg-white/[0.07]
-              hover:text-emerald-300
+
+              border-slate-200
+              bg-slate-100
+              text-slate-600
+
+              hover:bg-slate-200
+
+              dark:border-white/10
+              dark:bg-white/[0.045]
+              dark:text-white/60
+              dark:hover:bg-white/[0.07]
+
+              hover:text-emerald-600
+              dark:hover:text-emerald-300
             "
           >
             {mounted ? (
@@ -1358,9 +1517,16 @@ export default function Header() {
             justify-center
             rounded-full
             border
-            border-white/10
-            bg-white/[0.04]
-            text-white
+            transition
+
+            border-slate-200
+            bg-slate-100
+            text-slate-800
+
+            dark:border-white/10
+            dark:bg-white/[0.04]
+            dark:text-white
+
             md:hidden
           "
         >
@@ -1391,7 +1557,11 @@ export default function Header() {
                     0.7,
                 }}
               >
-                <X size={23} />
+                <X
+                  size={
+                    23
+                  }
+                />
               </motion.div>
             ) : (
               <motion.div
@@ -1416,7 +1586,11 @@ export default function Header() {
                     0.7,
                 }}
               >
-                <Menu size={24} />
+                <Menu
+                  size={
+                    24
+                  }
+                />
               </motion.div>
             )}
           </AnimatePresence>
@@ -1449,8 +1623,13 @@ export default function Header() {
             className="
               overflow-hidden
               border-t
-              border-white/[0.07]
-              bg-[#06110c]/98
+
+              border-slate-200/70
+              bg-white/98
+
+              dark:border-white/[0.07]
+              dark:bg-[#06110c]/98
+
               backdrop-blur-2xl
               md:hidden
             "
@@ -1471,9 +1650,13 @@ export default function Header() {
                   px-4
                   py-3.5
                   text-left
-                  text-white
                   transition
-                  hover:bg-white/[0.05]
+
+                  text-slate-900
+                  hover:bg-slate-100
+
+                  dark:text-white
+                  dark:hover:bg-white/[0.05]
                 "
                 style={{
                   fontFamily:
@@ -1494,7 +1677,10 @@ export default function Header() {
                   size={
                     16
                   }
-                  className="text-emerald-300/60"
+                  className="
+                    text-emerald-600/70
+                    dark:text-emerald-300/60
+                  "
                 />
               </button>
 
@@ -1525,11 +1711,20 @@ export default function Header() {
                         py-3.5
                         text-left
                         transition
-                        hover:bg-white/[0.05]
+
+                        hover:bg-slate-100
+
+                        dark:hover:bg-white/[0.05]
                       "
                     >
                       <div className="flex items-center gap-3">
-                        <span className="text-[10px] font-black text-emerald-300/35">
+                        <span className="
+                          text-[10px]
+                          font-black
+
+                          text-emerald-600/45
+                          dark:text-emerald-300/35
+                        ">
                           {String(
                             index +
                               1
@@ -1540,7 +1735,13 @@ export default function Header() {
                         </span>
 
                         <span
-                          className="text-[15px] font-semibold text-white/80"
+                          className="
+                            text-[15px]
+                            font-semibold
+
+                            text-slate-700
+                            dark:text-white/80
+                          "
                           style={{
                             fontFamily:
                               lang ===
@@ -1560,26 +1761,36 @@ export default function Header() {
                         size={
                           15
                         }
-                        className="text-white/20"
+                        className="
+                          text-slate-300
+                          dark:text-white/20
+                        "
                       />
                     </button>
                   )
                 )}
               </div>
 
-              {/* Explore */}
-              <div className="mt-3 border-t border-white/[0.06] pt-3">
-                <p
-                  className="
-                    px-4
-                    pb-2
-                    text-[9px]
-                    font-bold
-                    uppercase
-                    tracking-[0.22em]
-                    text-emerald-300/45
-                  "
-                >
+              {/* More sections */}
+              <div className="
+                mt-3
+                border-t
+                pt-3
+
+                border-slate-200
+                dark:border-white/[0.06]
+              ">
+                <p className="
+                  px-4
+                  pb-2
+                  text-[9px]
+                  font-bold
+                  uppercase
+                  tracking-[0.22em]
+
+                  text-emerald-700/50
+                  dark:text-emerald-300/45
+                ">
                   {lang ===
                   "si"
                     ? "තවත් කොටස්"
@@ -1616,7 +1827,10 @@ export default function Header() {
                             py-3.5
                             text-left
                             transition
-                            hover:bg-emerald-400/[0.06]
+
+                            hover:bg-emerald-50
+
+                            dark:hover:bg-emerald-400/[0.06]
                           "
                         >
                           <span className="
@@ -1627,8 +1841,12 @@ export default function Header() {
                             items-center
                             justify-center
                             rounded-xl
-                            bg-emerald-400/[0.07]
-                            text-emerald-300
+
+                            bg-emerald-50
+                            text-emerald-700
+
+                            dark:bg-emerald-400/[0.07]
+                            dark:text-emerald-300
                           ">
                             <Icon
                               size={
@@ -1642,7 +1860,9 @@ export default function Header() {
                               flex-1
                               text-[14px]
                               font-semibold
-                              text-white/75
+
+                              text-slate-700
+                              dark:text-white/75
                             "
                             style={{
                               fontFamily:
@@ -1662,7 +1882,10 @@ export default function Header() {
                             size={
                               15
                             }
-                            className="text-white/20"
+                            className="
+                              text-slate-300
+                              dark:text-white/20
+                            "
                           />
                         </button>
                       );
@@ -1672,9 +1895,34 @@ export default function Header() {
               </div>
 
               {/* Controls */}
-              <div className="mt-4 flex items-center justify-between rounded-[22px] border border-white/[0.06] bg-white/[0.025] p-3">
+              <div className="
+                mt-4
+                flex
+                items-center
+                justify-between
+                rounded-[22px]
+                border
+                p-3
+
+                border-slate-200
+                bg-slate-50
+
+                dark:border-white/[0.06]
+                dark:bg-white/[0.025]
+              ">
                 {/* Language */}
-                <div className="flex items-center gap-1 rounded-full bg-black/20 p-1">
+                <div className="
+                  flex
+                  items-center
+                  gap-1
+                  rounded-full
+                  p-1
+
+                  bg-white
+                  shadow-sm
+
+                  dark:bg-black/20
+                ">
                   <button
                     type="button"
                     onClick={() =>
@@ -1688,11 +1936,22 @@ export default function Header() {
                       py-2
                       text-xs
                       transition
+
                       ${
                         lang ===
                         "si"
-                          ? "bg-emerald-400 font-bold text-emerald-950 shadow-[0_6px_20px_rgba(52,211,153,0.15)]"
-                          : "font-semibold text-white/45"
+                          ? `
+                            bg-emerald-500
+                            font-bold
+                            text-white
+                            dark:bg-emerald-400
+                            dark:text-emerald-950
+                          `
+                          : `
+                            font-semibold
+                            text-slate-500
+                            dark:text-white/45
+                          `
                       }
                     `}
                     style={{
@@ -1716,11 +1975,22 @@ export default function Header() {
                       py-2
                       text-xs
                       transition
+
                       ${
                         lang ===
                         "en"
-                          ? "bg-emerald-400 font-bold text-emerald-950 shadow-[0_6px_20px_rgba(52,211,153,0.15)]"
-                          : "font-semibold text-white/45"
+                          ? `
+                            bg-emerald-500
+                            font-bold
+                            text-white
+                            dark:bg-emerald-400
+                            dark:text-emerald-950
+                          `
+                          : `
+                            font-semibold
+                            text-slate-500
+                            dark:text-white/45
+                          `
                       }
                     `}
                     style={{
@@ -1751,10 +2021,17 @@ export default function Header() {
                     items-center
                     justify-center
                     rounded-full
-                    bg-white/[0.05]
-                    text-white/65
+
+                    bg-white
+                    text-slate-600
+                    shadow-sm
+
+                    dark:bg-white/[0.05]
+                    dark:text-white/65
+
                     transition
-                    hover:bg-white/[0.08]
+                    hover:bg-slate-100
+                    dark:hover:bg-white/[0.08]
                   "
                 >
                   {mounted &&
@@ -1764,14 +2041,14 @@ export default function Header() {
                       size={
                         18
                       }
-                      className="text-amber-300"
+                      className="text-amber-500 dark:text-amber-300"
                     />
                   ) : (
                     <Moon
                       size={
                         18
                       }
-                      className="text-indigo-300"
+                      className="text-indigo-500 dark:text-indigo-300"
                     />
                   )}
                 </button>
@@ -1793,16 +2070,22 @@ export default function Header() {
                   justify-center
                   gap-2
                   rounded-2xl
-                  bg-emerald-400
                   px-5
                   py-3.5
                   text-sm
                   font-bold
-                  text-emerald-950
-                  shadow-[0_12px_40px_rgba(52,211,153,0.14)]
                   transition
-                  hover:bg-emerald-300
                   active:scale-[0.98]
+
+                  bg-emerald-500
+                  text-white
+                  shadow-[0_12px_40px_rgba(16,185,129,0.14)]
+
+                  hover:bg-emerald-400
+
+                  dark:bg-emerald-400
+                  dark:text-emerald-950
+                  dark:hover:bg-emerald-300
                 "
                 style={{
                   fontFamily:
@@ -1829,4 +2112,4 @@ export default function Header() {
       </AnimatePresence>
     </header>
   );
-                  }
+              }
