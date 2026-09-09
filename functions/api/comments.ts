@@ -10,6 +10,11 @@ type CommentRow = {
   created_at: string;
 };
 
+/*
+ * =========================================================
+ * JSON RESPONSE HELPER
+ * =========================================================
+ */
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -22,8 +27,35 @@ function json(data: unknown, status = 200) {
 
 /*
  * =========================================================
+ * ENSURE COMMENTS TABLE
+ *
+ * This makes the API safer against a missing table.
+ * If the table already exists, nothing happens.
+ * =========================================================
+ */
+async function ensureCommentsTable(
+  db: D1Database
+) {
+  await db
+    .prepare(
+      `
+      CREATE TABLE IF NOT EXISTS comments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        comment TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'approved',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+      `
+    )
+    .run();
+}
+
+/*
+ * =========================================================
  * GET /api/comments
- * Publicly returns approved comments only.
+ *
+ * Public website only receives approved comments.
  * =========================================================
  */
 export const onRequestGet: PagesFunction<Env> = async ({
@@ -34,12 +66,21 @@ export const onRequestGet: PagesFunction<Env> = async ({
       return json(
         {
           success: false,
-          message: "D1 database binding 'DB' is not available.",
+          message:
+            "D1 database binding 'DB' is not available.",
         },
         500
       );
     }
 
+    /*
+     * Make sure table exists.
+     */
+    await ensureCommentsTable(env.DB);
+
+    /*
+     * Get approved comments.
+     */
     const result = await env.DB.prepare(
       `
       SELECT
@@ -62,12 +103,25 @@ export const onRequestGet: PagesFunction<Env> = async ({
       comments: result.results ?? [],
     });
   } catch (error) {
-    console.error("GET /api/comments error:", error);
+    console.error(
+      "GET /api/comments ERROR:",
+      error
+    );
+
+    /*
+     * Temporary diagnostic message.
+     * This helps us identify the exact D1 problem
+     * if Cloudflare still returns an error.
+     */
+    const message =
+      error instanceof Error
+        ? error.message
+        : String(error);
 
     return json(
       {
         success: false,
-        message: "Could not load comments.",
+        message: `Could not load comments: ${message}`,
       },
       500
     );
@@ -77,7 +131,8 @@ export const onRequestGet: PagesFunction<Env> = async ({
 /*
  * =========================================================
  * POST /api/comments
- * Public comment submission.
+ *
+ * Adds a new public idea/comment.
  * =========================================================
  */
 export const onRequestPost: PagesFunction<Env> = async ({
@@ -89,12 +144,21 @@ export const onRequestPost: PagesFunction<Env> = async ({
       return json(
         {
           success: false,
-          message: "D1 database binding 'DB' is not available.",
+          message:
+            "D1 database binding 'DB' is not available.",
         },
         500
       );
     }
 
+    /*
+     * Make sure table exists.
+     */
+    await ensureCommentsTable(env.DB);
+
+    /*
+     * Read JSON body.
+     */
     let body: {
       name?: unknown;
       comment?: unknown;
@@ -112,6 +176,9 @@ export const onRequestPost: PagesFunction<Env> = async ({
       );
     }
 
+    /*
+     * Clean input.
+     */
     const name =
       typeof body.name === "string"
         ? body.name.trim()
@@ -123,7 +190,7 @@ export const onRequestPost: PagesFunction<Env> = async ({
         : "";
 
     /*
-     * Basic validation
+     * Validation
      */
     if (!name) {
       return json(
@@ -166,10 +233,10 @@ export const onRequestPost: PagesFunction<Env> = async ({
     }
 
     /*
-     * Insert comment.
+     * Insert.
      *
-     * We use "approved" because the current website
-     * is designed to display the submitted idea immediately.
+     * We use approved because your current design
+     * wants the idea to appear immediately.
      */
     const insertResult = await env.DB.prepare(
       `
@@ -179,11 +246,17 @@ export const onRequestPost: PagesFunction<Env> = async ({
         (?, ?, ?)
       `
     )
-      .bind(name, comment, "approved")
+      .bind(
+        name,
+        comment,
+        "approved"
+      )
       .run();
 
     if (!insertResult.success) {
-      throw new Error("D1 insert failed.");
+      throw new Error(
+        "D1 could not insert the comment."
+      );
     }
 
     const insertedId =
@@ -191,12 +264,12 @@ export const onRequestPost: PagesFunction<Env> = async ({
 
     if (!insertedId) {
       throw new Error(
-        "Could not determine inserted comment ID."
+        "Comment inserted but no ID was returned."
       );
     }
 
     /*
-     * Fetch the newly-created comment.
+     * Get newly-created comment.
      */
     const created = await env.DB.prepare(
       `
@@ -229,12 +302,20 @@ export const onRequestPost: PagesFunction<Env> = async ({
       201
     );
   } catch (error) {
-    console.error("POST /api/comments error:", error);
+    console.error(
+      "POST /api/comments ERROR:",
+      error
+    );
+
+    const message =
+      error instanceof Error
+        ? error.message
+        : String(error);
 
     return json(
       {
         success: false,
-        message: "Could not submit your idea.",
+        message: `Could not submit your idea: ${message}`,
       },
       500
     );
