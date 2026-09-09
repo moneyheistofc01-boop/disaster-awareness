@@ -2,33 +2,44 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LockKeyhole, Leaf, Loader2, ShieldCheck } from "lucide-react";
+import {
+  LockKeyhole,
+  Leaf,
+  Loader2,
+  ShieldCheck,
+} from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [loggingIn, setLoggingIn] = useState(false);
   const [error, setError] = useState("");
 
+  /*
+   * Check existing admin session
+   */
   useEffect(() => {
     const checkSession = async () => {
       try {
         const response = await fetch("/api/admin", {
           method: "GET",
           cache: "no-store",
+          credentials: "same-origin",
         });
 
         const data = await response.json();
 
         if (data.loggedIn) {
-          router.replace("/admin/dashboard");
+          router.replace("/eco-admin/dashboard");
           return;
         }
       } catch {
-        // Login page can still be used if session check fails.
+        // Login page can still be used
+        // if session check fails.
       } finally {
         setLoading(false);
       }
@@ -37,7 +48,12 @@ export default function AdminLoginPage() {
     checkSession();
   }, [router]);
 
-  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
+  /*
+   * Login
+   */
+  const handleLogin = async (
+    event: FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
 
     setError("");
@@ -59,26 +75,44 @@ export default function AdminLoginPage() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        setError(data.message || "Username or password is incorrect.");
+        setError(
+          data.message ||
+            "Username or password is incorrect."
+        );
+
         setLoggingIn(false);
         return;
       }
 
-      router.replace("/admin/dashboard");
+      /*
+       * Correct dashboard path
+       */
+      router.replace("/eco-admin/dashboard");
+      router.refresh();
     } catch {
       setError(
         "Server එක සමඟ සම්බන්ධ වීමට නොහැකි විය. නැවත උත්සාහ කරන්න."
       );
+
       setLoggingIn(false);
     }
   };
 
+  /*
+   * Loading screen
+   */
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4 text-white">
-          <Loader2 className="animate-spin text-emerald-400" size={32} />
-          <p className="text-sm text-slate-400">Checking security...</p>
+          <Loader2
+            className="animate-spin text-emerald-400"
+            size={32}
+          />
+
+          <p className="text-sm text-slate-400">
+            Checking security...
+          </p>
         </div>
       </main>
     );
@@ -87,7 +121,10 @@ export default function AdminLoginPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-md">
-        {/* Logo / Brand */}
+        {/* =====================================================
+            LOGO / BRAND
+        ====================================================== */}
+
         <div className="text-center mb-8">
           <div className="mx-auto mb-5 w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-400/20 flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.12)]">
             <Leaf
@@ -106,7 +143,10 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
-        {/* Login Card */}
+        {/* =====================================================
+            LOGIN CARD
+        ====================================================== */}
+
         <div className="rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 sm:p-8 shadow-2xl">
           <div className="flex items-center gap-3 mb-7">
             <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
@@ -120,14 +160,21 @@ export default function AdminLoginPage() {
               <h2 className="font-bold text-xl">
                 Admin Login
               </h2>
+
               <p className="text-xs text-slate-500 mt-0.5">
                 Authorized access only
               </p>
             </div>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
-            {/* Username */}
+          <form
+            onSubmit={handleLogin}
+            className="space-y-5"
+          >
+            {/* =================================================
+                USERNAME
+            ================================================== */}
+
             <div>
               <label
                 htmlFor="username"
@@ -140,7 +187,9 @@ export default function AdminLoginPage() {
                 id="username"
                 type="email"
                 value={username}
-                onChange={(event) => setUsername(event.target.value)}
+                onChange={(event) =>
+                  setUsername(event.target.value)
+                }
                 placeholder="Enter username"
                 autoComplete="username"
                 required
@@ -149,7 +198,10 @@ export default function AdminLoginPage() {
               />
             </div>
 
-            {/* Password */}
+            {/* =================================================
+                PASSWORD
+            ================================================== */}
+
             <div>
               <label
                 htmlFor="password"
@@ -168,7 +220,9 @@ export default function AdminLoginPage() {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(event) => setPassword(event.target.value)}
+                  onChange={(event) =>
+                    setPassword(event.target.value)
+                  }
                   placeholder="Enter password"
                   autoComplete="current-password"
                   required
@@ -178,14 +232,20 @@ export default function AdminLoginPage() {
               </div>
             </div>
 
-            {/* Error */}
+            {/* =================================================
+                ERROR
+            ================================================== */}
+
             {error && (
               <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
                 {error}
               </div>
             )}
 
-            {/* Login Button */}
+            {/* =================================================
+                LOGIN BUTTON
+            ================================================== */}
+
             <button
               type="submit"
               disabled={loggingIn}
@@ -193,26 +253,39 @@ export default function AdminLoginPage() {
             >
               {loggingIn ? (
                 <>
-                  <Loader2 size={19} className="animate-spin" />
+                  <Loader2
+                    size={19}
+                    className="animate-spin"
+                  />
+
                   Signing in...
                 </>
               ) : (
                 <>
                   <LockKeyhole size={19} />
+
                   Sign in
                 </>
               )}
             </button>
           </form>
 
+          {/* =================================================
+              SECURITY NOTE
+          ================================================== */}
+
           <div className="mt-6 pt-5 border-t border-white/5 text-center">
             <p className="text-[11px] leading-5 text-slate-600">
-              This area is restricted to authorized administrators.
+              This area is restricted to authorized
+              administrators.
             </p>
           </div>
         </div>
 
-        {/* Back */}
+        {/* =====================================================
+            BACK TO WEBSITE
+        ====================================================== */}
+
         <button
           type="button"
           onClick={() => router.push("/")}
