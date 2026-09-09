@@ -1,715 +1,643 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
+import {
+  ChevronDown,
+  CheckCircle2,
+  Leaf,
+  Users,
+  Target,
+  ShieldCheck,
+  HeartHandshake,
+  Sprout,
+  Scale,
+  TreePine,
+  MessageCircle,
+  Facebook,
+  MessageSquare,
+  ArrowRight,
+} from "lucide-react";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 35 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: "easeOut" },
-  },
+import LatestAnnouncements from "../components/LatestAnnouncements";
+
+type LangText = {
+  si: string;
+  en: string;
 };
 
-const images = {
-  hero:
-    "https://images.unsplash.com/photo-1511497584788-876760111969?q=85&w=1800&auto=format&fit=crop",
-  introduction:
-    "https://images.unsplash.com/photo-1523995462485-3d171b5c8fa9?q=85&w=1400&auto=format&fit=crop",
-  vision:
-    "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=85&w=1400&auto=format&fit=crop",
-  action:
-    "https://images.unsplash.com/photo-1448375240586-882707db888b?q=85&w=1400&auto=format&fit=crop",
-  members:
-    "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=85&w=1400&auto=format&fit=crop",
-  message:
-    "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=85&w=1400&auto=format&fit=crop",
+const text = (value: LangText, lang: "si" | "en") =>
+  lang === "si" ? value.si : value.en;
+
+const sections = {
+  vision: {
+    title: {
+      si: "දැක්ම",
+      en: "Vision",
+    },
+    icon: TreePine,
+    content: {
+      si: "ස්වභාවධර්මය පිළිබඳ මනුෂ්‍යත්වයේ වගකීම හා වගවීම පිළිබඳ අවබෝධය ඇති කර, ස්වයං විනය, ආචාර ධර්ම, කරුණාව, සහජීවනය හා සමාජ වගකීමෙන් යුතු පරමාදර්ශී ශ්‍රී ලාංකීය සමාජයක් බිහි කිරීම.",
+      en: "To create an ideal Sri Lankan society built on self-discipline, ethics, compassion, coexistence and social responsibility by strengthening humanity's awareness of its responsibility and accountability towards nature.",
+    },
+  },
+
+  mission: {
+    title: {
+      si: "මෙහෙවර",
+      en: "Mission",
+    },
+    icon: ShieldCheck,
+    content: {
+      si: "ස්වභාවධර්මය වෙත පුද්ගල වගකීම හා වගවීම ශක්තිමත් කරමින්, ස්වයං විනයගරුක පුරවැසියන්ගෙන් සමන්විත සමාජයක් ගොඩනැගීම සහ ශ්‍රී ලංකාවේ ස්වභාවික පරිසරයේ සමතුලිතතාව හා ආරක්ෂාව වෙනුවෙන් දායක විය හැකි සමාජ බලයක් සංවිධානය කිරීම.",
+      en: "To strengthen individual responsibility and accountability towards nature, build a society of self-disciplined citizens, and organize social power that can contribute to the balance, protection and wellbeing of Sri Lanka's natural environment.",
+    },
+  },
+
+  objective: {
+    title: {
+      si: "අරමුණු",
+      en: "Objectives",
+    },
+    icon: Target,
+    content: {
+      si: "ස්වභාවධර්මය සම්බන්ධයෙන් මනුෂ්‍යත්වයේ වගකීම හා වගවීම පිළිබඳ ජනතාව දැනුවත් කිරීම, සමාජ සංවාද ඇති කිරීම, ස්වයං විනය ගොඩනැගීම, ස්වභාවික සමතුලිතතාව වෙනුවෙන් සමාජ වගකීමක් ඇති ප්‍රජාවක් බලගැන්වීම සහ ස්වභාවික ආපදා ඇතිවීමට බලපාන හේතු අවම කිරීම.",
+      en: "To educate people about humanity's responsibility towards nature, encourage broad social dialogue, establish personal discipline, empower a socially responsible community for natural balance, and minimize causes that contribute to natural disasters.",
+    },
+  },
 };
 
 const objectives = [
-  "ස්වභාවධර්මය පිළිබඳ මනුෂ්‍යත්වයේ වගකීම හා වගවීම සම්බන්ධයෙන් සියලු ලාංකිකයන් දැනුවත් කිරීම.",
-  "ස්වභාවධර්මය පිළිබඳ පුළුල් සමාජ කතිකාවකට වන පසුබිම සකස් කිරීම.",
-  "ස්වභාවධර්මයේ ආරක්ෂාව හා යහපැවැත්ම සඳහා පුද්ගලික ආචාරධර්ම හඳුනාගෙන බලගැන්වීම.",
-  "ස්වභාවධර්මයේ සමතුලිතතාවය හා ආරක්ෂාව සඳහා සමාජීය වශයෙන් ක්‍රියාකාරී සමාජ සමූහයක් බලගැන්වීම.",
-  "ස්වභාවික ව්‍යසනයන් සඳහා හේතු වන කරුණු අවම කරමින් සුරක්ෂිත දේශයක් බිහි කිරීමට දායක වීම.",
+  {
+    si: "සියලු ශ්‍රී ලාංකිකයන් ස්වභාවධර්මය වෙත මනුෂ්‍යත්වයේ වගකීම හා වගවීම පිළිබඳ දැනුවත් කිරීම.",
+    en: "Educate all Sri Lankans about humanity's responsibility and accountability towards nature.",
+  },
+  {
+    si: "ස්වභාවධර්මය පිළිබඳ පුළුල් සමාජ සංවාදයක් සඳහා පසුබිම සකස් කිරීම.",
+    en: "Create a background for broad social dialogue about nature.",
+  },
+  {
+    si: "ස්වභාවධර්මය ආරක්ෂා කිරීම සඳහා අවශ්‍ය පුද්ගල ආචාර ධර්ම සහ ස්වයං විනය ස්ථාපිත කිරීම.",
+    en: "Identify personal ethics needed to protect nature and establish self-discipline.",
+  },
+  {
+    si: "ස්වභාවික සමතුලිතතාව ආරක්ෂා කිරීම සඳහා සමාජ වගකීමෙන් යුතු ප්‍රජාවක් බලගැන්වීම.",
+    en: "Empower a socially responsible community to protect natural balance.",
+  },
+  {
+    si: "ස්වභාවික ආපදා ඇතිවීමට බලපාන හේතු අවම කර ආරක්ෂිත රටක් වෙනුවෙන් දායක වීම.",
+    en: "Minimize causes of natural disasters and contribute towards a safer country.",
+  },
 ];
 
-const actionLevels = [
+const membershipPoints = [
   {
-    number: "01",
-    title: "පුද්ගල මට්ටම",
-    text: "ස්වභාවධර්මයේ සමතුලිතතාවයට බාධා පමුණුවන පුද්ගලික ක්‍රියා හඳුනා ගැනීමත්, ස්වයං විනයෙන් හා වගකීමෙන් යුතු සමාජිකයෙකු ලෙස වෙනස් වීමත්.",
+    si: "ජාතිය, ආගම, පන්තිය, කුලය, භාෂාව හෝ දේශපාලන බෙදීම් නොසලකා සෑම ශ්‍රී ලාංකිකයෙකුටම එක්විය හැක.",
+    en: "Every Sri Lankan can participate regardless of race, religion, class, caste, language or political divisions.",
   },
   {
-    number: "02",
-    title: "සමූහ මට්ටම",
-    text: "සමාන අරමුණක් හා වගකීමක් සහිත පුද්ගලයන් සමූහයක් ලෙස ඒකරාශී කරමින් ස්වභාවධර්මයේ ආරක්ෂාව හා සමතුලිතතාවය උදෙසා සාමූහික දායකත්වයක් ලබා දීම.",
+    si: "සොබා සේනාංකයේ අරමුණු හා මූලධර්ම පිළිගැනීම අවශ්‍ය වේ.",
+    en: "Members should accept the aims and principles of Soba Senankaya.",
   },
   {
-    number: "03",
-    title: "සමාජ මට්ටම",
-    text: "ස්වභාවධර්මය සුරැකීමේ ආචාරධර්ම හා රීති බලගන්වන සමාජ මතයක් ගොඩනඟමින් එය සාමාන්‍ය ජීවන රටාවේ කොටසක් බවට පත් කිරීම.",
+    si: "ස්වභාවධර්මය වෙනුවෙන් වගකීමෙන් හා ස්වයං විනයෙන් ක්‍රියා කිරීමට සූදානම් විය යුතුය.",
+    en: "Members should be willing to act responsibly and with self-discipline for nature.",
   },
 ];
 
 const ethics = [
-  "මම ස්වභාවධර්මයට හානි නොකරමි.",
-  "ස්වභාවධර්මයට හානි කරන ක්‍රියාවන්ට අනුබල නොදෙමි.",
-  "ස්වභාවධර්මය ආරක්ෂා කිරීම සඳහා මට කළ හැකි උපරිම දේ කරමි.",
-  "අන් අයද ඒ සඳහා දිරිමත් කරමි.",
-  "මගේ ක්‍රියාවන් තුළින් ස්වභාවධර්මයේ සමතුලිතතාවයට ගරු කරමි.",
+  {
+    si: "මම ස්වභාවධර්මයට හානි නොකරමි.",
+    en: "I will not harm nature.",
+  },
+  {
+    si: "ස්වභාවධර්මයට හානි කරන ක්‍රියාවන්ට අනුබල නොදෙමි.",
+    en: "I will not support actions that harm nature.",
+  },
+  {
+    si: "ස්වභාවධර්මය ආරක්ෂා කිරීම සඳහා මට කළ හැකි උපරිම දේ කරමි.",
+    en: "I will do my utmost to protect nature.",
+  },
+  {
+    si: "අන් අයද ඒ සඳහා දිරිමත් කරමි.",
+    en: "I will encourage others to do the same.",
+  },
+  {
+    si: "මගේ ක්‍රියාවන් තුළින් ස්වභාවධර්මයේ සමතුලිතතාවයට ගරු කරමි.",
+    en: "I will respect the balance of nature through my actions.",
+  },
 ];
 
-export default function Home() {
+function ExpandCard({
+  id,
+  title,
+  icon: Icon,
+  content,
+  open,
+  onClick,
+}: {
+  id: string;
+  title: string;
+  icon: React.ElementType;
+  content: string;
+  open: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <div
+      id={id}
+      className="overflow-hidden rounded-2xl border border-gray-200/70 bg-white shadow-sm transition-all dark:border-gray-800 dark:bg-gray-900"
+    >
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex w-full items-center justify-between gap-4 p-4 text-left sm:p-5"
+      >
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+            <Icon size={20} />
+          </div>
+
+          <span className="break-words text-base font-bold text-gray-900 dark:text-white sm:text-lg">
+            {title}
+          </span>
+        </div>
+
+        <ChevronDown
+          size={20}
+          className={`shrink-0 text-gray-500 transition-transform duration-300 ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+          >
+            <div className="border-t border-gray-100 px-4 pb-5 pt-4 text-sm leading-7 text-gray-600 dark:border-gray-800 dark:text-gray-300 sm:px-5 sm:text-base">
+              {content}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export default function HomePage() {
   const { lang } = useLanguage();
 
-  const si = lang === "si";
+  const [openFolder, setOpenFolder] = useState<string | null>("vision");
+
+  const toggleFolder = (id: string) => {
+    setOpenFolder((current) => (current === id ? null : id));
+  };
 
   return (
-    <main className="min-h-screen overflow-hidden bg-white text-slate-900 dark:bg-[#07110d] dark:text-white">
-
-      {/* ================= NAV ================= */}
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-white/80 backdrop-blur-xl dark:bg-[#07110d]/85">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
-          
-          <a href="#home" className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-600 text-xl shadow-lg">
-              🌿
-            </div>
-            <div>
-              <p className="font-black leading-none">
-                සොබා සේනාංකය
-              </p>
-              <p className="mt-1 text-[10px] uppercase tracking-[0.25em] text-emerald-600">
-                Nature • Humanity • Responsibility
-              </p>
-            </div>
-          </a>
-
-          <nav className="hidden gap-6 text-sm font-semibold md:flex">
-            <a href="#about" className="hover:text-emerald-600">හැඳින්වීම</a>
-            <a href="#vision" className="hover:text-emerald-600">දැක්ම</a>
-            <a href="#mission" className="hover:text-emerald-600">මෙහෙවර</a>
-            <a href="#objectives" className="hover:text-emerald-600">අරමුණු</a>
-            <a href="#action" className="hover:text-emerald-600">ක්‍රියාකාරීත්වය</a>
-            <a href="#membership" className="hover:text-emerald-600">සාමාජිකත්වය</a>
-          </nav>
-
-          <a
-            href="#join"
-            className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:-translate-y-0.5"
-          >
-            සොබා ආරක්ෂකයෙක් වන්න
-          </a>
-        </div>
-      </header>
-
-      {/* ================= HERO ================= */}
-      <section id="home" className="relative isolate min-h-[720px] overflow-hidden">
+    <main className="w-full overflow-x-hidden bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white">
+      {/* HERO / LOGO */}
+      <section className="relative isolate overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${images.hero})` }}
+          className="absolute inset-0 -z-20 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1800&q=85')",
+          }}
         />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,20,12,.92),rgba(2,20,12,.72),rgba(2,20,12,.35))]" />
 
-        <div className="relative mx-auto flex min-h-[720px] max-w-7xl items-center px-5 py-20 md:px-8">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            className="max-w-4xl text-white"
-          >
-            {/* Logo animation */}
+        <div className="absolute inset-0 -z-10 bg-black/55" />
+
+        <div className="mx-auto flex min-h-[430px] w-full max-w-6xl items-center px-4 py-14 sm:min-h-[500px] sm:px-6 sm:py-16">
+          <div className="w-full text-center text-white">
             <motion.div
-              animate={{ y: [0, -7, 0], rotate: [0, 2, -2, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="mb-8 flex h-24 w-24 items-center justify-center rounded-[2rem] border border-white/20 bg-white/10 text-5xl shadow-2xl backdrop-blur-md"
+              initial={{ opacity: 0, scale: 0.85, rotate: -8 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ duration: 0.8 }}
+              className="mx-auto mb-5 flex h-28 w-28 items-center justify-center rounded-full bg-white/10 p-2 shadow-2xl ring-4 ring-white/20 backdrop-blur-sm sm:h-32 sm:w-32"
             >
-              🌿
+              <img
+                src="/logo.png"
+                alt="සොබා සේනාංකය"
+                className="h-full w-full rounded-full object-contain"
+              />
             </motion.div>
 
-            <p className="mb-4 text-sm font-bold uppercase tracking-[0.35em] text-emerald-300">
-              {si ? "ස්වභාවධර්මය • මනුෂ්‍යත්වය • වගකීම" : "Nature • Humanity • Responsibility"}
-            </p>
+            <motion.h1
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.6 }}
+              className="text-3xl font-black tracking-tight sm:text-4xl md:text-5xl"
+            >
+              {lang === "si" ? "සොබා සේනාංකය" : "Soba Senankaya"}
+            </motion.h1>
 
-            <h1 className="text-5xl font-black leading-[1.08] md:text-7xl">
-              {si ? (
-                <>
-                  සොබා සේනාංකය
-                  <br />
-                  <span className="text-emerald-300">
-                    ස්වභාවධර්මය වෙනුවෙන්
-                  </span>
-                </>
-              ) : (
-                <>
-                  Soba Senankaya
-                  <br />
-                  <span className="text-emerald-300">
-                    For Nature & Humanity
-                  </span>
-                </>
-              )}
-            </h1>
+            <motion.p
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25, duration: 0.6 }}
+              className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white/90 sm:text-base"
+            >
+              {lang === "si"
+                ? "සොබාදහම වෙනුවෙන් මනුෂ්‍යත්වයේ වගකීම හා වගවීම"
+                : "Humanity's responsibility and accountability for nature"}
+            </motion.p>
 
-            <p className="mt-7 max-w-2xl text-base leading-8 text-white/80 md:text-lg">
-              {si
-                ? "ස්වභාවධර්මය උදෙසා මනුෂ්‍යත්වයේ වගකීම, වගවීම හා යුතුකම අවබෝධ කරමින් ස්වයං විනයෙන් යුතු සමාජයක් ගොඩනඟන සමාජ මෙහෙවරක්."
-                : "A social movement dedicated to strengthening humanity’s responsibility, accountability and duty towards nature."}
-            </p>
-
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="#about"
-                className="rounded-full bg-emerald-500 px-7 py-3 text-center font-bold text-white transition hover:bg-emerald-400"
-              >
-                හැඳින්වීම බලන්න
-              </a>
-
-              <a
-                href="#membership"
-                className="rounded-full border border-white/30 bg-white/10 px-7 py-3 text-center font-bold backdrop-blur-md transition hover:bg-white/20"
-              >
-                සාමාජිකත්වය
-              </a>
-            </div>
-          </motion.div>
+            <div className="mx-auto mt-6 h-1 w-16 rounded-full bg-emerald-400" />
+          </div>
         </div>
       </section>
 
-      {/* ================= INTRODUCTION ================= */}
-      <section id="about" className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-28">
-        <div className="grid items-center gap-12 md:grid-cols-2 md:gap-20">
-          
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            variants={fadeUp}
-            className="order-2 md:order-1"
-          >
-            <p className="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-emerald-600">
-              02 • හැඳින්වීම
-            </p>
-
-            <h2 className="text-4xl font-black tracking-tight md:text-5xl">
-              ස්වභාවධර්මයේ
-              <br />
-              උදාර රාජකාරියක්
-            </h2>
-
-            <div className="mt-7 space-y-5 text-base leading-8 text-slate-600 dark:text-slate-300 md:text-lg">
-              <p>
-                “සොබා සේනාංකය” තවත් එක් සමාජ මාධ්‍ය සමූහයක් නොව,
-                ස්වභාවධර්මයේ මෑණියන් උදෙසා කැප වූ උත්තරීතර රාජකාරියකි.
-              </p>
-
-              <p>
-                එය ජාතිය, කුලය, ආගම, පාට, පක්ෂ යන බෙදීම්වලින් ඔබ්බට
-                විහිදෙන මනුෂ්‍යත්වයේ උපරිම වගකීම හා වගවීමකි.
-              </p>
-
-              <p className="font-semibold text-emerald-700 dark:text-emerald-400">
-                “තනි තනිව වෙනස් වෙමු. අවසානයේ සුන්දර ලොවක් ගොඩනැගේවි.”
-              </p>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-            className="order-1 overflow-hidden rounded-[2rem] shadow-2xl md:order-2"
-          >
+      {/* INTRODUCTION */}
+      <section
+        id="about"
+        className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14"
+      >
+        <div className="grid gap-7 md:grid-cols-2 md:items-center">
+          <div className="overflow-hidden rounded-2xl shadow-lg">
             <img
-              src={images.introduction}
-              alt="Nature"
-              className="h-[340px] w-full object-cover transition duration-700 hover:scale-105 md:h-[520px]"
+              src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=85"
+              alt="Sri Lankan nature"
+              className="h-64 w-full object-cover sm:h-72 md:h-[350px]"
             />
-          </motion.div>
-        </div>
-      </section>
+          </div>
 
-      {/* ================= VISION ================= */}
-      <section id="vision" className="bg-emerald-950 text-white">
-        <div className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-28">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-            className="mx-auto max-w-5xl text-center"
-          >
-            <p className="mb-4 text-sm font-bold uppercase tracking-[0.3em] text-emerald-300">
-              03 • දැක්ම
-            </p>
-
-            <h2 className="text-4xl font-black md:text-6xl">
-              මිනිසාත් ස්වභාවධර්මයත්
-              <br />
-              අතර සමතුලිත අනාගතයක්
-            </h2>
-
-            <p className="mx-auto mt-8 max-w-4xl text-base leading-8 text-emerald-50/80 md:text-lg md:leading-9">
-              මිනිසාගේ පැවැත්මට පමණක් සම්පතක් නොවූ, මිනිසාද ඇතුළත් සමස්ත
-              ජීව පද්ධතියේ පදනම වූ ස්වභාවධර්මය උදෙසා මනුෂ්‍යත්වයේ වගකීම,
-              වගවීම සහ යුතුකම සෑම පුරවැසියෙක් තුළම අවබෝධ කරවීම තුළින්,
-              ස්වයං විනය, ආචාරධර්ම, කරුණාව, සහජීවනය හා සමාජ වගකීම මත
-              පදනම් වූ ආදර්ශවත් ශ්‍රී ලාංකීය සමාජයක් බිහි කිරීම.
-            </p>
-
-            <div className="mt-10 inline-block rounded-2xl border border-emerald-400/20 bg-white/5 px-6 py-5 text-sm font-semibold text-emerald-200 md:text-base">
-              “ස්වභාවධර්මය සුරැකීම යනු පරිසරය සුරැකීම පමණක් නොව,
-              මනුෂ්‍යත්වයේ අනාගතය සුරැකීමයි.”
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ================= MISSION ================= */}
-      <section id="mission" className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-28">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
-          className="grid gap-10 rounded-[2.5rem] bg-slate-50 p-7 dark:bg-white/[0.04] md:grid-cols-[0.8fr_1.2fr] md:p-12"
-        >
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.3em] text-emerald-600">
-              04 • මෙහෙවර
+            <span className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
+              {lang === "si" ? "හැඳින්වීම" : "Introduction"}
+            </span>
+
+            <h2 className="mt-2 text-2xl font-black sm:text-3xl">
+              {lang === "si"
+                ? "ස්වභාවධර්මය වෙනුවෙන් එක්වන මනුෂ්‍යත්වය"
+                : "Humanity united for nature"}
+            </h2>
+
+            <p className="mt-4 text-sm leading-7 text-gray-600 dark:text-gray-300 sm:text-base">
+              {lang === "si"
+                ? "සොබා සේනාංකය තවත් සමාජ මාධ්‍ය කණ්ඩායමක් නොව, මාතෘ ස්වභාවධර්මය වෙනුවෙන් කැප වූ වගකීමකි. ජාති, ආගම්, පක්ෂ හා වෙනත් බෙදීම් ඉක්මවා, ස්වභාවධර්මය ආරක්ෂා කිරීම සඳහා පුද්ගලයාගෙන් ආරම්භ වන වෙනසක් ගොඩනැගීම මෙහි අරමුණයි."
+                : "Soba Senankaya is not simply another social media group, but a responsibility dedicated to Mother Nature. Beyond divisions of race, religion, politics and other differences, it seeks to build meaningful change beginning with the individual."}
             </p>
 
-            <h2 className="mt-4 text-4xl font-black md:text-5xl">
-              වගකීමෙන්
-              <br />
-              ක්‍රියාවට
+            <div className="mt-5 flex items-center gap-3 rounded-2xl bg-emerald-50 p-4 dark:bg-emerald-950/30">
+              <HeartHandshake
+                className="shrink-0 text-emerald-600 dark:text-emerald-400"
+                size={24}
+              />
+              <p className="text-sm font-semibold leading-6 text-emerald-800 dark:text-emerald-300">
+                {lang === "si"
+                  ? "තනි තනිව වෙනස් වෙමු. අවසානයේ සුන්දර ලොවක් ගොඩනැගේවි."
+                  : "Let us change individually. Together, a beautiful world can be built."}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* VISION / MISSION / OBJECTIVE */}
+      <section className="w-full bg-white py-10 dark:bg-gray-900 sm:py-14">
+        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+          <div className="mx-auto mb-7 max-w-2xl text-center">
+            <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+              {lang === "si" ? "අපගේ පදනම" : "Our Foundation"}
+            </span>
+
+            <h2 className="mt-2 text-2xl font-black sm:text-3xl">
+              {lang === "si" ? "දැක්ම • මෙහෙවර • අරමුණ" : "Vision • Mission • Purpose"}
             </h2>
           </div>
 
-          <div className="flex items-center">
-            <p className="text-lg leading-9 text-slate-600 dark:text-slate-300">
-              ස්වභාවධර්මය සුරැකීම සම්බන්ධයෙන් පුද්ගලයාගේ වගකීම හා වගවීම
-              ශක්තිමත් කරමින්, ස්වයං විනයෙන් යුතු පුරවැසියන්ගෙන් සමන්විත
-              සමාජයක් ගොඩනැඟීමත්, එම සමාජ බලය සංවිධානාත්මකව ඒකරාශී කරමින්
-              ශ්‍රී ලංකාවේ ස්වභාවික පරිසරයේ සමතුලිතතාවය, ආරක්ෂාව හා
-              යහපැවැත්ම තහවුරු කරවීමට දායක වීමත් සොබා සේනාංකයේ මෙහෙවර වේ.
-            </p>
+          <div className="space-y-3">
+            {Object.entries(sections).map(([id, section]) => (
+              <ExpandCard
+                key={id}
+                id={id}
+                title={text(section.title, lang)}
+                icon={section.icon}
+                content={text(section.content, lang)}
+                open={openFolder === id}
+                onClick={() => toggleFolder(id)}
+              />
+            ))}
           </div>
-        </motion.div>
+        </div>
       </section>
 
-      {/* ================= OBJECTIVES ================= */}
-      <section id="objectives" className="mx-auto max-w-7xl px-5 pb-20 md:px-8 md:pb-28">
-        <div className="mb-12">
-          <p className="text-sm font-bold uppercase tracking-[0.3em] text-emerald-600">
-            05 • අරමුණ
-          </p>
-          <h2 className="mt-3 text-4xl font-black md:text-5xl">
-            අපගේ ප්‍රධාන අරමුණු
+      {/* OBJECTIVES */}
+      <section
+        id="objectives"
+        className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14"
+      >
+        <div className="mb-7">
+          <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+            {lang === "si" ? "අපගේ අරමුණු" : "Our Objectives"}
+          </span>
+
+          <h2 className="mt-2 text-2xl font-black sm:text-3xl">
+            {lang === "si"
+              ? "ස්වභාවික සමතුලිතතාව වෙනුවෙන්"
+              : "For natural balance"}
           </h2>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-2">
           {objectives.map((item, index) => (
-            <motion.article
-              key={item}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeUp}
-              className="group rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-white/10 dark:bg-white/[0.03]"
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.35 }}
+              className="flex gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900"
             >
-              <div className="mb-6 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-100 font-black text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-                0{index + 1}
-              </div>
+              <CheckCircle2
+                size={21}
+                className="mt-1 shrink-0 text-emerald-500"
+              />
 
-              <p className="leading-8 text-slate-600 dark:text-slate-300">
-                {item}
+              <p className="text-sm leading-7 text-gray-600 dark:text-gray-300 sm:text-base">
+                {text(item, lang)}
               </p>
-            </motion.article>
+            </motion.div>
           ))}
         </div>
       </section>
 
-      {/* ================= ACTION ================= */}
-      <section id="action" className="relative overflow-hidden bg-slate-950 text-white">
-        <div className="absolute inset-0 opacity-20">
-          <img
-            src={images.action}
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </div>
+      {/* ACTION STRUCTURE */}
+      <section
+        id="action"
+        className="w-full bg-emerald-950 py-10 text-white sm:py-14"
+      >
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto mb-8 max-w-2xl text-center">
+            <Sprout className="mx-auto mb-3 text-emerald-300" size={34} />
 
-        <div className="relative mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-28">
-          <div className="mb-12 max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.3em] text-emerald-400">
-              06 • ක්‍රියාකාරීත්වය
-            </p>
-
-            <h2 className="mt-4 text-4xl font-black md:text-6xl">
-              තනි පුද්ගලයාගෙන්
-              <br />
-              සමාජ වෙනසක් දක්වා
+            <h2 className="text-2xl font-black sm:text-3xl">
+              {lang === "si" ? "ක්‍රියාකාරී ව්‍යුහය" : "Action Structure"}
             </h2>
+
+            <p className="mt-3 text-sm leading-7 text-emerald-100/80 sm:text-base">
+              {lang === "si"
+                ? "ස්වභාවධර්මය වෙනුවෙන් වෙනස පුද්ගලයාගෙන් ආරම්භ වී සමාජය දක්වා ගමන් කරයි."
+                : "Change for nature begins with the individual and grows towards society."}
+            </p>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
-            {actionLevels.map((item) => (
-              <motion.article
-                key={item.number}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUp}
-                className="rounded-[2rem] border border-white/10 bg-white/10 p-7 backdrop-blur-md"
-              >
-                <span className="text-4xl font-black text-emerald-400">
-                  {item.number}
-                </span>
+          <div className="grid gap-4 md:grid-cols-3">
+            {[
+              {
+                icon: Leaf,
+                title: lang === "si" ? "පුද්ගල මට්ටම" : "Individual Level",
+                text:
+                  lang === "si"
+                    ? "ස්වභාවික සමතුලිතතාවයට බාධා කරන තමන්ගේ ක්‍රියා හඳුනාගෙන ඒවා අවම කරමින් ස්වයං විනයෙන් හා වගකීමෙන් ක්‍රියා කිරීම."
+                    : "Identify personal actions that disturb natural balance, reduce them, and act with self-discipline and responsibility.",
+              },
+              {
+                icon: Users,
+                title: lang === "si" ? "කණ්ඩායම් මට්ටම" : "Group Level",
+                text:
+                  lang === "si"
+                    ? "එකම අරමුණ හා වගකීම සහිත පුද්ගලයන් එක්ව ස්වභාවධර්මය ආරක්ෂා කිරීම සඳහා සාමූහික දායකත්වයක් ලබාදීම."
+                    : "Bring together people with a common purpose and responsibility for collective contribution to nature.",
+              },
+              {
+                icon: Scale,
+                title: lang === "si" ? "සමාජ මට්ටම" : "Social Level",
+                text:
+                  lang === "si"
+                    ? "ස්වභාවධර්මය සඳහා ආචාර ධර්ම හා නීතිගරුකභාවය ශක්තිමත් කරන සමාජ මතයක් ගොඩනැගීම."
+                    : "Build social awareness that strengthens ethics and lawful responsibility towards nature.",
+              },
+            ].map((item, index) => {
+              const Icon = item.icon;
 
-                <h3 className="mt-5 text-2xl font-black">
-                  {item.title}
-                </h3>
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.35, delay: index * 0.08 }}
+                  className="rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-sm"
+                >
+                  <Icon className="mb-4 text-emerald-300" size={28} />
 
-                <p className="mt-4 leading-8 text-white/70">
-                  {item.text}
-                </p>
-              </motion.article>
-            ))}
+                  <h3 className="text-lg font-bold">{item.title}</h3>
+
+                  <p className="mt-3 text-sm leading-7 text-emerald-50/80">
+                    {item.text}
+                  </p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* ================= MEMBERSHIP ================= */}
-      <section id="membership" className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-28">
-        <div className="grid items-center gap-12 md:grid-cols-2">
-          
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-            className="overflow-hidden rounded-[2rem]"
-          >
-            <img
-              src={images.members}
-              alt="Community"
-              className="h-[420px] w-full object-cover md:h-[560px]"
-            />
-          </motion.div>
+      {/* MEMBERSHIP */}
+      <section
+        id="membership"
+        className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14"
+      >
+        <div className="grid gap-7 md:grid-cols-2 md:items-start">
+          <div>
+            <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+              {lang === "si" ? "සාමාජිකත්වය" : "Membership"}
+            </span>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-          >
-            <p className="text-sm font-bold uppercase tracking-[0.3em] text-emerald-600">
-              07 • සාමාජිකත්වය
-            </p>
-
-            <h2 className="mt-4 text-4xl font-black md:text-5xl">
-              ඔබත් සොබා
-              <br />
-              ආරක්ෂකයෙක් වන්න
+            <h2 className="mt-2 text-2xl font-black sm:text-3xl">
+              {lang === "si"
+                ? "සොබා ආරක්ෂකයෙකු වන්න"
+                : "Become a Guardian of Nature"}
             </h2>
 
-            <p className="mt-7 text-lg leading-8 text-slate-600 dark:text-slate-300">
-              සෑම ශ්‍රී ලාංකිකයෙකුම ජාති, ආගම්, වර්ග, කුල, භාෂා හෝ
-              දේශපාලනික බෙදීම්වලින් තොරව සොබා සේනාංකයේ අරමුණු හා ප්‍රතිපත්ති
-              පිළිගන්නේ නම් එහි සාමාජිකත්වය ලබා ගැනීමට සුදුසුකම් ලබයි.
+            <p className="mt-4 text-sm leading-7 text-gray-600 dark:text-gray-300 sm:text-base">
+              {lang === "si"
+                ? "ස්වභාවධර්මය ආරක්ෂා කිරීමේ වගකීම පිළිගන්නා ඕනෑම ශ්‍රී ලාංකිකයෙකුට මෙම මෙහෙවරට එක්විය හැක."
+                : "Any Sri Lankan who accepts the responsibility of protecting nature can become part of this mission."}
             </p>
 
-            <div
-              id="join"
-              className="mt-8 rounded-3xl border border-emerald-200 bg-emerald-50 p-6 dark:border-emerald-900/40 dark:bg-emerald-950/30"
-            >
-              <p className="font-bold text-emerald-800 dark:text-emerald-300">
-                “ස්වභාවධර්මය වෙනුවෙන් මනුෂ්‍යත්වයේ ප්‍රතිඥාව”
-              </p>
+            <div className="mt-5 space-y-3">
+              {membershipPoints.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex gap-3 rounded-xl bg-white p-4 shadow-sm dark:bg-gray-900"
+                >
+                  <Users
+                    size={20}
+                    className="mt-1 shrink-0 text-emerald-500"
+                  />
 
-              <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                ප්‍රතිඥාව හෘද සාක්ෂියට එකඟව ලබා දී, එහි අන්තර්ගතයට අනුගතව
-                ක්‍රියා කිරීමට කැමති හා හැකියාව ඇති ඕනෑම පුරවැසියෙකු මෙම
-                සමාජ මෙහෙවරෙහි කොටස්කරුවෙකු වේ.
-              </p>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Ethics */}
-        <div className="mt-16 rounded-[2rem] bg-slate-950 p-7 text-white md:p-10">
-          <h3 className="text-2xl font-black md:text-3xl">
-            සොබා සේනාංකයේ ආචාරධර්ම
-          </h3>
-
-          <div className="mt-7 grid gap-3 md:grid-cols-2">
-            {ethics.map((item, index) => (
-              <div
-                key={item}
-                className="flex gap-4 rounded-2xl border border-white/10 bg-white/5 p-4"
-              >
-                <span className="font-black text-emerald-400">
-                  {index + 1}
-                </span>
-                <p className="leading-7 text-white/80">{item}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ================= MESSAGE / SUB FOLDERS ================= */}
-      <section id="message" className="bg-emerald-50 dark:bg-emerald-950/20">
-        <div className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-28">
-
-          <div className="mb-12 max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.3em] text-emerald-600">
-              ස්වභාවධර්මයේ පණිවිඩය
-            </p>
-
-            <h2 className="mt-4 text-4xl font-black md:text-5xl">
-              පණිවිඩය • නිවේදන • වීඩියෝ
-            </h2>
-          </div>
-
-          {/* Sub folders */}
-          <div className="grid gap-5 md:grid-cols-3">
-
-            <a
-              href="#latest"
-              className="group overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-white/[0.04]"
-            >
-              <div className="relative h-52 overflow-hidden">
-                <img
-                  src={images.message}
-                  alt="Latest announcement"
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                <span className="absolute bottom-5 left-5 rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white">
-                  LATEST
-                </span>
-              </div>
-
-              <div className="p-6">
-                <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">
-                  Sub Folder 01
-                </p>
-                <h3 className="mt-2 text-xl font-black">
-                  නවතම නිවේදන
-                </h3>
-              </div>
-            </a>
-
-            <a
-              href="#duty"
-              className="group rounded-3xl bg-white p-7 shadow-sm transition hover:-translate-y-1 dark:bg-white/[0.04]"
-            >
-              <span className="text-4xl">🌱</span>
-              <p className="mt-7 text-xs font-bold uppercase tracking-widest text-emerald-600">
-                Sub Folder 02
-              </p>
-              <h3 className="mt-2 text-2xl font-black">
-                මගේ රාජකාරිය
-              </h3>
-              <p className="mt-4 leading-7 text-slate-600 dark:text-slate-300">
-                ස්වභාවධර්මය වෙනුවෙන් පුද්ගලික වගකීම හා ස්වයං විනය.
-              </p>
-            </a>
-
-            <a
-              href="#social-mission"
-              className="group rounded-3xl bg-white p-7 shadow-sm transition hover:-translate-y-1 dark:bg-white/[0.04]"
-            >
-              <span className="text-4xl">🤝</span>
-              <p className="mt-7 text-xs font-bold uppercase tracking-widest text-emerald-600">
-                Sub Folder 03
-              </p>
-              <h3 className="mt-2 text-2xl font-black">
-                සමාජ මෙහෙවර
-              </h3>
-              <p className="mt-4 leading-7 text-slate-600 dark:text-slate-300">
-                පුද්ගලයාගෙන් සමූහයටත්, සමූහයෙන් සමාජයටත්.
-              </p>
-            </a>
-
-          </div>
-
-          {/* Latest content */}
-          <div
-            id="latest"
-            className="mt-10 grid gap-5 md:grid-cols-2"
-          >
-            <article className="rounded-3xl bg-white p-7 shadow-sm dark:bg-white/[0.04]">
-              <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-                ANNOUNCEMENT
-              </span>
-              <h3 className="mt-5 text-2xl font-black">
-                ස්වභාවධර්මයේ නවතම පණිවිඩය
-              </h3>
-              <p className="mt-3 leading-7 text-slate-600 dark:text-slate-300">
-                මෙතැනට ඔබගේ latest announcement එක dynamic data එකෙන්
-                පසුව load කරන්න පුළුවන්.
-              </p>
-              <a
-                href="#"
-                className="mt-5 inline-block font-bold text-emerald-600"
-              >
-                වැඩි විස්තර →
-              </a>
-            </article>
-
-            <article className="overflow-hidden rounded-3xl bg-slate-950 text-white">
-              <div className="flex min-h-[250px] items-center justify-center p-8">
-                <div className="text-center">
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-2xl shadow-xl">
-                    ▶
-                  </div>
-                  <h3 className="mt-5 text-2xl font-black">
-                    නවතම වීඩියෝව
-                  </h3>
-                  <p className="mt-2 text-sm text-white/60">
-                    Video URL එක මෙතැනට connect කරන්න.
+                  <p className="text-sm leading-7 text-gray-600 dark:text-gray-300">
+                    {text(item, lang)}
                   </p>
                 </div>
-              </div>
-            </article>
+              ))}
+            </div>
           </div>
 
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-900 dark:bg-emerald-950/30 sm:p-6">
+            <h3 className="text-xl font-black text-emerald-900 dark:text-emerald-300">
+              {lang === "si" ? "ස්වභාවධර්මයේ ප්‍රතිඥාව" : "Nature's Pledge"}
+            </h3>
+
+            <div className="mt-5 space-y-3">
+              {ethics.map((item, index) => (
+                <div key={index} className="flex gap-3">
+                  <CheckCircle2
+                    size={19}
+                    className="mt-1 shrink-0 text-emerald-600"
+                  />
+
+                  <p className="text-sm leading-7 text-gray-700 dark:text-gray-300">
+                    {text(item, lang)}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 border-t border-emerald-200 pt-5 text-center dark:border-emerald-900">
+              <p className="text-sm font-bold leading-7 text-emerald-800 dark:text-emerald-300">
+                {lang === "si"
+                  ? "සොබා සේනාංකය - සොබාදහම වෙනුවෙන් මනුෂ්‍යත්වයේ ප්‍රතිඥාවයි."
+                  : "Soba Senankaya - Humanity's pledge for nature."}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ================= DUTY ================= */}
-      <section id="duty" className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-28">
-        <div className="rounded-[2.5rem] border border-emerald-200 bg-white p-7 shadow-sm dark:border-emerald-900/30 dark:bg-white/[0.03] md:p-12">
-          <p className="text-sm font-bold uppercase tracking-[0.3em] text-emerald-600">
-            මගේ රාජකාරිය
-          </p>
-
-          <h2 className="mt-4 text-4xl font-black md:text-5xl">
-            වෙනස ආරම්භ වන්නේ
-            <br />
-            මගෙන්මය.
-          </h2>
-
-          <p className="mt-7 max-w-4xl text-lg leading-9 text-slate-600 dark:text-slate-300">
-            ස්වභාවධර්මයේ සමතුලිතතාවයට බාධා පමුණුවන පුද්ගලික ක්‍රියා
-            හඳුනාගැනීම, ඒවා අවම කිරීම, ස්වයං විනයෙන් හා වගකීමෙන් යුතු
-            සාමාජිකයෙකු ලෙස ක්‍රියා කිරීම සහ ස්වභාවධර්මයේ ආරක්ෂකයෙකු
-            ලෙස පුද්ගල පරිවර්තනයක් ඇති කිරීම මගේ රාජකාරියේ මූලික පදනමයි.
-          </p>
-        </div>
-      </section>
-
-      {/* ================= SOCIAL MISSION ================= */}
+      {/* LATEST ANNOUNCEMENTS */}
       <section
-        id="social-mission"
-        className="bg-slate-950 text-white"
+        id="message"
+        className="w-full bg-gray-100 py-10 dark:bg-gray-900/60 sm:py-14"
       >
-        <div className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-28">
-          <div className="grid gap-10 md:grid-cols-2">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+          <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.3em] text-emerald-400">
-                සමාජ මෙහෙවර
-              </p>
+              <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                {lang === "si" ? "ස්වභාවධර්මයේ පණිවිඩය" : "Message of Nature"}
+              </span>
 
-              <h2 className="mt-4 text-4xl font-black md:text-6xl">
-                එකමුතුවෙන්
-                <br />
-                සුරකිමු.
+              <h2 className="mt-1 text-2xl font-black sm:text-3xl">
+                {lang === "si" ? "නවතම නිවේදන" : "Latest Announcements"}
               </h2>
             </div>
 
-            <div className="space-y-6 text-lg leading-9 text-white/70">
-              <p>
-                සමාන අරමුණක් හා වගකීමක් සහිත පුද්ගලයන් සමූහයක් ලෙස
-                ඒකරාශී කරමින් ස්වභාවධර්මයේ ආරක්ෂාව හා සමතුලිතතාවය උදෙසා
-                සාමූහික දායකත්වයක් ලබා දීම.
-              </p>
-
-              <p>
-                ස්වභාවධර්මය සුරැකීමේ ආචාරධර්ම හා රීති බලගන්වන සමාජ මතයක්
-                ගොඩනඟමින් එය සමාජයේ සාමාන්‍ය ජීවන රටාවේ කොටසක් කිරීම.
-              </p>
-
-              <p className="font-semibold text-emerald-300">
-                “සියලු දෙනාගේම අම්මා වන ස්වභාවධර්මය අපට කියා දෙන පාඩම
-                අවබෝධ කර ගනිමු.”
-              </p>
-            </div>
+            <ArrowRight className="hidden text-emerald-500 sm:block" size={24} />
           </div>
+
+          <LatestAnnouncements />
         </div>
       </section>
 
-      {/* ================= FEEDBACK ================= */}
-      <section className="mx-auto max-w-7xl px-5 py-20 md:px-8">
-        <div className="rounded-[2.5rem] bg-gradient-to-br from-emerald-600 to-teal-700 p-8 text-white md:p-12">
-          <div className="grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
+      {/* IDEAS / SUGGESTIONS */}
+      <section
+        id="comments"
+        className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14"
+      >
+        <div className="rounded-3xl bg-emerald-600 p-6 text-white shadow-xl sm:p-8">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.25em] text-emerald-100">
-                අදහස් හා යෝජනා
-              </p>
+              <div className="flex items-center gap-3">
+                <MessageCircle size={27} />
 
-              <h2 className="mt-3 text-4xl font-black md:text-5xl">
-                ඔබගේ අදහසද
-                <br />
-                මේ ගමනේ කොටසක්.
-              </h2>
+                <h2 className="text-2xl font-black">
+                  {lang === "si" ? "අදහස් හා යෝජනා" : "Ideas & Suggestions"}
+                </h2>
+              </div>
 
-              <p className="mt-4 max-w-2xl leading-8 text-white/80">
-                ස්වභාවධර්මයේ ආරක්ෂාව උදෙසා ඔබගේ වටිනා අදහස්,
-                යෝජනා හා දායකත්වය ලබා දෙන්න.
+              <p className="mt-3 max-w-xl text-sm leading-7 text-emerald-50 sm:text-base">
+                {lang === "si"
+                  ? "ඔබේ අදහසක්, යෝජනාවක් හෝ ස්වභාවධර්මය වෙනුවෙන් කළ හැකි ක්‍රියාවක් අප සමඟ බෙදාගන්න."
+                  : "Share your idea, suggestion, or an action that can help protect nature."}
               </p>
             </div>
 
-            <a
-              href="#"
-              className="rounded-full bg-white px-7 py-4 text-center font-black text-emerald-700 transition hover:scale-105"
+            <button
+              type="button"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-emerald-700 shadow-sm transition hover:bg-emerald-50 sm:w-auto"
             >
-              අදහසක් යොමු කරන්න
-            </a>
+              <MessageSquare size={18} />
+              {lang === "si" ? "ඔබේ අදහස එක් කරන්න" : "Add your idea"}
+            </button>
           </div>
         </div>
       </section>
 
-      {/* ================= FOOTER ================= */}
-      <footer className="border-t border-slate-200 bg-white dark:border-white/10 dark:bg-[#050c09]">
-        <div className="mx-auto max-w-7xl px-5 py-10 md:px-8">
-          <div className="flex flex-col gap-7 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-xl font-black">සොබා සේනාංකය</p>
-              <p className="mt-1 text-sm text-slate-500">
-                ස්වභාවධර්මය වෙනුවෙන් මනුෂ්‍යත්වයේ ප්‍රතිඥාවයි.
-              </p>
+      {/* SOCIAL LINKS */}
+      <section className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-6 sm:pb-14">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <a
+            href="#"
+            className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 dark:border-gray-800 dark:bg-gray-900"
+          >
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl bg-blue-100 p-2 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                <Facebook size={22} />
+              </div>
+
+              <div>
+                <p className="font-bold">
+                  {lang === "si" ? "Facebook පිටුව" : "Facebook Page"}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {lang === "si"
+                    ? "අප සමඟ සම්බන්ධ වන්න"
+                    : "Connect with us"}
+                </p>
+              </div>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              <a
-                href="https://facebook.com/"
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full border border-slate-200 px-5 py-2 text-sm font-bold transition hover:border-emerald-500 hover:text-emerald-600 dark:border-white/10"
-              >
-                Facebook
-              </a>
+            <ArrowRight size={19} className="text-gray-400" />
+          </a>
 
-              <a
-                href="https://wa.me/"
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-bold text-white transition hover:bg-emerald-500"
-              >
-                WhatsApp
-              </a>
+          <a
+            href="#"
+            className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 dark:border-gray-800 dark:bg-gray-900"
+          >
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl bg-green-100 p-2 text-green-600 dark:bg-green-900/30 dark:text-green-400">
+                <MessageCircle size={22} />
+              </div>
+
+              <div>
+                <p className="font-bold">
+                  {lang === "si" ? "WhatsApp" : "WhatsApp"}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {lang === "si"
+                    ? "අප සමඟ සම්බන්ධ වන්න"
+                    : "Connect with us"}
+                </p>
+              </div>
             </div>
-          </div>
+
+            <ArrowRight size={19} className="text-gray-400" />
+          </a>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-gray-200 bg-white py-7 dark:border-gray-800 dark:bg-gray-950">
+        <div className="mx-auto w-full max-w-6xl px-4 text-center sm:px-6">
+          <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
+            {lang === "si" ? "සොබා සේනාංකය" : "Soba Senankaya"}
+          </p>
+
+          <p className="mt-1 text-xs text-gray-500">
+            {lang === "si"
+              ? "සොබාදහම වෙනුවෙන් මනුෂ්‍යත්වයේ වගකීම"
+              : "Humanity's responsibility for nature"}
+          </p>
         </div>
       </footer>
     </main>
   );
-            }
+              }
