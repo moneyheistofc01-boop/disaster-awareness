@@ -70,16 +70,15 @@ export default function AdminDashboardPage() {
   const [comments, setComments] = useState<Comment[]>([]);
 
   const [loading, setLoading] = useState(true);
-  const [commentsLoading, setCommentsLoading] =
-    useState(true);
+  const [commentsLoading, setCommentsLoading] = useState(true);
 
   const [saving, setSaving] = useState(false);
-  const [savingComment, setSavingComment] =
-    useState(false);
+  const [savingComment, setSavingComment] = useState(false);
 
   const [checking, setChecking] = useState(true);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
+
   const [isCommentFormOpen, setIsCommentFormOpen] =
     useState(false);
 
@@ -87,11 +86,15 @@ export default function AdminDashboardPage() {
     null
   );
 
-  const [editingCommentId, setEditingCommentId] =
-    useState<number | null>(null);
+  /*
+   * Instead of depending only on an ID,
+   * keep the actual selected comment.
+   * This prevents invalid/null ID problems.
+   */
+  const [selectedComment, setSelectedComment] =
+    useState<Comment | null>(null);
 
-  const [form, setForm] =
-    useState<FormState>(emptyForm);
+  const [form, setForm] = useState<FormState>(emptyForm);
 
   const [commentForm, setCommentForm] =
     useState<CommentFormState>(
@@ -107,11 +110,9 @@ export default function AdminDashboardPage() {
   const [deletingCommentId, setDeletingCommentId] =
     useState<number | null>(null);
 
-  const [loggingOut, setLoggingOut] =
-    useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
-  const [refreshing, setRefreshing] =
-    useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   /*
    * =========================================================
@@ -264,7 +265,7 @@ export default function AdminDashboardPage() {
 
   /*
    * =========================================================
-   * REFRESH ALL
+   * REFRESH
    * =========================================================
    */
 
@@ -281,7 +282,9 @@ export default function AdminDashboardPage() {
         loadComments(),
       ]);
 
-      setMessage("Dashboard refreshed.");
+      setMessage(
+        "Dashboard refreshed."
+      );
     } finally {
       setRefreshing(false);
     }
@@ -289,7 +292,7 @@ export default function AdminDashboardPage() {
 
   /*
    * =========================================================
-   * ANNOUNCEMENT - ADD
+   * ANNOUNCEMENT ADD
    * =========================================================
    */
 
@@ -305,7 +308,7 @@ export default function AdminDashboardPage() {
 
   /*
    * =========================================================
-   * ANNOUNCEMENT - EDIT
+   * ANNOUNCEMENT EDIT
    * =========================================================
    */
 
@@ -319,7 +322,8 @@ export default function AdminDashboardPage() {
       description:
         announcement.description || "",
       imageUrl: announcement.imageUrl,
-      linkUrl: announcement.linkUrl || "",
+      linkUrl:
+        announcement.linkUrl || "",
     });
 
     setError("");
@@ -330,7 +334,7 @@ export default function AdminDashboardPage() {
 
   /*
    * =========================================================
-   * ANNOUNCEMENT - CLOSE
+   * ANNOUNCEMENT CLOSE
    * =========================================================
    */
 
@@ -344,7 +348,7 @@ export default function AdminDashboardPage() {
 
   /*
    * =========================================================
-   * ANNOUNCEMENT - CHANGE
+   * ANNOUNCEMENT CHANGE
    * =========================================================
    */
 
@@ -360,7 +364,7 @@ export default function AdminDashboardPage() {
 
   /*
    * =========================================================
-   * ANNOUNCEMENT - SAVE
+   * ANNOUNCEMENT SAVE
    * =========================================================
    */
 
@@ -392,21 +396,34 @@ export default function AdminDashboardPage() {
         {
           method,
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type":
+              "application/json",
           },
-          credentials: "same-origin",
-          body: JSON.stringify(body),
+          credentials:
+            "same-origin",
+          body: JSON.stringify(
+            body
+          ),
         }
       );
 
-      const data = await response.json();
+      const data =
+        await response.json();
 
-      if (response.status === 401) {
-        router.replace("/eco-admin");
+      if (
+        response.status ===
+        401
+      ) {
+        router.replace(
+          "/eco-admin"
+        );
         return;
       }
 
-      if (!response.ok || !data.success) {
+      if (
+        !response.ok ||
+        !data.success
+      ) {
         throw new Error(
           data?.message ||
             "Could not save announcement."
@@ -437,44 +454,63 @@ export default function AdminDashboardPage() {
 
   /*
    * =========================================================
-   * ANNOUNCEMENT - DELETE
+   * ANNOUNCEMENT DELETE
    * =========================================================
    */
 
-  const handleDelete = async (id: number) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this announcement?"
-    );
+  const handleDelete = async (
+    id: number
+  ) => {
+    const confirmed =
+      window.confirm(
+        "Are you sure you want to delete this announcement?"
+      );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
     setError("");
     setMessage("");
     setDeletingId(id);
 
     try {
-      const response = await fetch(
-        "/api/announcements",
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "same-origin",
-          body: JSON.stringify({
-            id,
-          }),
-        }
-      );
+      const response =
+        await fetch(
+          "/api/announcements",
+          {
+            method:
+              "DELETE",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            credentials:
+              "same-origin",
+            body:
+              JSON.stringify({
+                id,
+              }),
+          }
+        );
 
-      const data = await response.json();
+      const data =
+        await response.json();
 
-      if (response.status === 401) {
-        router.replace("/eco-admin");
+      if (
+        response.status ===
+        401
+      ) {
+        router.replace(
+          "/eco-admin"
+        );
         return;
       }
 
-      if (!response.ok || !data.success) {
+      if (
+        !response.ok ||
+        !data.success
+      ) {
         throw new Error(
           data?.message ||
             "Could not delete announcement."
@@ -499,64 +535,91 @@ export default function AdminDashboardPage() {
 
   /*
    * =========================================================
-   * COMMENT - ADD FORM
+   * COMMENT ADD
    * =========================================================
    */
 
-  const openAddCommentForm = () => {
-    setEditingCommentId(null);
+  const openAddCommentForm =
+    () => {
+      setSelectedComment(
+        null
+      );
 
-    setCommentForm(
-      emptyCommentForm
-    );
+      setCommentForm(
+        emptyCommentForm
+      );
 
-    setError("");
-    setMessage("");
+      setError("");
+      setMessage("");
 
-    setIsCommentFormOpen(true);
-  };
+      setIsCommentFormOpen(
+        true
+      );
+    };
 
   /*
    * =========================================================
-   * COMMENT - EDIT FORM
+   * COMMENT EDIT
    * =========================================================
    */
 
-  const openEditCommentForm = (
-    comment: Comment
-  ) => {
-    setEditingCommentId(comment.id);
+  const openEditCommentForm =
+    (comment: Comment) => {
+      /*
+       * Keep the full object.
+       * This guarantees the real DB ID
+       * stays attached to the edit action.
+       */
+      setSelectedComment(
+        comment
+      );
 
-    setCommentForm({
-      name: comment.name,
-      comment: comment.comment,
-    });
+      setCommentForm({
+        name: comment.name,
+        comment:
+          comment.comment,
+      });
 
-    setError("");
-    setMessage("");
+      setError("");
+      setMessage("");
 
-    setIsCommentFormOpen(true);
-  };
+      setIsCommentFormOpen(
+        true
+      );
+    };
 
   /*
    * =========================================================
-   * COMMENT - CLOSE FORM
+   * COMMENT CLOSE
    * =========================================================
    */
 
-  const closeCommentForm = () => {
-    if (savingComment) return;
+  const closeCommentForm =
+    () => {
+      if (
+        savingComment
+      ) {
+        return;
+      }
 
-    setIsCommentFormOpen(false);
-    setEditingCommentId(null);
-    setCommentForm(
-      emptyCommentForm
-    );
-  };
+      setIsCommentFormOpen(
+        false
+      );
+
+      setSelectedComment(
+        null
+      );
+
+      setCommentForm(
+        emptyCommentForm
+      );
+
+      setError("");
+    };
 
   /*
    * =========================================================
-   * COMMENT - CHANGE
+   * COMMENT CHANGE
    * =========================================================
    */
 
@@ -564,137 +627,335 @@ export default function AdminDashboardPage() {
     field: keyof CommentFormState,
     value: string
   ) => {
-    setCommentForm((previous) => ({
-      ...previous,
-      [field]: value,
-    }));
-  };
-
-  /*
-   * =========================================================
-   * COMMENT - SAVE
-   * =========================================================
-   */
-
-  const handleCommentSave = async (
-    event: FormEvent<HTMLFormElement>
-  ) => {
-    event.preventDefault();
-
-    setError("");
-    setMessage("");
-    setSavingComment(true);
-
-    try {
-      const response = await fetch(
-        "/api/comments",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "same-origin",
-          body: JSON.stringify({
-            id: editingCommentId,
-            name: commentForm.name,
-            comment: commentForm.comment,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.status === 401) {
-        router.replace("/eco-admin");
-        return;
-      }
-
-      if (!response.ok || !data.success) {
-        throw new Error(
-          data?.message ||
-            "Could not update comment."
-        );
-      }
-
-      setMessage(
-        "Comment updated successfully."
-      );
-
-      setIsCommentFormOpen(false);
-      setEditingCommentId(null);
-      setCommentForm(
-        emptyCommentForm
-      );
-
-      await loadComments();
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Could not update comment."
-      );
-    } finally {
-      setSavingComment(false);
-    }
-  };
-
-  /*
-   * =========================================================
-   * COMMENT - DELETE
-   * =========================================================
-   */
-
-  const handleDeleteComment = async (
-    id: number
-  ) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to permanently delete this comment?"
+    setCommentForm(
+      (previous) => ({
+        ...previous,
+        [field]: value,
+      })
     );
+  };
 
-    if (!confirmed) return;
+  /*
+   * =========================================================
+   * COMMENT SAVE
+   *
+   * ADD = POST
+   * EDIT = PUT
+   * =========================================================
+   */
 
-    setError("");
-    setMessage("");
-    setDeletingCommentId(id);
+  const handleCommentSave =
+    async (
+      event: FormEvent<HTMLFormElement>
+    ) => {
+      event.preventDefault();
 
-    try {
-      const response = await fetch(
-        `/api/comments?id=${id}`,
-        {
-          method: "DELETE",
-          credentials: "same-origin",
-        }
+      setError("");
+      setMessage("");
+      setSavingComment(
+        true
       );
 
-      const data = await response.json();
+      try {
+        const name =
+          commentForm.name.trim();
 
-      if (response.status === 401) {
-        router.replace("/eco-admin");
+        const comment =
+          commentForm.comment.trim();
+
+        if (!name) {
+          throw new Error(
+            "Name is required."
+          );
+        }
+
+        if (!comment) {
+          throw new Error(
+            "Comment is required."
+          );
+        }
+
+        /*
+         * ===================================================
+         * ADD NEW COMMENT
+         * ===================================================
+         */
+
+        if (!selectedComment) {
+          const response =
+            await fetch(
+              "/api/comments",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type":
+                    "application/json",
+                },
+                credentials:
+                  "same-origin",
+                body:
+                  JSON.stringify({
+                    name,
+                    comment,
+                  }),
+              }
+            );
+
+          const data =
+            await response.json();
+
+          if (
+            response.status ===
+            401
+          ) {
+            router.replace(
+              "/eco-admin"
+            );
+            return;
+          }
+
+          if (
+            !response.ok ||
+            !data.success
+          ) {
+            throw new Error(
+              data?.message ||
+                "Could not add comment."
+            );
+          }
+
+          setMessage(
+            "Comment added successfully."
+          );
+
+          setIsCommentFormOpen(
+            false
+          );
+
+          setSelectedComment(
+            null
+          );
+
+          setCommentForm(
+            emptyCommentForm
+          );
+
+          await loadComments();
+
+          return;
+        }
+
+        /*
+         * ===================================================
+         * EDIT EXISTING COMMENT
+         * ===================================================
+         */
+
+        const commentId =
+          Number(
+            selectedComment.id
+          );
+
+        /*
+         * Extra protection.
+         */
+        if (
+          !Number.isInteger(
+            commentId
+          ) ||
+          commentId <= 0
+        ) {
+          throw new Error(
+            "Invalid comment ID."
+          );
+        }
+
+        const response =
+          await fetch(
+            "/api/comments",
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+              credentials:
+                "same-origin",
+              body:
+                JSON.stringify({
+                  id: commentId,
+                  name,
+                  comment,
+                }),
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (
+          response.status ===
+          401
+        ) {
+          router.replace(
+            "/eco-admin"
+          );
+          return;
+        }
+
+        if (
+          !response.ok ||
+          !data.success
+        ) {
+          throw new Error(
+            data?.message ||
+              "Could not update comment."
+          );
+        }
+
+        setMessage(
+          "Comment updated successfully."
+        );
+
+        setIsCommentFormOpen(
+          false
+        );
+
+        setSelectedComment(
+          null
+        );
+
+        setCommentForm(
+          emptyCommentForm
+        );
+
+        await loadComments();
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Could not save comment."
+        );
+      } finally {
+        setSavingComment(
+          false
+        );
+      }
+    };
+
+  /*
+   * =========================================================
+   * COMMENT DELETE
+   * =========================================================
+   */
+
+  const handleDeleteComment =
+    async (
+      id: number
+    ) => {
+      const commentId =
+        Number(id);
+
+      if (
+        !Number.isInteger(
+          commentId
+        ) ||
+        commentId <= 0
+      ) {
+        setError(
+          "Invalid comment ID."
+        );
         return;
       }
 
-      if (!response.ok || !data.success) {
-        throw new Error(
-          data?.message ||
-            "Could not delete comment."
+      const confirmed =
+        window.confirm(
+          "Are you sure you want to permanently delete this comment?"
         );
+
+      if (!confirmed) {
+        return;
       }
 
-      setMessage(
-        "Comment deleted successfully."
+      setError("");
+      setMessage("");
+      setDeletingCommentId(
+        commentId
       );
 
-      await loadComments();
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Could not delete comment."
-      );
-    } finally {
-      setDeletingCommentId(null);
-    }
-  };
+      try {
+        const response =
+          await fetch(
+            `/api/comments?id=${commentId}`,
+            {
+              method:
+                "DELETE",
+              credentials:
+                "same-origin",
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (
+          response.status ===
+          401
+        ) {
+          router.replace(
+            "/eco-admin"
+          );
+          return;
+        }
+
+        if (
+          !response.ok ||
+          !data.success
+        ) {
+          throw new Error(
+            data?.message ||
+              "Could not delete comment."
+          );
+        }
+
+        setMessage(
+          "Comment deleted successfully."
+        );
+
+        /*
+         * If currently editing the
+         * deleted comment, close modal.
+         */
+        if (
+          selectedComment?.id ===
+          commentId
+        ) {
+          setIsCommentFormOpen(
+            false
+          );
+
+          setSelectedComment(
+            null
+          );
+
+          setCommentForm(
+            emptyCommentForm
+          );
+        }
+
+        await loadComments();
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Could not delete comment."
+        );
+      } finally {
+        setDeletingCommentId(
+          null
+        );
+      }
+    };
 
   /*
    * =========================================================
@@ -702,33 +963,44 @@ export default function AdminDashboardPage() {
    * =========================================================
    */
 
-  const handleLogout = async () => {
-    if (loggingOut) return;
+  const handleLogout =
+    async () => {
+      if (loggingOut) return;
 
-    setLoggingOut(true);
+      setLoggingOut(true);
 
-    try {
-      await fetch("/api/admin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "same-origin",
-        body: JSON.stringify({
-          action: "logout",
-        }),
-      });
-    } catch {
-      // Continue to login page.
-    } finally {
-      router.replace("/eco-admin");
-      router.refresh();
-    }
-  };
+      try {
+        await fetch(
+          "/api/admin",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            credentials:
+              "same-origin",
+            body:
+              JSON.stringify({
+                action:
+                  "logout",
+              }),
+          }
+        );
+      } catch {
+        // Continue to login.
+      } finally {
+        router.replace(
+          "/eco-admin"
+        );
+
+        router.refresh();
+      }
+    };
 
   /*
    * =========================================================
-   * SESSION CHECKING
+   * SESSION CHECK
    * =========================================================
    */
 
@@ -756,11 +1028,10 @@ export default function AdminDashboardPage() {
       ====================================================== */}
 
       <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/85 backdrop-blur-xl">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4">
+        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
           <div className="flex items-center justify-between gap-4">
-            {/* Brand */}
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 shrink-0 rounded-2xl bg-emerald-500/10 border border-emerald-400/20 flex items-center justify-center">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-500/10">
                 <Leaf
                   size={24}
                   className="text-emerald-400"
@@ -768,24 +1039,27 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="min-w-0">
-                <h1 className="font-black text-lg sm:text-xl truncate">
+                <h1 className="truncate text-lg font-black sm:text-xl">
                   සොබා සේනාංකය
                 </h1>
 
-                <p className="text-xs text-slate-500 truncate">
+                <p className="truncate text-xs text-slate-500">
                   Admin Dashboard
                 </p>
               </div>
             </div>
 
-            {/* Header Actions */}
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={handleRefresh}
-                disabled={refreshing}
+                onClick={
+                  handleRefresh
+                }
+                disabled={
+                  refreshing
+                }
                 title="Refresh"
-                className="w-10 h-10 inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 transition disabled:opacity-50"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 transition hover:bg-white/10 disabled:opacity-50"
               >
                 <RefreshCw
                   size={17}
@@ -799,17 +1073,27 @@ export default function AdminDashboardPage() {
 
               <button
                 type="button"
-                onClick={handleLogout}
-                disabled={loggingOut}
-                className="shrink-0 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 sm:px-4 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/10 transition disabled:opacity-50"
+                onClick={
+                  handleLogout
+                }
+                disabled={
+                  loggingOut
+                }
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-white/10 disabled:opacity-50 sm:px-4"
               >
                 {loggingOut ? (
                   <Loader2
-                    size={17}
+                    size={
+                      17
+                    }
                     className="animate-spin"
                   />
                 ) : (
-                  <LogOut size={17} />
+                  <LogOut
+                    size={
+                      17
+                    }
+                  />
                 )}
 
                 <span className="hidden sm:inline">
@@ -825,12 +1109,9 @@ export default function AdminDashboardPage() {
           MAIN
       ====================================================== */}
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
-        {/* =================================================
-            STATS
-        ================================================== */}
-
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+        {/* STATS */}
+        <section className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {/* Announcements */}
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
             <div className="flex items-center justify-between">
@@ -840,11 +1121,13 @@ export default function AdminDashboardPage() {
                 </p>
 
                 <p className="mt-2 text-3xl font-black">
-                  {announcements.length}
+                  {
+                    announcements.length
+                  }
                 </p>
               </div>
 
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10">
                 <Bell
                   size={23}
                   className="text-emerald-400"
@@ -862,11 +1145,13 @@ export default function AdminDashboardPage() {
                 </p>
 
                 <p className="mt-2 text-3xl font-black">
-                  {comments.length}
+                  {
+                    comments.length
+                  }
                 </p>
               </div>
 
-              <div className="w-12 h-12 rounded-2xl bg-sky-500/10 flex items-center justify-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500/10">
                 <MessageCircle
                   size={23}
                   className="text-sky-400"
@@ -896,9 +1181,7 @@ export default function AdminDashboardPage() {
           </div>
         </section>
 
-        {/* =================================================
-            GLOBAL MESSAGES
-        ================================================== */}
+        {/* MESSAGES */}
 
         {message && (
           <div className="mb-5 flex items-start gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
@@ -907,7 +1190,9 @@ export default function AdminDashboardPage() {
               className="mt-0.5 shrink-0"
             />
 
-            <span>{message}</span>
+            <span>
+              {message}
+            </span>
           </div>
         )}
 
@@ -917,41 +1202,42 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* =================================================
+        {/* =====================================================
             ANNOUNCEMENTS
-        ================================================== */}
+        ====================================================== */}
 
-        <section className="rounded-3xl border border-white/10 bg-white/[0.035] overflow-hidden">
-          {/* Section Header */}
-          <div className="p-5 sm:p-6 border-b border-white/10">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035]">
+          <div className="border-b border-white/10 p-5 sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-xl sm:text-2xl font-black">
+                <h2 className="text-xl font-black sm:text-2xl">
                   නවතම නිවේදන
                 </h2>
 
                 <p className="mt-1 text-sm text-slate-500">
-                  Add, edit and manage website
-                  announcements.
+                  Add, edit and manage website announcements.
                 </p>
               </div>
 
               <button
                 type="button"
-                onClick={openAddForm}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-black text-slate-950 hover:bg-emerald-400 active:scale-[0.98] transition"
+                onClick={
+                  openAddForm
+                }
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-emerald-400 sm:w-auto"
               >
-                <Plus size={19} />
+                <Plus
+                  size={19}
+                />
 
                 Add Announcement
               </button>
             </div>
           </div>
 
-          {/* Announcement List */}
           <div className="p-4 sm:p-6">
             {loading ? (
-              <div className="py-16 flex flex-col items-center gap-4 text-slate-500">
+              <div className="flex flex-col items-center gap-4 py-16 text-slate-500">
                 <Loader2
                   size={30}
                   className="animate-spin text-emerald-400"
@@ -961,16 +1247,15 @@ export default function AdminDashboardPage() {
                   Loading announcements...
                 </p>
               </div>
-            ) : announcements.length === 0 ? (
-              <div className="py-16 flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center mb-4">
-                  <Bell
-                    size={27}
-                    className="text-slate-500"
-                  />
-                </div>
+            ) : announcements.length ===
+              0 ? (
+              <div className="flex flex-col items-center py-16 text-center">
+                <Bell
+                  size={27}
+                  className="mb-4 text-slate-500"
+                />
 
-                <h3 className="font-bold text-lg">
+                <h3 className="text-lg font-bold">
                   No announcements yet
                 </h3>
 
@@ -981,14 +1266,17 @@ export default function AdminDashboardPage() {
             ) : (
               <div className="grid gap-4">
                 {announcements.map(
-                  (announcement) => (
+                  (
+                    announcement
+                  ) => (
                     <article
-                      key={announcement.id}
+                      key={
+                        announcement.id
+                      }
                       className="overflow-hidden rounded-3xl border border-white/10 bg-black/10"
                     >
                       <div className="flex flex-col md:flex-row">
-                        {/* Image */}
-                        <div className="md:w-56 md:shrink-0 aspect-video md:aspect-auto bg-white/5">
+                        <div className="aspect-video bg-white/5 md:w-56 md:shrink-0 md:aspect-auto">
                           <img
                             src={
                               announcement.imageUrl
@@ -996,26 +1284,27 @@ export default function AdminDashboardPage() {
                             alt={
                               announcement.title
                             }
-                            className="w-full h-full object-cover"
-                            onError={(event) => {
+                            className="h-full w-full object-cover"
+                            onError={(
+                              event
+                            ) => {
                               event.currentTarget.style.display =
                                 "none";
                             }}
                           />
                         </div>
 
-                        {/* Content */}
                         <div className="flex-1 p-5">
-                          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                             <div className="min-w-0">
-                              <h3 className="text-lg font-black break-words">
+                              <h3 className="break-words text-lg font-black">
                                 {
                                   announcement.title
                                 }
                               </h3>
 
                               {announcement.description && (
-                                <p className="mt-2 text-sm leading-6 text-slate-400 break-words">
+                                <p className="mt-2 break-words text-sm leading-6 text-slate-400">
                                   {
                                     announcement.description
                                   }
@@ -1029,10 +1318,12 @@ export default function AdminDashboardPage() {
                                   }
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 break-all"
+                                  className="mt-3 inline-flex items-center gap-1.5 break-all text-xs font-semibold text-emerald-400"
                                 >
                                   <ExternalLink
-                                    size={14}
+                                    size={
+                                      14
+                                    }
                                   />
 
                                   Open link
@@ -1051,8 +1342,7 @@ export default function AdminDashboardPage() {
                               </p>
                             </div>
 
-                            {/* Actions */}
-                            <div className="flex items-center gap-2 shrink-0">
+                            <div className="flex shrink-0 items-center gap-2">
                               <button
                                 type="button"
                                 onClick={() =>
@@ -1060,9 +1350,13 @@ export default function AdminDashboardPage() {
                                     announcement
                                   )
                                 }
-                                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold hover:bg-white/10 transition"
+                                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10"
                               >
-                                <Edit3 size={16} />
+                                <Edit3
+                                  size={
+                                    16
+                                  }
+                                />
 
                                 Edit
                               </button>
@@ -1078,16 +1372,22 @@ export default function AdminDashboardPage() {
                                   deletingId ===
                                   announcement.id
                                 }
-                                className="inline-flex items-center gap-2 rounded-xl border border-red-400/10 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-red-300 hover:bg-red-500/15 transition disabled:opacity-50"
+                                className="inline-flex items-center gap-2 rounded-xl border border-red-400/10 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-red-300 transition hover:bg-red-500/15 disabled:opacity-50"
                               >
                                 {deletingId ===
                                 announcement.id ? (
                                   <Loader2
-                                    size={16}
+                                    size={
+                                      16
+                                    }
                                     className="animate-spin"
                                   />
                                 ) : (
-                                  <Trash2 size={16} />
+                                  <Trash2
+                                    size={
+                                      16
+                                    }
+                                  />
                                 )}
 
                                 Delete
@@ -1104,51 +1404,51 @@ export default function AdminDashboardPage() {
           </div>
         </section>
 
-        {/* =================================================
+        {/* =====================================================
             COMMENTS
-        ================================================== */}
+        ====================================================== */}
 
-        <section className="mt-6 rounded-3xl border border-white/10 bg-white/[0.035] overflow-hidden">
-          {/* Section Header */}
-          <div className="p-5 sm:p-6 border-b border-white/10">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-sky-500/10 flex items-center justify-center">
-                    <MessageCircle
-                      size={22}
-                      className="text-sky-400"
-                    />
-                  </div>
+        <section className="mt-6 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035]">
+          <div className="border-b border-white/10 p-5 sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-sky-500/10">
+                  <MessageCircle
+                    size={22}
+                    className="text-sky-400"
+                  />
+                </div>
 
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-black">
-                      අදහස් හා යෝජනා
-                    </h2>
+                <div>
+                  <h2 className="text-xl font-black sm:text-2xl">
+                    අදහස් හා යෝජනා
+                  </h2>
 
-                    <p className="mt-1 text-sm text-slate-500">
-                      Manage live ideas and suggestions.
-                    </p>
-                  </div>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Manage live ideas and suggestions.
+                  </p>
                 </div>
               </div>
 
               <button
                 type="button"
-                onClick={openAddCommentForm}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-sky-500 px-5 py-3 text-sm font-black text-slate-950 hover:bg-sky-400 active:scale-[0.98] transition"
+                onClick={
+                  openAddCommentForm
+                }
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-sky-500 px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-sky-400 sm:w-auto"
               >
-                <Plus size={19} />
+                <Plus
+                  size={19}
+                />
 
                 Add Comment
               </button>
             </div>
           </div>
 
-          {/* Comment List */}
           <div className="p-4 sm:p-6">
             {commentsLoading ? (
-              <div className="py-16 flex flex-col items-center gap-4 text-slate-500">
+              <div className="flex flex-col items-center gap-4 py-16 text-slate-500">
                 <Loader2
                   size={30}
                   className="animate-spin text-sky-400"
@@ -1158,16 +1458,15 @@ export default function AdminDashboardPage() {
                   Loading comments...
                 </p>
               </div>
-            ) : comments.length === 0 ? (
-              <div className="py-16 flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center mb-4">
-                  <MessageCircle
-                    size={27}
-                    className="text-slate-500"
-                  />
-                </div>
+            ) : comments.length ===
+              0 ? (
+              <div className="flex flex-col items-center py-16 text-center">
+                <MessageCircle
+                  size={27}
+                  className="mb-4 text-slate-500"
+                />
 
-                <h3 className="font-bold text-lg">
+                <h3 className="text-lg font-bold">
                   No comments yet
                 </h3>
 
@@ -1177,86 +1476,112 @@ export default function AdminDashboardPage() {
               </div>
             ) : (
               <div className="grid gap-3">
-                {comments.map((comment) => (
-                  <article
-                    key={comment.id}
-                    className="rounded-3xl border border-white/10 bg-black/10 p-4 sm:p-5"
-                  >
-                    <div className="flex flex-col gap-4">
-                      {/* Comment Content */}
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <div className="w-9 h-9 rounded-full bg-sky-500/10 flex items-center justify-center shrink-0">
-                            <MessageCircle
-                              size={17}
-                              className="text-sky-400"
-                            />
+                {comments.map(
+                  (
+                    comment
+                  ) => (
+                    <article
+                      key={
+                        comment.id
+                      }
+                      className="rounded-3xl border border-white/10 bg-black/10 p-4 sm:p-5"
+                    >
+                      <div className="flex flex-col gap-4">
+                        <div>
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sky-500/10">
+                              <MessageCircle
+                                size={
+                                  17
+                                }
+                                className="text-sky-400"
+                              />
+                            </div>
+
+                            <div className="min-w-0">
+                              <h3 className="break-words text-sm font-bold sm:text-base">
+                                {
+                                  comment.name
+                                }
+                              </h3>
+
+                              <p className="text-[10px] text-slate-600">
+                                ID #
+                                {
+                                  comment.id
+                                }{" "}
+                                ·{" "}
+                                {
+                                  comment.created_at
+                                }
+                              </p>
+                            </div>
                           </div>
 
-                          <div className="min-w-0">
-                            <h3 className="font-bold text-sm sm:text-base break-words">
-                              {comment.name}
-                            </h3>
-
-                            <p className="text-[10px] text-slate-600">
-                              ID #{comment.id} ·{" "}
-                              {comment.created_at}
+                          <div className="mt-4 rounded-2xl border border-white/5 bg-white/[0.025] px-4 py-3">
+                            <p className="break-words whitespace-pre-wrap text-sm leading-7 text-slate-300">
+                              {
+                                comment.comment
+                              }
                             </p>
                           </div>
                         </div>
 
-                        <div className="mt-4 rounded-2xl border border-white/5 bg-white/[0.025] px-4 py-3">
-                          <p className="text-sm leading-6 text-slate-300 whitespace-pre-wrap break-words">
-                            {comment.comment}
-                          </p>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openEditCommentForm(
+                                comment
+                              )
+                            }
+                            className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10 sm:flex-none"
+                          >
+                            <Edit3
+                              size={
+                                16
+                              }
+                            />
+
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleDeleteComment(
+                                comment.id
+                              )
+                            }
+                            disabled={
+                              deletingCommentId ===
+                              comment.id
+                            }
+                            className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl border border-red-400/10 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-red-300 transition hover:bg-red-500/15 disabled:opacity-50 sm:flex-none"
+                          >
+                            {deletingCommentId ===
+                            comment.id ? (
+                              <Loader2
+                                size={
+                                  16
+                                }
+                                className="animate-spin"
+                              />
+                            ) : (
+                              <Trash2
+                                size={
+                                  16
+                                }
+                              />
+                            )}
+
+                            Delete
+                          </button>
                         </div>
                       </div>
-
-                      {/* Actions */}
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            openEditCommentForm(
-                              comment
-                            )
-                          }
-                          className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold hover:bg-white/10 transition"
-                        >
-                          <Edit3 size={16} />
-
-                          Edit
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleDeleteComment(
-                              comment.id
-                            )
-                          }
-                          disabled={
-                            deletingCommentId ===
-                            comment.id
-                          }
-                          className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-xl border border-red-400/10 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-red-300 hover:bg-red-500/15 transition disabled:opacity-50"
-                        >
-                          {deletingCommentId ===
-                          comment.id ? (
-                            <Loader2
-                              size={16}
-                              className="animate-spin"
-                            />
-                          ) : (
-                            <Trash2 size={16} />
-                          )}
-
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                ))}
+                    </article>
+                  )
+                )}
               </div>
             )}
           </div>
@@ -1264,32 +1589,35 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* =====================================================
-          ANNOUNCEMENT ADD / EDIT MODAL
+          ANNOUNCEMENT MODAL
       ====================================================== */}
 
       {isFormOpen && (
-        <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="min-h-full flex items-center justify-center py-6">
-            <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-950 shadow-2xl overflow-hidden">
-              {/* Header */}
-              <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 sm:px-6 py-5">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+        <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
+          <div className="flex min-h-full items-center justify-center py-6">
+            <div className="w-full max-w-2xl overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl">
+              <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-5 sm:px-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/10">
                     {editingId ? (
                       <Edit3
-                        size={21}
+                        size={
+                          21
+                        }
                         className="text-emerald-400"
                       />
                     ) : (
                       <Plus
-                        size={21}
+                        size={
+                          21
+                        }
                         className="text-emerald-400"
                       />
                     )}
                   </div>
 
-                  <div className="min-w-0">
-                    <h2 className="font-black text-lg truncate">
+                  <div>
+                    <h2 className="text-lg font-black">
                       {editingId
                         ? "Edit Announcement"
                         : "Add Announcement"}
@@ -1303,24 +1631,28 @@ export default function AdminDashboardPage() {
 
                 <button
                   type="button"
-                  onClick={closeForm}
-                  disabled={saving}
-                  className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10 transition disabled:opacity-50"
+                  onClick={
+                    closeForm
+                  }
+                  disabled={
+                    saving
+                  }
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 transition hover:bg-white/10 disabled:opacity-50"
                 >
                   <X size={19} />
                 </button>
               </div>
 
-              {/* Form */}
               <form
-                onSubmit={handleSave}
-                className="p-5 sm:p-6 space-y-5"
+                onSubmit={
+                  handleSave
+                }
+                className="space-y-5 p-5 sm:p-6"
               >
-                {/* Title */}
                 <div>
                   <label
                     htmlFor="announcement-title"
-                    className="block text-sm font-semibold text-slate-300 mb-2"
+                    className="mb-2 block text-sm font-semibold text-slate-300"
                   >
                     Title
                   </label>
@@ -1328,85 +1660,109 @@ export default function AdminDashboardPage() {
                   <input
                     id="announcement-title"
                     type="text"
-                    value={form.title}
-                    onChange={(event) =>
+                    value={
+                      form.title
+                    }
+                    onChange={(
+                      event
+                    ) =>
                       handleChange(
                         "title",
-                        event.target.value
+                        event
+                          .target
+                          .value
                       )
                     }
-                    placeholder="Announcement title"
                     required
-                    disabled={saving}
-                    className="w-full h-12 rounded-2xl border border-white/10 bg-black/20 px-4 text-white placeholder:text-slate-600 outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-400/10 disabled:opacity-50"
+                    disabled={
+                      saving
+                    }
+                    className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 px-4 text-white outline-none focus:border-emerald-400/60 disabled:opacity-50"
                   />
                 </div>
 
-                {/* Description */}
                 <div>
                   <label
                     htmlFor="announcement-description"
-                    className="block text-sm font-semibold text-slate-300 mb-2"
+                    className="mb-2 block text-sm font-semibold text-slate-300"
                   >
                     Description
                   </label>
 
                   <textarea
                     id="announcement-description"
-                    value={form.description}
-                    onChange={(event) =>
+                    value={
+                      form.description
+                    }
+                    onChange={(
+                      event
+                    ) =>
                       handleChange(
                         "description",
-                        event.target.value
+                        event
+                          .target
+                          .value
                       )
                     }
-                    placeholder="Short description"
                     rows={4}
-                    disabled={saving}
-                    className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder:text-slate-600 outline-none resize-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-400/10 disabled:opacity-50"
+                    disabled={
+                      saving
+                    }
+                    className="w-full resize-none rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-emerald-400/60 disabled:opacity-50"
                   />
                 </div>
 
-                {/* Image URL */}
                 <div>
                   <label
                     htmlFor="announcement-image"
-                    className="block text-sm font-semibold text-slate-300 mb-2"
+                    className="mb-2 block text-sm font-semibold text-slate-300"
                   >
                     Image URL
                   </label>
 
                   <div className="relative">
                     <ImageIcon
-                      size={18}
+                      size={
+                        18
+                      }
                       className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
                     />
 
                     <input
                       id="announcement-image"
                       type="url"
-                      value={form.imageUrl}
-                      onChange={(event) =>
+                      value={
+                        form.imageUrl
+                      }
+                      onChange={(
+                        event
+                      ) =>
                         handleChange(
                           "imageUrl",
-                          event.target.value
+                          event
+                            .target
+                            .value
                         )
                       }
-                      placeholder="https://..."
                       required
-                      disabled={saving}
-                      className="w-full h-12 rounded-2xl border border-white/10 bg-black/20 pl-11 pr-4 text-white placeholder:text-slate-600 outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-400/10 disabled:opacity-50"
+                      disabled={
+                        saving
+                      }
+                      className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 pl-11 pr-4 text-white outline-none focus:border-emerald-400/60 disabled:opacity-50"
                     />
                   </div>
 
-                  {/* Preview */}
                   {form.imageUrl && (
-                    <div className="mt-3 h-40 rounded-2xl overflow-hidden border border-white/10 bg-white/5">
+                    <div className="mt-3 h-40 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
                       <img
-                        src={form.imageUrl}
+                        src={
+                          form.imageUrl
+                        }
                         alt="Preview"
-                        className="w-full h-full object-cover"
-                        onError={(event) => {
+                        className="h-full w-full object-cover"
+                        onError={(
+                          event
+                        ) => {
                           event.currentTarget.style.display =
                             "none";
                         }}
@@ -1415,14 +1771,12 @@ export default function AdminDashboardPage() {
                   )}
                 </div>
 
-                {/* Link */}
                 <div>
                   <label
                     htmlFor="announcement-link"
-                    className="block text-sm font-semibold text-slate-300 mb-2"
+                    className="mb-2 block text-sm font-semibold text-slate-300"
                   >
                     Link URL
-
                     <span className="ml-2 text-xs font-normal text-slate-600">
                       Optional
                     </span>
@@ -1430,54 +1784,71 @@ export default function AdminDashboardPage() {
 
                   <div className="relative">
                     <ExternalLink
-                      size={18}
+                      size={
+                        18
+                      }
                       className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
                     />
 
                     <input
                       id="announcement-link"
                       type="url"
-                      value={form.linkUrl}
-                      onChange={(event) =>
+                      value={
+                        form.linkUrl
+                      }
+                      onChange={(
+                        event
+                      ) =>
                         handleChange(
                           "linkUrl",
-                          event.target.value
+                          event
+                            .target
+                            .value
                         )
                       }
-                      placeholder="https://..."
-                      disabled={saving}
-                      className="w-full h-12 rounded-2xl border border-white/10 bg-black/20 pl-11 pr-4 text-white placeholder:text-slate-600 outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-400/10 disabled:opacity-50"
+                      disabled={
+                        saving
+                      }
+                      className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 pl-11 pr-4 text-white outline-none focus:border-emerald-400/60 disabled:opacity-50"
                     />
                   </div>
                 </div>
 
-                {/* Error */}
                 {error && (
                   <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-                    {error}
+                    {
+                      error
+                    }
                   </div>
                 )}
 
-                {/* Buttons */}
-                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
+                <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                   <button
                     type="button"
-                    onClick={closeForm}
-                    disabled={saving}
-                    className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold hover:bg-white/10 transition disabled:opacity-50"
+                    onClick={
+                      closeForm
+                    }
+                    disabled={
+                      saving
+                    }
+                    className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50"
                   >
                     Cancel
                   </button>
 
                   <button
                     type="submit"
-                    disabled={saving}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-6 py-3 text-sm font-black text-slate-950 hover:bg-emerald-400 transition disabled:opacity-60"
+                    disabled={
+                      saving
+                    }
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-6 py-3 text-sm font-black text-slate-950 transition hover:bg-emerald-400 disabled:opacity-60"
                   >
                     {saving ? (
                       <>
                         <Loader2
-                          size={18}
+                          size={
+                            18
+                          }
                           className="animate-spin"
                         />
 
@@ -1485,7 +1856,11 @@ export default function AdminDashboardPage() {
                       </>
                     ) : (
                       <>
-                        <Save size={18} />
+                        <Save
+                          size={
+                            18
+                          }
+                        />
 
                         {editingId
                           ? "Save Changes"
@@ -1501,39 +1876,58 @@ export default function AdminDashboardPage() {
       )}
 
       {/* =====================================================
-          COMMENT EDIT MODAL
+          COMMENT ADD / EDIT MODAL
       ====================================================== */}
 
       {isCommentFormOpen && (
-        <div className="fixed inset-0 z-[110] bg-black/70 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="min-h-full flex items-center justify-center py-6">
-            <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-slate-950 shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-[110] overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
+          <div className="flex min-h-full items-center justify-center py-6">
+            <div className="w-full max-w-xl overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl">
               {/* Header */}
-              <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 sm:px-6 py-5">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-11 h-11 rounded-2xl bg-sky-500/10 flex items-center justify-center shrink-0">
-                    <Edit3
-                      size={21}
-                      className="text-sky-400"
-                    />
+              <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-5 sm:px-6">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-sky-500/10">
+                    {selectedComment ? (
+                      <Edit3
+                        size={
+                          21
+                        }
+                        className="text-sky-400"
+                      />
+                    ) : (
+                      <Plus
+                        size={
+                          21
+                        }
+                        className="text-sky-400"
+                      />
+                    )}
                   </div>
 
                   <div className="min-w-0">
-                    <h2 className="font-black text-lg">
-                      Edit Comment
+                    <h2 className="truncate text-lg font-black">
+                      {selectedComment
+                        ? "Edit Comment"
+                        : "Add Comment"}
                     </h2>
 
                     <p className="text-xs text-slate-500">
-                      Update the live comment.
+                      {selectedComment
+                        ? `Editing comment #${selectedComment.id}`
+                        : "Add a live comment"}
                     </p>
                   </div>
                 </div>
 
                 <button
                   type="button"
-                  onClick={closeCommentForm}
-                  disabled={savingComment}
-                  className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10 transition disabled:opacity-50"
+                  onClick={
+                    closeCommentForm
+                  }
+                  disabled={
+                    savingComment
+                  }
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/5 transition hover:bg-white/10 disabled:opacity-50"
                 >
                   <X size={19} />
                 </button>
@@ -1541,88 +1935,122 @@ export default function AdminDashboardPage() {
 
               {/* Form */}
               <form
-                onSubmit={handleCommentSave}
-                className="p-5 sm:p-6 space-y-5"
+                onSubmit={
+                  handleCommentSave
+                }
+                className="space-y-5 p-5 sm:p-6"
               >
                 {/* Name */}
                 <div>
                   <label
-                    htmlFor="comment-name"
-                    className="block text-sm font-semibold text-slate-300 mb-2"
+                    htmlFor="admin-comment-name"
+                    className="mb-2 block text-sm font-semibold text-slate-300"
                   >
                     Name
                   </label>
 
                   <input
-                    id="comment-name"
+                    id="admin-comment-name"
                     type="text"
-                    value={commentForm.name}
-                    onChange={(event) =>
+                    maxLength={
+                      80
+                    }
+                    value={
+                      commentForm.name
+                    }
+                    onChange={(
+                      event
+                    ) =>
                       handleCommentChange(
                         "name",
-                        event.target.value
+                        event
+                          .target
+                          .value
                       )
                     }
                     placeholder="Name"
                     required
-                    disabled={savingComment}
-                    className="w-full h-12 rounded-2xl border border-white/10 bg-black/20 px-4 text-white placeholder:text-slate-600 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/10 disabled:opacity-50"
+                    disabled={
+                      savingComment
+                    }
+                    className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 px-4 text-white outline-none placeholder:text-slate-600 focus:border-sky-400/60 disabled:opacity-50"
                   />
                 </div>
 
                 {/* Comment */}
                 <div>
                   <label
-                    htmlFor="comment-text"
-                    className="block text-sm font-semibold text-slate-300 mb-2"
+                    htmlFor="admin-comment-text"
+                    className="mb-2 block text-sm font-semibold text-slate-300"
                   >
                     Comment
                   </label>
 
                   <textarea
-                    id="comment-text"
-                    value={commentForm.comment}
-                    onChange={(event) =>
+                    id="admin-comment-text"
+                    maxLength={
+                      1000
+                    }
+                    rows={
+                      6
+                    }
+                    value={
+                      commentForm.comment
+                    }
+                    onChange={(
+                      event
+                    ) =>
                       handleCommentChange(
                         "comment",
-                        event.target.value
+                        event
+                          .target
+                          .value
                       )
                     }
                     placeholder="Comment"
-                    rows={6}
                     required
-                    disabled={savingComment}
-                    className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder:text-slate-600 outline-none resize-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/10 disabled:opacity-50"
+                    disabled={
+                      savingComment
+                    }
+                    className="w-full resize-none rounded-2xl border border-white/10 bg-black/20 px-4 py-3 leading-7 text-white outline-none placeholder:text-slate-600 focus:border-sky-400/60 disabled:opacity-50"
                   />
                 </div>
 
-                {/* Error */}
                 {error && (
-                  <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-                    {error}
+                  <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm leading-6 text-red-300">
+                    {
+                      error
+                    }
                   </div>
                 )}
 
-                {/* Buttons */}
-                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
+                <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                   <button
                     type="button"
-                    onClick={closeCommentForm}
-                    disabled={savingComment}
-                    className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold hover:bg-white/10 transition disabled:opacity-50"
+                    onClick={
+                      closeCommentForm
+                    }
+                    disabled={
+                      savingComment
+                    }
+                    className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50"
                   >
                     Cancel
                   </button>
 
                   <button
                     type="submit"
-                    disabled={savingComment}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-sky-500 px-6 py-3 text-sm font-black text-slate-950 hover:bg-sky-400 transition disabled:opacity-60"
+                    disabled={
+                      savingComment
+                    }
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-sky-500 px-6 py-3 text-sm font-black text-slate-950 transition hover:bg-sky-400 disabled:opacity-60"
                   >
                     {savingComment ? (
                       <>
                         <Loader2
-                          size={18}
+                          size={
+                            18
+                          }
                           className="animate-spin"
                         />
 
@@ -1630,9 +2058,15 @@ export default function AdminDashboardPage() {
                       </>
                     ) : (
                       <>
-                        <Save size={18} />
+                        <Save
+                          size={
+                            18
+                          }
+                        />
 
-                        Save Changes
+                        {selectedComment
+                          ? "Save Changes"
+                          : "Add Comment"}
                       </>
                     )}
                   </button>
@@ -1644,4 +2078,4 @@ export default function AdminDashboardPage() {
       )}
     </main>
   );
-    }
+        }
