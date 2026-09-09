@@ -1,175 +1,383 @@
 "use client";
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 
-// Apple-style buttery smooth easing curve
-const smoothEase = [0.22, 1, 0.36, 1];
+import { useEffect, useState } from "react";
+import {
+  motion,
+  AnimatePresence,
+} from "framer-motion";
+
+const smoothEase = [
+  0.22,
+  1,
+  0.36,
+  1,
+] as const;
+
+const INTRO_KEY =
+  "sobasenankaya_intro_seen";
 
 export default function IntroAnimation() {
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] =
+    useState(false);
+
+  const [ready, setReady] =
+    useState(false);
 
   useEffect(() => {
-    // Intro එක යනකන් page එක scroll වෙන එක නවත්තනවා
-    document.body.style.overflow = "hidden";
+    /*
+     * -------------------------------------------------------
+     * FIRST ENTRY ONLY
+     *
+     * sessionStorage means:
+     * - Refresh -> NO intro
+     * - Internal navigation -> NO intro
+     * - Return in same browser tab -> NO intro
+     * - New tab/session -> intro can appear again
+     * -------------------------------------------------------
+     */
 
-    // මේ premium animation එක බලන්න තත්පර 5.5 ක් දෙනවා, ඊටපස්සේ fade out වෙනවා
-    const timer = setTimeout(() => {
-      setShowIntro(false);
-      document.body.style.overflow = "unset";
-    }, 5500);
+    try {
+      const alreadySeen =
+        sessionStorage.getItem(
+          INTRO_KEY
+        );
+
+      if (alreadySeen === "1") {
+        setReady(true);
+        return;
+      }
+
+      /*
+       * Mark as seen immediately.
+       * This prevents the intro from appearing twice
+       * because of re-renders / route transitions.
+       */
+      sessionStorage.setItem(
+        INTRO_KEY,
+        "1"
+      );
+
+      setShowIntro(true);
+    } catch {
+      /*
+       * If storage is unavailable,
+       * still show intro once for this mount.
+       */
+      setShowIntro(true);
+    }
+
+    setReady(true);
+
+    /*
+     * Stop scrolling during intro.
+     */
+    document.body.style.overflow =
+      "hidden";
+
+    const timer =
+      window.setTimeout(() => {
+        setShowIntro(false);
+        document.body.style.overflow =
+          "";
+      }, 4200);
 
     return () => {
-      clearTimeout(timer);
-      document.body.style.overflow = "unset";
+      window.clearTimeout(timer);
+      document.body.style.overflow =
+        "";
     };
   }, []);
+
+  if (!ready) {
+    return null;
+  }
 
   return (
     <AnimatePresence>
       {showIntro && (
         <motion.div
-          key="apple-style-intro"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 1.1, filter: "blur(15px)" }} // Cinematic Fade Out
-          transition={{ duration: 1, ease: "easeInOut" }}
-          className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-[#000000] overflow-hidden"
+          key="sobasenankaya-intro"
+          initial={{
+            opacity: 1,
+          }}
+          exit={{
+            opacity: 0,
+          }}
+          transition={{
+            duration: 0.7,
+            ease: "easeOut",
+          }}
+          className="fixed inset-0 z-[1000] flex items-center justify-center overflow-hidden bg-[#020705]"
         >
-          {/* Subtle Ambient Background Glow */}
+          {/* =================================================
+              BACKGROUND GLOW
+          ================================================== */}
+
           <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 3, ease: smoothEase }}
-            className="absolute inset-0 m-auto bg-emerald-500/10 blur-[120px] rounded-full w-[300px] h-[300px] md:w-[600px] md:h-[600px]"
+            initial={{
+              opacity: 0,
+              scale: 0.7,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+            }}
+            transition={{
+              duration: 1.4,
+              ease: smoothEase,
+            }}
+            className="pointer-events-none absolute left-1/2 top-1/2 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/[0.08] blur-[70px] sm:h-[480px] sm:w-[480px]"
           />
 
-          {/* Original Custom SVG Animation Container */}
-          <motion.div 
-            className="relative z-10 flex items-center justify-center w-64 h-64 md:w-80 md:h-80"
-            animate={{ y: [0, -10, 0] }} // Breathing float effect
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <motion.svg 
-              viewBox="0 0 100 100" 
-              className="w-full h-full overflow-visible drop-shadow-[0_0_20px_rgba(52,211,153,0.3)]"
-            >
-              <defs>
-                <linearGradient id="emerald-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#6ee7b7" />
-                  <stop offset="50%" stopColor="#10b981" />
-                  <stop offset="100%" stopColor="#047857" />
-                </linearGradient>
-                <filter id="glow-effect">
-                  <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                  <feMerge>
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-              </defs>
+          {/* =================================================
+              SECOND SOFT GLOW
+          ================================================== */}
 
-              {/* Protective Shield Aura (පිටතින් එන ආරක්ෂක වලල්ල) */}
-              <motion.circle
-                cx="50" cy="50" r="46"
-                fill="none"
-                stroke="url(#emerald-gradient)"
-                strokeWidth="0.5"
-                strokeDasharray="5 5"
-                initial={{ pathLength: 0, opacity: 0, rotate: -90 }}
-                animate={{ pathLength: 1, opacity: 0.4, rotate: 0 }}
-                transition={{ delay: 2.5, duration: 2, ease: smoothEase }}
-                className="origin-center"
-              />
-
-              {/* Left Hand (වම් අත - Abstract vector path) */}
-              <motion.path
-                d="M 12 50 C 12 75, 30 92, 50 92 C 55 92, 62 88, 66 82 C 60 78, 50 82, 40 72 C 30 62, 26 55, 26 45 C 26 38, 18 38, 12 50 Z"
-                fill="transparent"
-                stroke="url(#emerald-gradient)"
-                strokeWidth="1.2"
-                initial={{ pathLength: 0, fill: "rgba(16, 185, 129, 0)" }}
-                animate={{ 
-                  pathLength: 1, 
-                  fill: "rgba(16, 185, 129, 0.15)" 
-                }}
-                transition={{
-                  pathLength: { delay: 0.5, duration: 1.8, ease: smoothEase },
-                  fill: { delay: 2.2, duration: 1.5, ease: "linear" }
-                }}
-                filter="url(#glow-effect)"
-              />
-
-              {/* Right Hand (දකුණු අත - Abstract vector path) */}
-              <motion.path
-                d="M 88 50 C 88 75, 70 92, 50 92 C 45 92, 38 88, 34 82 C 40 78, 50 82, 60 72 C 70 62, 74 55, 74 45 C 74 38, 82 38, 88 50 Z"
-                fill="transparent"
-                stroke="url(#emerald-gradient)"
-                strokeWidth="1.2"
-                initial={{ pathLength: 0, fill: "rgba(16, 185, 129, 0)" }}
-                animate={{ 
-                  pathLength: 1, 
-                  fill: "rgba(16, 185, 129, 0.15)" 
-                }}
-                transition={{
-                  pathLength: { delay: 0.5, duration: 1.8, ease: smoothEase },
-                  fill: { delay: 2.2, duration: 1.5, ease: "linear" }
-                }}
-                filter="url(#glow-effect)"
-              />
-
-              {/* Central Leaf (මැද තියෙන ස්වභාවදහම - Detailed leaf path) */}
-              <motion.path
-                d="M 50 82 C 50 82, 18 55, 25 28 C 30 12, 45 10, 50 12 C 55 10, 70 12, 75 28 C 82 55, 50 82, 50 82 Z"
-                fill="transparent"
-                stroke="#34d399"
-                strokeWidth="1.5"
-                initial={{ pathLength: 0, fill: "rgba(52, 211, 153, 0)" }}
-                animate={{ 
-                  pathLength: 1, 
-                  fill: "rgba(16, 185, 129, 0.6)" // Leaf fills with solid color
-                }}
-                transition={{
-                  pathLength: { delay: 1, duration: 1.8, ease: smoothEase },
-                  fill: { delay: 2.5, duration: 1.2, ease: "linear" }
-                }}
-                filter="url(#glow-effect)"
-              />
-
-              {/* Leaf Inner Veins (කොළයේ නහර - යථාර්ථවාදී පෙනුම සඳහා) */}
-              <motion.path
-                d="M 50 82 C 50 60, 47 40, 50 15 M 50 62 C 40 55, 35 48, 35 48 M 50 45 C 60 40, 65 33, 65 33 M 50 30 C 42 26, 38 22, 38 22"
-                fill="transparent"
-                stroke="#022c22"
-                strokeWidth="1"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 0.8 }}
-                transition={{ delay: 2.8, duration: 1.5, ease: smoothEase }}
-              />
-            </motion.svg>
-          </motion.div>
-
-          {/* Apple-Style Cinematic Text Reveal */}
           <motion.div
-            initial={{ opacity: 0, filter: "blur(15px)", scale: 0.9, y: 15 }}
-            animate={{ opacity: 1, filter: "blur(0px)", scale: 1, y: 0 }}
-            transition={{ delay: 3, duration: 1.5, ease: smoothEase }}
-            className="mt-2 text-center z-20 flex flex-col items-center"
-          >
-            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white mb-2">
-              EcoGuard<span className="text-emerald-400">.</span>
-            </h1>
-            <motion.div 
-              initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ delay: 3.5, duration: 1, ease: smoothEase }}
-              className="h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent mb-3 w-4/5"
-            />
-            <motion.p 
-              initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 3.8, duration: 1, ease: smoothEase }}
-              className="text-emerald-200/70 font-semibold tracking-[0.25em] text-[10px] md:text-xs uppercase"
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 0.35,
+            }}
+            transition={{
+              delay: 0.35,
+              duration: 1.8,
+              ease: "easeOut",
+            }}
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(16,185,129,0.08),transparent_38%)]"
+          />
+
+          {/* =================================================
+              CONTENT
+          ================================================== */}
+
+          <div className="relative z-10 flex w-full flex-col items-center justify-center px-6">
+            {/* Logo animation */}
+            <motion.div
+              initial={{
+                opacity: 0,
+                scale: 0.72,
+                y: 16,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                y: 0,
+              }}
+              transition={{
+                delay: 0.15,
+                duration: 0.85,
+                ease: smoothEase,
+              }}
+              className="relative flex h-40 w-40 items-center justify-center sm:h-48 sm:w-48"
             >
-              Protect Nature • Survive Disasters
+              {/* Outer ring */}
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.8,
+                  rotate: -20,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  rotate: 0,
+                }}
+                transition={{
+                  delay: 0.35,
+                  duration: 1,
+                  ease: smoothEase,
+                }}
+                className="absolute inset-0 rounded-full border border-emerald-300/20"
+              />
+
+              {/* Rotating dashed ring */}
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  rotate: -90,
+                }}
+                animate={{
+                  opacity: 0.7,
+                  rotate: 0,
+                }}
+                transition={{
+                  opacity: {
+                    delay: 0.75,
+                    duration: 0.4,
+                  },
+                  rotate: {
+                    delay: 0.75,
+                    duration: 2.6,
+                    ease: "linear",
+                  },
+                }}
+                className="absolute inset-2 rounded-full border border-dashed border-emerald-400/25"
+              />
+
+              {/* Logo glow */}
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.7,
+                }}
+                animate={{
+                  opacity: 0.9,
+                  scale: 1,
+                }}
+                transition={{
+                  delay: 0.7,
+                  duration: 1,
+                  ease: smoothEase,
+                }}
+                className="absolute inset-7 rounded-full bg-emerald-400/10 blur-2xl"
+              />
+
+              {/* Actual logo */}
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.82,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                }}
+                transition={{
+                  delay: 0.48,
+                  duration: 0.85,
+                  ease: smoothEase,
+                }}
+                className="relative h-28 w-28 overflow-hidden rounded-full border border-white/15 bg-black/20 p-2 shadow-[0_0_45px_rgba(16,185,129,0.16)] sm:h-32 sm:w-32"
+              >
+                <img
+                  src="/logo.png"
+                  alt="සොබා සේනාංකය"
+                  draggable={false}
+                  className="h-full w-full rounded-full object-contain"
+                />
+              </motion.div>
+            </motion.div>
+
+            {/* =================================================
+                BRAND
+            ================================================== */}
+
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: 14,
+                filter:
+                  "blur(8px)",
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                filter:
+                  "blur(0px)",
+              }}
+              transition={{
+                delay: 1.15,
+                duration: 0.9,
+                ease: smoothEase,
+              }}
+              className="mt-7 text-center"
+            >
+              <h1 className="text-3xl font-black tracking-[-0.03em] text-white sm:text-5xl">
+                සොබා සේනාංකය
+              </h1>
+
+              <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.28em] text-emerald-300/75 sm:text-xs">
+                Soba Senankaya
+              </p>
+            </motion.div>
+
+            {/* =================================================
+                LINE
+            ================================================== */}
+
+            <motion.div
+              initial={{
+                width: 0,
+                opacity: 0,
+              }}
+              animate={{
+                width: "110px",
+                opacity: 1,
+              }}
+              transition={{
+                delay: 1.55,
+                duration: 0.85,
+                ease: smoothEase,
+              }}
+              className="mt-5 h-px bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent"
+            />
+
+            {/* =================================================
+                TAGLINE
+            ================================================== */}
+
+            <motion.p
+              initial={{
+                opacity: 0,
+                y: 8,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              transition={{
+                delay: 1.78,
+                duration: 0.8,
+                ease: smoothEase,
+              }}
+              className="mt-4 text-center text-[10px] font-semibold tracking-[0.16em] text-emerald-100/55 sm:text-xs"
+            >
+              ස්වභාවය • මනුෂ්‍යත්වය • වගකීම
             </motion.p>
-          </motion.div>
+
+            {/* =================================================
+                PROGRESS
+            ================================================== */}
+
+            <motion.div
+              initial={{
+                opacity: 0,
+              }}
+              animate={{
+                opacity: 1,
+              }}
+              transition={{
+                delay: 2.05,
+                duration: 0.5,
+              }}
+              className="mt-8 h-[2px] w-24 overflow-hidden rounded-full bg-white/5"
+            >
+              <motion.div
+                initial={{
+                  x: "-100%",
+                }}
+                animate={{
+                  x: "100%",
+                }}
+                transition={{
+                  delay: 2.1,
+                  duration: 1.4,
+                  ease: "easeInOut",
+                }}
+                className="h-full w-1/2 rounded-full bg-emerald-400"
+              />
+            </motion.div>
+          </div>
+
+          {/* =================================================
+              BOTTOM FADE
+          ================================================== */}
+
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/40 to-transparent" />
         </motion.div>
       )}
     </AnimatePresence>
   );
-}
+              }
