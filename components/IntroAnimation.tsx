@@ -93,19 +93,20 @@ function FloatingLeaf({
 }
 
 export default function IntroAnimation() {
-  const [showIntro, setShowIntro] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
   const [ready, setReady] = useState(false);
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    let shouldShow = false;
+    let shouldShow = true;
 
     try {
       const alreadySeen = sessionStorage.getItem(INTRO_KEY);
 
-      if (alreadySeen !== "1") {
+      if (alreadySeen === "1") {
+        shouldShow = false;
+      } else {
         sessionStorage.setItem(INTRO_KEY, "1");
-        shouldShow = true;
       }
     } catch {
       shouldShow = true;
@@ -114,10 +115,9 @@ export default function IntroAnimation() {
     setReady(true);
 
     if (!shouldShow) {
+      setShowIntro(false);
       return;
     }
-
-    setShowIntro(true);
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -134,7 +134,12 @@ export default function IntroAnimation() {
   }, []);
 
   if (!ready) {
-    return null;
+    return (
+      <div
+        className="fixed inset-0 z-[2147483647] bg-[#020806]"
+        aria-hidden="true"
+      />
+    );
   }
 
   return (
@@ -156,6 +161,8 @@ export default function IntroAnimation() {
           style={{
             WebkitTransform: "translateZ(0)",
             transform: "translateZ(0)",
+            WebkitBackfaceVisibility: "hidden",
+            backfaceVisibility: "hidden",
           }}
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(16,185,129,0.075),transparent_34%),radial-gradient(circle_at_20%_80%,rgba(34,197,94,0.045),transparent_26%),linear-gradient(180deg,#020806_0%,#03100a_52%,#010503_100%)]" />
