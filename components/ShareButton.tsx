@@ -2,13 +2,10 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Check,
-  Copy,
-  Share2,
-  Sparkles,
-} from "lucide-react";
+import { Check, Share2 } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
+
+const SITE_URL = "https://ecoguard-srilanka.pages.dev/";
 
 export default function ShareButton() {
   const { lang } = useLanguage();
@@ -16,13 +13,39 @@ export default function ShareButton() {
   const [copied, setCopied] = useState(false);
   const [sharing, setSharing] = useState(false);
 
+  const copySiteUrl = async () => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(SITE_URL);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = SITE_URL;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      setCopied(true);
+
+      window.setTimeout(() => {
+        setCopied(false);
+      }, 2200);
+    } catch {
+      setCopied(false);
+    }
+  };
+
   const sharePage = async () => {
     if (sharing) return;
 
     setSharing(true);
     setCopied(false);
-
-    const url = window.location.href;
 
     const shareTitle =
       lang === "si"
@@ -35,41 +58,14 @@ export default function ShareButton() {
         : "Join Soba Senankaya — a social mission bringing people together for humanity's responsibility towards nature. 🌿❤️";
 
     try {
-      try {
-        await navigator.clipboard.writeText(url);
-        setCopied(true);
-      } catch {
-        const textArea =
-          document.createElement("textarea");
+      await copySiteUrl();
 
-        textArea.value = url;
-        textArea.style.position = "fixed";
-        textArea.style.opacity = "0";
-        textArea.style.pointerEvents = "none";
-
-        document.body.appendChild(textArea);
-
-        textArea.focus();
-        textArea.select();
-
-        try {
-          document.execCommand("copy");
-        } catch {
-        }
-
-        document.body.removeChild(textArea);
-
-        setCopied(true);
-      }
-
-      if (
-        typeof navigator.share === "function"
-      ) {
+      if (typeof navigator.share === "function") {
         try {
           await navigator.share({
             title: shareTitle,
             text: shareText,
-            url,
+            url: SITE_URL,
           });
         } catch (error) {
           if (
@@ -82,15 +78,11 @@ export default function ShareButton() {
       }
     } finally {
       setSharing(false);
-
-      window.setTimeout(() => {
-        setCopied(false);
-      }, 2200);
     }
   };
 
   return (
-    <div className="fixed bottom-5 right-5 z-[450] sm:bottom-7 sm:right-7">
+    <div className="fixed bottom-9 right-5 z-[450] sm:bottom-10 sm:right-7">
       <AnimatePresence>
         {copied && (
           <motion.div
@@ -110,16 +102,32 @@ export default function ShareButton() {
               scale: 0.94,
             }}
             transition={{
-              duration: 0.22,
+              duration: 0.2,
             }}
-            className="absolute bottom-[calc(100%+10px)] right-0 whitespace-nowrap rounded-full border border-emerald-300/20 bg-[#07130e]/95 px-3.5 py-2 text-[11px] font-bold text-emerald-200 shadow-[0_12px_35px_rgba(0,0,0,0.28)] backdrop-blur-xl"
+            className="
+              absolute
+              bottom-[calc(100%+12px)]
+              right-0
+              whitespace-nowrap
+              rounded-xl
+              border
+              border-emerald-400/20
+              bg-white/95
+              px-3.5
+              py-2.5
+              text-[11px]
+              font-semibold
+              text-emerald-700
+              shadow-[0_12px_30px_rgba(0,0,0,0.14)]
+              backdrop-blur-xl
+              dark:border-emerald-300/20
+              dark:bg-[#07130e]/95
+              dark:text-emerald-200
+            "
           >
             <span className="flex items-center gap-2">
-              <Check size={14} className="text-emerald-300" />
-
-              {lang === "si"
-                ? "Link එක Copy කළා"
-                : "Link copied"}
+              <Check size={14} />
+              {lang === "si" ? "Link එක Copy කළා" : "Link copied"}
             </span>
           </motion.div>
         )}
@@ -130,112 +138,70 @@ export default function ShareButton() {
         onClick={sharePage}
         disabled={sharing}
         whileHover={{
-          scale: 1.045,
-          y: -2,
+          scale: 1.06,
         }}
         whileTap={{
-          scale: 0.94,
+          scale: 0.92,
         }}
         aria-label={
           lang === "si"
             ? "වෙබ් අඩවිය Share කරන්න"
             : "Share this website"
         }
+        title={
+          lang === "si"
+            ? "වෙබ් අඩවිය Share කරන්න"
+            : "Share this website"
+        }
         className="
-          group
           relative
           flex
-          h-14
-          w-14
+          h-13
+          w-13
           items-center
           justify-center
-          overflow-hidden
           rounded-full
           border
-          border-emerald-300/20
-          bg-[#07130e]/92
-          text-emerald-300
-          shadow-[0_14px_45px_rgba(0,0,0,0.30),0_0_35px_rgba(16,185,129,0.10)]
-          backdrop-blur-2xl
+          border-slate-200
+          bg-white
+          text-slate-700
+          shadow-[0_10px_30px_rgba(0,0,0,0.16)]
           transition-all
           duration-300
-          hover:border-emerald-300/40
-          hover:bg-[#0a1b14]/95
-          hover:text-emerald-200
+          hover:border-emerald-300
+          hover:bg-emerald-50
+          hover:text-emerald-600
           disabled:cursor-not-allowed
           disabled:opacity-70
-          sm:h-16
-          sm:w-16
+          dark:border-white/10
+          dark:bg-[#0a1711]
+          dark:text-white
+          dark:shadow-[0_12px_35px_rgba(0,0,0,0.34)]
+          dark:hover:border-emerald-400/30
+          dark:hover:bg-[#10231a]
+          dark:hover:text-emerald-300
+          sm:h-14
+          sm:w-14
         "
       >
-        <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-emerald-400/10 via-transparent to-lime-300/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-        <motion.span
-          className="absolute inset-0 rounded-full border border-emerald-300/10"
-          animate={
-            sharing
-              ? {
-                  scale: [1, 1.14, 1],
-                  opacity: [0.15, 0.5, 0.15],
-                }
-              : {
-                  scale: [1, 1.04, 1],
-                  opacity: [0.12, 0.28, 0.12],
-                }
-          }
-          transition={{
-            duration: sharing ? 1.1 : 3.2,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+        <span
+          className="
+            pointer-events-none
+            absolute
+            inset-0
+            rounded-full
+            bg-emerald-400/10
+            opacity-0
+            blur-xl
+            transition-opacity
+            duration-300
+            group-hover:opacity-100
+          "
         />
 
-        <motion.span
-          className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400 text-emerald-950 shadow-lg"
-          animate={{
-            rotate: [0, 8, -8, 0],
-            scale: [1, 1.05, 1],
-          }}
-          transition={{
-            duration: 2.8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        >
-          <Sparkles size={10} />
-        </motion.span>
-
         <AnimatePresence mode="wait" initial={false}>
-          {sharing ? (
-            <motion.div
-              key="sharing"
-              initial={{
-                opacity: 0,
-                rotate: -30,
-                scale: 0.7,
-              }}
-              animate={{
-                opacity: 1,
-                rotate: 0,
-                scale: 1,
-              }}
-              exit={{
-                opacity: 0,
-                rotate: 30,
-                scale: 0.7,
-              }}
-              transition={{
-                duration: 0.18,
-              }}
-              className="relative z-10"
-            >
-              <Share2
-                size={23}
-                className="animate-pulse"
-              />
-            </motion.div>
-          ) : copied ? (
-            <motion.div
+          {copied ? (
+            <motion.span
               key="copied"
               initial={{
                 opacity: 0,
@@ -250,14 +216,14 @@ export default function ShareButton() {
                 scale: 0.7,
               }}
               transition={{
-                duration: 0.18,
+                duration: 0.16,
               }}
               className="relative z-10"
             >
-              <Check size={23} />
-            </motion.div>
+              <Check size={23} strokeWidth={2.3} />
+            </motion.span>
           ) : (
-            <motion.div
+            <motion.span
               key="share"
               initial={{
                 opacity: 0,
@@ -272,28 +238,40 @@ export default function ShareButton() {
                 scale: 0.85,
               }}
               transition={{
-                duration: 0.18,
+                duration: 0.16,
               }}
               className="relative z-10"
             >
               <Share2
                 size={23}
-                className="transition-transform duration-300 group-hover:rotate-6"
+                strokeWidth={2.2}
               />
-            </motion.div>
+            </motion.span>
           )}
         </AnimatePresence>
+
+        {sharing && (
+          <motion.span
+            className="
+              pointer-events-none
+              absolute
+              inset-0
+              rounded-full
+              border
+              border-emerald-400/40
+            "
+            animate={{
+              scale: [1, 1.18, 1],
+              opacity: [0.15, 0.45, 0.15],
+            }}
+            transition={{
+              duration: 1.1,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        )}
       </motion.button>
-
-      <div className="pointer-events-none absolute -inset-1 rounded-full opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-100" />
-
-      <div className="pointer-events-none absolute bottom-0 right-full mr-3 hidden sm:block">
-        <div className="rounded-full border border-white/5 bg-black/20 px-3 py-1.5 text-[9px] font-bold text-white/0 backdrop-blur-md transition-all duration-300">
-          {lang === "si"
-            ? "Share"
-            : "Share"}
-        </div>
-      </div>
     </div>
   );
 }
