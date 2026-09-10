@@ -7,35 +7,10 @@ import {
   useReducedMotion,
 } from "framer-motion";
 
-/*
- * ============================================================
- * CONFIG
- * ============================================================
- */
-
-const INTRO_KEY =
-  "sobasenankaya_intro_seen";
-
-const smoothEase = [
-  0.22,
-  1,
-  0.36,
-  1,
-] as const;
-
-/*
- * Total intro duration.
- *
- * Slow / cinematic on purpose.
- */
+const INTRO_KEY = "sobasenankaya_intro_seen";
 const INTRO_DURATION = 7000;
 
-/*
- * ============================================================
- * FLOATING LEAF
- * Lightweight CSS/SVG-style decorative element.
- * ============================================================
- */
+const smoothEase = [0.22, 1, 0.36, 1] as const;
 
 function FloatingLeaf({
   delay,
@@ -52,8 +27,7 @@ function FloatingLeaf({
   duration: number;
   rotate: number;
 }) {
-  const reduceMotion =
-    useReducedMotion();
+  const reduceMotion = useReducedMotion();
 
   return (
     <motion.div
@@ -70,24 +44,9 @@ function FloatingLeaf({
               rotate,
             }
           : {
-              opacity: [
-                0,
-                0.18,
-                0.12,
-                0,
-              ],
-              x: [
-                0,
-                18,
-                -12,
-                0,
-              ],
-              y: [
-                15,
-                -8,
-                -28,
-                -45,
-              ],
+              opacity: [0, 0.18, 0.12, 0],
+              x: [0, 18, -12, 0],
+              y: [15, -8, -28, -45],
               rotate: [
                 rotate - 8,
                 rotate + 5,
@@ -122,7 +81,6 @@ function FloatingLeaf({
           stroke="rgba(110,231,183,0.42)"
           strokeWidth="1"
         />
-
         <path
           d="M10 29C17 23 23 17 30 9"
           stroke="rgba(167,243,208,0.42)"
@@ -134,55 +92,22 @@ function FloatingLeaf({
   );
 }
 
-/*
- * ============================================================
- * INTRO
- * ============================================================
- */
-
 export default function IntroAnimation() {
-  const [
-    showIntro,
-    setShowIntro,
-  ] = useState(false);
-
-  const [
-    ready,
-    setReady,
-  ] = useState(false);
-
-  const reduceMotion =
-    useReducedMotion();
+  const [showIntro, setShowIntro] = useState(false);
+  const [ready, setReady] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     let shouldShow = false;
 
-    /*
-     * --------------------------------------------------------
-     * SHOW ONLY ON FIRST ENTRY OF THIS BROWSER SESSION
-     * --------------------------------------------------------
-     */
-
     try {
-      const alreadySeen =
-        sessionStorage.getItem(
-          INTRO_KEY
-        );
+      const alreadySeen = sessionStorage.getItem(INTRO_KEY);
 
-      if (
-        alreadySeen !== "1"
-      ) {
-        sessionStorage.setItem(
-          INTRO_KEY,
-          "1"
-        );
-
+      if (alreadySeen !== "1") {
+        sessionStorage.setItem(INTRO_KEY, "1");
         shouldShow = true;
       }
     } catch {
-      /*
-       * Fallback when storage is unavailable.
-       */
       shouldShow = true;
     }
 
@@ -194,31 +119,17 @@ export default function IntroAnimation() {
 
     setShowIntro(true);
 
-    /*
-     * Prevent scrolling while intro is running.
-     */
-    const previousOverflow =
-      document.body.style
-        .overflow;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
 
-    document.body.style.overflow =
-      "hidden";
-
-    const timer =
-      window.setTimeout(() => {
-        setShowIntro(false);
-
-        document.body.style.overflow =
-          previousOverflow;
-      }, INTRO_DURATION);
+    const timer = window.setTimeout(() => {
+      setShowIntro(false);
+      document.body.style.overflow = previousOverflow;
+    }, INTRO_DURATION);
 
     return () => {
-      window.clearTimeout(
-        timer
-      );
-
-      document.body.style.overflow =
-        previousOverflow;
+      window.clearTimeout(timer);
+      document.body.style.overflow = previousOverflow;
     };
   }, []);
 
@@ -241,15 +152,14 @@ export default function IntroAnimation() {
             duration: 1.5,
             ease: "easeInOut",
           }}
-          className="fixed inset-0 z-[1000] isolate overflow-hidden bg-[#020806]"
+          className="fixed inset-0 z-[2147483647] isolate overflow-hidden bg-[#020806]"
+          style={{
+            WebkitTransform: "translateZ(0)",
+            transform: "translateZ(0)",
+          }}
         >
-          {/* =================================================
-              BACKGROUND
-          ================================================== */}
-
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(16,185,129,0.075),transparent_34%),radial-gradient(circle_at_20%_80%,rgba(34,197,94,0.045),transparent_26%),linear-gradient(180deg,#020806_0%,#03100a_52%,#010503_100%)]" />
 
-          {/* Very subtle vertical light */}
           <motion.div
             initial={{
               opacity: 0,
@@ -263,10 +173,6 @@ export default function IntroAnimation() {
             }}
             className="pointer-events-none absolute inset-x-0 top-0 h-[55%] bg-[radial-gradient(ellipse_at_50%_0%,rgba(134,239,172,0.055),transparent_60%)]"
           />
-
-          {/* =================================================
-              FLOATING NATURAL PARTICLES
-          ================================================== */}
 
           <FloatingLeaf
             delay={0.8}
@@ -313,112 +219,75 @@ export default function IntroAnimation() {
             rotate={20}
           />
 
-          {/* =================================================
-              SMALL PARTICLE DOTS
-          ================================================== */}
+          {[...Array(7)].map((_, index) => {
+            const positions = [
+              {
+                left: "17%",
+                top: "40%",
+              },
+              {
+                left: "82%",
+                top: "39%",
+              },
+              {
+                left: "28%",
+                top: "72%",
+              },
+              {
+                left: "69%",
+                top: "68%",
+              },
+              {
+                left: "91%",
+                top: "52%",
+              },
+              {
+                left: "9%",
+                top: "50%",
+              },
+              {
+                left: "50%",
+                top: "16%",
+              },
+            ];
 
-          {[...Array(7)].map(
-            (_, index) => {
-              const positions = [
-                {
-                  left: "17%",
-                  top: "40%",
-                },
-                {
-                  left: "82%",
-                  top: "39%",
-                },
-                {
-                  left: "28%",
-                  top: "72%",
-                },
-                {
-                  left: "69%",
-                  top: "68%",
-                },
-                {
-                  left: "91%",
-                  top: "52%",
-                },
-                {
-                  left: "9%",
-                  top: "50%",
-                },
-                {
-                  left: "50%",
-                  top: "16%",
-                },
-              ];
+            const position = positions[index];
 
-              const position =
-                positions[index];
-
-              return (
-                <motion.span
-                  key={index}
-                  initial={{
-                    opacity: 0,
-                    scale: 0.4,
-                  }}
-                  animate={
-                    reduceMotion
-                      ? {
-                          opacity: 0.2,
-                        }
-                      : {
-                          opacity: [
-                            0,
-                            0.32,
-                            0.12,
-                            0,
-                          ],
-                          scale: [
-                            0.4,
-                            1,
-                            0.8,
-                            0.4,
-                          ],
-                          y: [
-                            8,
-                            -4,
-                            -10,
-                            -18,
-                          ],
-                        }
-                  }
-                  transition={{
-                    delay:
-                      1 +
-                      index *
-                        0.28,
-                    duration: 4.5,
-                    repeat:
-                      Infinity,
-                    ease:
-                      "easeInOut",
-                  }}
-                  className="pointer-events-none absolute h-1 w-1 rounded-full bg-emerald-300/40"
-                  style={{
-                    left:
-                      position.left,
-                    top:
-                      position.top,
-                  }}
-                />
-              );
-            }
-          )}
-
-          {/* =================================================
-              MAIN CONTENT
-          ================================================== */}
+            return (
+              <motion.span
+                key={index}
+                initial={{
+                  opacity: 0,
+                  scale: 0.4,
+                }}
+                animate={
+                  reduceMotion
+                    ? {
+                        opacity: 0.2,
+                      }
+                    : {
+                        opacity: [0, 0.32, 0.12, 0],
+                        scale: [0.4, 1, 0.8, 0.4],
+                        y: [8, -4, -10, -18],
+                      }
+                }
+                transition={{
+                  delay: 1 + index * 0.28,
+                  duration: 4.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="pointer-events-none absolute h-1 w-1 rounded-full bg-emerald-300/40"
+                style={{
+                  left: position.left,
+                  top: position.top,
+                }}
+              />
+            );
+          })}
 
           <div className="relative z-20 flex min-h-screen items-center justify-center px-6">
             <div className="flex w-full max-w-xl flex-col items-center text-center">
-              {/* =================================================
-                  LOGO AURA
-              ================================================== */}
-
               <motion.div
                 initial={{
                   opacity: 0,
@@ -435,23 +304,14 @@ export default function IntroAnimation() {
                 }}
                 className="relative flex h-[190px] w-[190px] items-center justify-center sm:h-[225px] sm:w-[225px]"
               >
-                {/* Outer ambient glow */}
                 <motion.div
                   initial={{
                     opacity: 0,
                     scale: 0.7,
                   }}
                   animate={{
-                    opacity: [
-                      0,
-                      0.7,
-                      0.42,
-                    ],
-                    scale: [
-                      0.7,
-                      1,
-                      0.96,
-                    ],
+                    opacity: [0, 0.7, 0.42],
+                    scale: [0.7, 1, 0.96],
                   }}
                   transition={{
                     delay: 0.7,
@@ -461,7 +321,6 @@ export default function IntroAnimation() {
                   className="absolute inset-6 rounded-full bg-emerald-400/[0.08] blur-3xl"
                 />
 
-                {/* Outer ring */}
                 <motion.div
                   initial={{
                     opacity: 0,
@@ -479,7 +338,6 @@ export default function IntroAnimation() {
                   className="absolute inset-0 rounded-full border border-emerald-200/20"
                 />
 
-                {/* Second ring */}
                 <motion.div
                   initial={{
                     opacity: 0,
@@ -497,7 +355,6 @@ export default function IntroAnimation() {
                   className="absolute inset-3 rounded-full border border-emerald-300/[0.16]"
                 />
 
-                {/* Slowly rotating ring */}
                 <motion.div
                   initial={{
                     opacity: 0,
@@ -515,7 +372,6 @@ export default function IntroAnimation() {
                   className="absolute inset-6 rounded-full border border-dashed border-emerald-300/[0.18]"
                 />
 
-                {/* Logo plate */}
                 <motion.div
                   initial={{
                     opacity: 0,
@@ -542,7 +398,6 @@ export default function IntroAnimation() {
                   />
                 </motion.div>
 
-                {/* Tiny light orbit */}
                 <motion.div
                   initial={{
                     opacity: 0,
@@ -554,16 +409,8 @@ export default function IntroAnimation() {
                           opacity: 0.25,
                         }
                       : {
-                          opacity: [
-                            0,
-                            0.5,
-                            0.1,
-                          ],
-                          rotate: [
-                            0,
-                            180,
-                            360,
-                          ],
+                          opacity: [0, 0.5, 0.1],
+                          rotate: [0, 180, 360],
                         }
                   }
                   transition={{
@@ -576,10 +423,6 @@ export default function IntroAnimation() {
                   <span className="absolute left-1/2 top-0 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-emerald-300/70" />
                 </motion.div>
               </motion.div>
-
-              {/* =================================================
-                  BRAND NAME
-              ================================================== */}
 
               <motion.div
                 initial={{
@@ -608,10 +451,6 @@ export default function IntroAnimation() {
                 </p>
               </motion.div>
 
-              {/* =================================================
-                  DIVIDER
-              ================================================== */}
-
               <motion.div
                 initial={{
                   width: 0,
@@ -622,16 +461,12 @@ export default function IntroAnimation() {
                   opacity: 1,
                 }}
                 transition={{
-                  delay: 3.0,
+                  delay: 3,
                   duration: 1.2,
                   ease: smoothEase,
                 }}
                 className="mt-6 h-px bg-gradient-to-r from-transparent via-emerald-300/45 to-transparent"
               />
-
-              {/* =================================================
-                  TAGLINE
-              ================================================== */}
 
               <motion.p
                 initial={{
@@ -660,10 +495,6 @@ export default function IntroAnimation() {
                 වගකීම
               </motion.p>
 
-              {/* =================================================
-                  MESSAGE
-              ================================================== */}
-
               <motion.p
                 initial={{
                   opacity: 0,
@@ -684,10 +515,6 @@ export default function IntroAnimation() {
                 මනුෂ්‍යත්වයේ අනාගතය
                 සුරැකීමයි.
               </motion.p>
-
-              {/* =================================================
-                  LOADING LINE
-              ================================================== */}
 
               <motion.div
                 initial={{
@@ -722,15 +549,7 @@ export default function IntroAnimation() {
             </div>
           </div>
 
-          {/* =================================================
-              BOTTOM VIGNETTE
-          ================================================== */}
-
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/45 to-transparent" />
-
-          {/* =================================================
-              SIDE VIGNETTE
-          ================================================== */}
 
           <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black/20 to-transparent" />
 
@@ -739,4 +558,4 @@ export default function IntroAnimation() {
       )}
     </AnimatePresence>
   );
-              }
+}
