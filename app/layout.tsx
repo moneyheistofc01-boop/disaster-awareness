@@ -1,71 +1,148 @@
-import type { Metadata, Viewport } from "next";
+import type {
+  Metadata,
+  Viewport,
+} from "next";
+
 import "./globals.css";
+
 import { ThemeProviderContext } from "../context/ThemeContext";
 import { LanguageProvider } from "../context/LanguageContext";
+
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import IntroAnimation from "../components/IntroAnimation";
+import ShareButton from "../components/ShareButton";
 
-// Page එක Zoom වෙන එක නවත්වන සැකසුම (Next.js අලුත් ක්‍රමය)
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: "cover",
+
+  themeColor: [
+    {
+      media: "(prefers-color-scheme: light)",
+      color: "#f6f9f7",
+    },
+    {
+      media: "(prefers-color-scheme: dark)",
+      color: "#06100c",
+    },
+  ],
+
+  colorScheme: "light dark",
 };
 
-// SEO සඳහා අවශ්‍ය සම්පූර්ණ Meta Data
 export const metadata: Metadata = {
-  metadataBase: new URL("https://ecoguard-srilanka.pages.dev/"),
+  metadataBase: new URL(
+    "https://ecoguard-srilanka.pages.dev/"
+  ),
+
   title: {
-    default: "EcoGuard | Protect Nature & Survive Disasters",
-    template: "%s | EcoGuard",
+    default:
+      "සොබා සේනාංකය | Soba Senankaya",
+    template:
+      "%s | සොබා සේනාංකය",
   },
-  description: "Learn how to protect our environment, minimize plastic usage, plant trees, and stay safe during natural disasters. Join EcoGuard for a secure and green future.",
+
+  description:
+    "සොබා සේනාංකය යනු ස්වභාවධර්මය වෙනුවෙන් මනුෂ්‍යත්වයේ වගකීම හා වගවීම ශක්තිමත් කරමින් ස්වභාවික සමතුලිතතාව, සමාජ වගකීම සහ පරිසර ආරක්ෂාව වෙනුවෙන් එක්වන සමාජ මෙහෙවරකි.",
+
   keywords: [
-    "EcoGuard", 
-    "Nature Conservation", 
-    "Natural Disasters", 
-    "Sri Lanka", 
-    "Environment Protection", 
-    "Eco Friendly", 
-    "Disaster Management", 
-    "Save Earth", 
-    "Green Future",
+    "සොබා සේනාංකය",
+    "Soba Senankaya",
+    "Nature",
+    "Nature Conservation",
+    "Environment",
+    "Environmental Protection",
+    "Sri Lanka",
+    "Natural Balance",
+    "Social Responsibility",
+    "Nature Protection",
+    "Environmental Awareness",
+    "ස්වභාවධර්මය",
     "ස්වභාවදහම",
-    "පරිසරය"
+    "පරිසරය",
+    "පරිසර ආරක්ෂාව",
+    "ස්වභාවික සමතුලිතතාව",
+    "මනුෂ්‍යත්වය",
   ],
-  authors: [{ name: "EcoGuard Team" }],
-  creator: "EcoGuard",
-  publisher: "EcoGuard",
-  
+
+  authors: [
+    {
+      name: "සොබා සේනාංකය",
+    },
+  ],
+
+  creator: "සොබා සේනාංකය",
+  publisher: "සොබා සේනාංකය",
+
+  applicationName:
+    "සොබා සේනාංකය",
+
+  category:
+    "Environment & Social Responsibility",
+
+  classification:
+    "Environmental awareness and social mission",
+
+  referrer:
+    "origin-when-cross-origin",
+
+  alternates: {
+    canonical: "/",
+  },
+
   openGraph: {
-    title: "EcoGuard | Nature & Disasters",
-    description: "Join EcoGuard to learn about nature conservation and natural disaster survival. Let's protect our environment for future generations.",
+    title:
+      "සොබා සේනාංකය | Soba Senankaya",
+
+    description:
+      "සොබාදහම වෙනුවෙන් මනුෂ්‍යත්වයේ වගකීම හා වගවීම. ස්වභාවික සමතුලිතතාව සහ පරිසර ආරක්ෂාව වෙනුවෙන් එක්වන සමාජ මෙහෙවර.",
+
     url: "/",
-    siteName: "EcoGuard",
+
+    siteName:
+      "සොබා සේනාංකය | Soba Senankaya",
+
+    locale: "si_LK",
+
+    alternateLocale: [
+      "en_US",
+    ],
+
+    type: "website",
+
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "EcoGuard - Protect Nature",
+        alt:
+          "සොබා සේනාංකය - Soba Senankaya",
       },
     ],
-    locale: "en_US",
-    type: "website",
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "EcoGuard | Protect Nature & Survive Disasters",
-    description: "Learn how to protect our environment, minimize plastic usage, and stay safe during natural disasters.",
-    images: ["/og-image.png"],
+
+    title:
+      "සොබා සේනාංකය | Soba Senankaya",
+
+    description:
+      "ස්වභාවධර්මය වෙනුවෙන් මනුෂ්‍යත්වයේ වගකීම හා වගවීම.",
+
+    images: [
+      "/og-image.png",
+    ],
   },
 
   robots: {
     index: true,
     follow: true,
+
     googleBot: {
       index: true,
       follow: true,
@@ -77,26 +154,51 @@ export const metadata: Metadata = {
 
   icons: {
     icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
+    shortcut:
+      "/favicon-16x16.png",
+    apple:
+      "/apple-touch-icon.png",
+  },
+
+  formatDetection: {
+    telephone: false,
+    date: false,
+    address: false,
+    email: false,
+    url: true,
   },
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      {/* "select-none" කියන class එක එකතු කළා, එතකොට කිසිම දෙයක් select කරන්න බෑ */}
-      <body className="bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300 antialiased font-sans select-none">
+    <html
+      lang="si"
+      suppressHydrationWarning
+    >
+      <body
+        className="
+          min-h-screen
+          overflow-x-hidden
+          bg-[#f6f9f7]
+          text-slate-900
+          antialiased
+          transition-colors
+          duration-300
+          dark:bg-[#06100c]
+          dark:text-white
+        "
+      >
         <ThemeProviderContext>
           <LanguageProvider>
             <IntroAnimation />
             <Header />
-            <main className="min-h-screen">{children}</main>
+            {children}
             <Footer />
+            <ShareButton />
           </LanguageProvider>
         </ThemeProviderContext>
       </body>
