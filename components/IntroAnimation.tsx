@@ -17,7 +17,6 @@ export default function OpeningIntro() {
         
         document.body.style.overflow = 'hidden';
 
-        // තත්පර 4.5 කින් Fade Out පටන් ගනී (Professional & Fast)
         const exitTimer = setTimeout(() => setIsExiting(true), 4500); 
         
         const removeTimer = setTimeout(() => {
@@ -51,7 +50,7 @@ export default function OpeningIntro() {
             inset: 0, 
             width: '100vw',
             height: '100dvh',
-            background: '#050505', // Solid Premium Dark Background
+            background: '#050505',
             zIndex: 2147483647,
             display: 'flex',
             flexDirection: 'column',
@@ -76,11 +75,11 @@ export default function OpeningIntro() {
               pointer-events: none;
             }
 
-            /* --- CRISP & PROFESSIONAL LOGO RINGS --- */
+            /* --- LOGO WRAPPER & DUAL FLAME RINGS --- */
             .premium-logo-wrapper {
               position: relative;
-              width: 180px;
-              height: 180px;
+              width: 190px;
+              height: 190px;
               display: flex;
               align-items: center;
               justify-content: center;
@@ -88,34 +87,50 @@ export default function OpeningIntro() {
               z-index: 10;
             }
 
-            /* Ring 1: Outer Dashed Orbit */
+            /* 1. Red Flame Ring - Spinning Clockwise (Right) */
+            .ring-fire-red {
+              position: absolute;
+              inset: -8px;
+              border-radius: 50%;
+              border: 3px solid transparent;
+              border-top-color: #ff003c;
+              border-right-color: #ff4d6d;
+              box-shadow: 0 0 15px rgba(255, 0, 60, 0.7);
+              animation: spinClockwise 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+              z-index: 3;
+            }
+
+            /* 2. Blue Flame Ring - Spinning Counter-Clockwise (Left) */
+            .ring-fire-blue {
+              position: absolute;
+              inset: -18px;
+              border-radius: 50%;
+              border: 3px solid transparent;
+              border-bottom-color: #00c3ff;
+              border-left-color: #0055ff;
+              box-shadow: 0 0 15px rgba(0, 195, 255, 0.7);
+              animation: spinCounterClockwise 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+              z-index: 2;
+            }
+
+            /* 3. Outer Golden Dashed Orbit */
             .ring-outer {
               position: absolute;
-              inset: 0;
+              inset: -30px;
               border-radius: 50%;
-              border: 1px dashed rgba(212, 175, 55, 0.4); /* Premium Gold */
-              animation: spinSlow 12s linear infinite;
+              border: 1px dashed rgba(212, 175, 55, 0.3);
+              animation: spinClockwise 15s linear infinite;
+              z-index: 1;
             }
 
-            /* Ring 2: Solid Accent Arc */
-            .ring-accent {
-              position: absolute;
-              inset: 10px;
-              border-radius: 50%;
-              border: 2px solid transparent;
-              border-top-color: #D4AF37; /* Solid Gold */
-              border-right-color: rgba(212, 175, 55, 0.2);
-              animation: spinFast 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-            }
-
-            /* Ring 3: Inner Glow Line */
+            /* Inner Core Ring */
             .ring-inner {
               position: absolute;
-              inset: 22px;
+              inset: 4px;
               border-radius: 50%;
-              border: 1px solid rgba(255, 255, 255, 0.1);
-              box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.1), 0 0 15px rgba(212, 175, 55, 0.1);
-              animation: pulseRing 2s ease-in-out infinite;
+              border: 1px solid rgba(255, 255, 255, 0.15);
+              box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.1);
+              z-index: 4;
             }
 
             /* The Logo itself */
@@ -126,17 +141,17 @@ export default function OpeningIntro() {
               border-radius: 50%;
               position: relative;
               z-index: 10;
-              border: 2px solid rgba(212, 175, 55, 0.3);
-              box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+              border: 2px solid rgba(212, 175, 55, 0.4);
+              box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
               background: #000;
             }
 
-            /* --- ANIMATIONS --- */
-            @keyframes spinSlow { 100% { transform: rotate(360deg); } }
-            @keyframes spinFast { 100% { transform: rotate(-360deg); } }
-            @keyframes pulseRing {
-              0%, 100% { transform: scale(1); opacity: 0.8; }
-              50% { transform: scale(1.02); opacity: 1; }
+            /* --- ANIMATION DIRECTIONS --- */
+            @keyframes spinClockwise { 
+              100% { transform: rotate(360deg); } 
+            }
+            @keyframes spinCounterClockwise { 
+              100% { transform: rotate(-360deg); } 
             }
 
             /* --- TYPOGRAPHY & LOADING BAR --- */
@@ -159,7 +174,7 @@ export default function OpeningIntro() {
             }
 
             .premium-title span {
-              background: linear-gradient(90deg, #D4AF37, #F3E5AB); /* Gold text gradient */
+              background: linear-gradient(90deg, #D4AF37, #F3E5AB);
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
             }
@@ -174,7 +189,6 @@ export default function OpeningIntro() {
               margin-top: 15px;
             }
 
-            /* Professional Progress Bar */
             .loading-wrapper {
               margin-top: 40px;
               display: flex;
@@ -215,17 +229,17 @@ export default function OpeningIntro() {
             }
 
             @media (max-width: 768px) {
-              .premium-logo-wrapper { width: 150px; height: 150px; margin-bottom: 30px; }
+              .premium-logo-wrapper { width: 160px; height: 160px; margin-bottom: 30px; }
               .premium-logo { width: 100px; height: 100px; }
-              .ring-inner { inset: 18px; }
             }
           `}} />
 
           {/* Main Content */}
           <div className="premium-logo-wrapper">
-            {/* Clean, Sharp Rotating Rings */}
+            {/* Counter-rotating Flame Rings */}
             <div className="ring-outer" />
-            <div className="ring-accent" />
+            <div className="ring-fire-blue" /> {/* Rotates Left (Counter-clockwise) */}
+            <div className="ring-fire-red" />  {/* Rotates Right (Clockwise) */}
             <div className="ring-inner" />
             
             <motion.img 
