@@ -1366,8 +1366,7 @@ export default function HomePage() {
                   0.04
                 }
               >
-                <motion.div
-                  }
+                <div
                   className="group flex h-full gap-4 rounded-[26px] border border-white/10 bg-[#071a13]/92 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.16)] dark:border-white/10 dark:bg-[#071a13]/92"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
@@ -1382,7 +1381,7 @@ export default function HomePage() {
                       lang
                     )}
                   </p>
-                </motion.div>
+                </div>
               </Reveal>
             )
           )}
@@ -1477,8 +1476,7 @@ export default function HomePage() {
                       0.07
                     }
                   >
-                    <motion.div
-                      }
+                    <div
                       className="h-full rounded-[28px] border border-white/10 bg-[#071a13]/92 p-6"
                     >
                       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-400/10 text-emerald-300">
