@@ -17,12 +17,13 @@ export default function OpeningIntro() {
         
         document.body.style.overflow = 'hidden';
 
-        const exitTimer = setTimeout(() => setIsExiting(true), 5500); 
+        // තත්පර 4.5 කින් Fade Out පටන් ගනී (Professional & Fast)
+        const exitTimer = setTimeout(() => setIsExiting(true), 4500); 
         
         const removeTimer = setTimeout(() => {
             setShow(false); 
             document.body.style.overflow = '';
-        }, 7000);
+        }, 5500);
 
         return () => {
           clearTimeout(exitTimer);
@@ -41,16 +42,16 @@ export default function OpeningIntro() {
     <AnimatePresence>
       {show && (
         <motion.div 
-          className="intro-master-container"
-          initial={{ opacity: 1, filter: 'blur(0px)' }}
-          animate={isExiting ? { opacity: 0, filter: 'blur(15px)', scale: 1.05 } : { opacity: 1, filter: 'blur(0px)', scale: 1 }}
-          transition={{ duration: 1.5, ease: "easeInOut" }}
+          className="premium-intro-container"
+          initial={{ opacity: 1 }}
+          animate={isExiting ? { opacity: 0, scale: 1.05 } : { opacity: 1, scale: 1 }}
+          transition={{ duration: 1, ease: "easeInOut" }}
           style={{
             position: 'fixed',
             inset: 0, 
             width: '100vw',
             height: '100dvh',
-            background: '#030102', // Very dark background to pop the fire
+            background: '#050505', // Solid Premium Dark Background
             zIndex: 2147483647,
             display: 'flex',
             flexDirection: 'column',
@@ -61,147 +62,85 @@ export default function OpeningIntro() {
           }}
         >
           <style dangerouslySetInnerHTML={{ __html: `
-            /* --- MYSTICAL BACKGROUND EFFECTS --- */
-            .mystic-glow {
+            /* --- PREMIUM BACKGROUND --- */
+            .premium-intro-container::before {
+              content: '';
               position: absolute;
               inset: 0;
-              background: radial-gradient(circle at 35% 65%, rgba(255, 0, 40, 0.08) 0%, transparent 55%),
-                          radial-gradient(circle at 65% 35%, rgba(0, 85, 255, 0.08) 0%, transparent 55%),
-                          #030102;
+              background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+              background-size: 40px 40px;
+              opacity: 0.5;
               z-index: 1;
-            }
-
-            /* --- FLOATING FIRE SPARKS --- */
-            .particles-container {
-              position: absolute;
-              inset: 0;
-              z-index: 2;
-              overflow: hidden;
               pointer-events: none;
             }
 
-            .firefly {
-              position: absolute;
-              border-radius: 50%;
-              animation: floatMagic 3s ease-in-out infinite alternate;
-            }
-
-            .f-red {
-              width: 5px; height: 5px;
-              background: #ff003c;
-              box-shadow: 0 0 15px #ff003c, 0 0 25px #ff4d6d;
-            }
-
-            .f-blue {
-              width: 6px; height: 6px;
-              background: #0077ff;
-              box-shadow: 0 0 15px #0077ff, 0 0 30px #00c3ff;
-            }
-
-            @keyframes floatMagic {
-              0% { transform: translate(0, 0) scale(0.8); opacity: 0.3; }
-              50% { opacity: 1; }
-              100% { transform: translate(40px, -80px) scale(1.4); opacity: 0; }
-            }
-
-            /* --- EPIC RED & BLUE FIRE VORTEX --- */
-            .logo-wrapper {
+            /* --- CRISP & PROFESSIONAL LOGO RINGS --- */
+            .premium-logo-wrapper {
               position: relative;
-              width: 210px;
-              height: 210px;
+              width: 180px;
+              height: 180px;
               display: flex;
               align-items: center;
               justify-content: center;
-              border-radius: 50%;
+              margin-bottom: 40px;
               z-index: 10;
-              margin-bottom: 35px;
             }
 
-            .fire-vortex {
+            /* Ring 1: Outer Dashed Orbit */
+            .ring-outer {
               position: absolute;
-              inset: -50px;
-              z-index: 1;
-              filter: blur(14px); /* Blurs the shapes to look like fluid fire */
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            }
-
-            /* Deep Red Leaping Flames */
-            .flame-red-main {
-              position: absolute;
-              inset: 0px;
-              background: linear-gradient(45deg, #8b0000, #ff002b);
-              mix-blend-mode: screen;
-              box-shadow: 0 0 40px #ff002b;
-              animation: morphSpin1 3s linear infinite;
-            }
-
-            /* Blue Leaping Flames */
-            .flame-blue-main {
-              position: absolute;
-              inset: 10px -15px -15px 10px;
-              background: linear-gradient(45deg, #001188, #0055ff);
-              mix-blend-mode: screen;
-              box-shadow: 0 0 40px #0055ff;
-              animation: morphSpin2 4s linear infinite;
-            }
-
-            /* Bright Red/Orange Core Fire */
-            .flame-red-core {
-              position: absolute;
-              inset: 25px -10px 15px 25px;
-              background: #ff3333;
-              mix-blend-mode: screen;
-              animation: morphSpin2 2.2s linear infinite;
-            }
-
-            /* Bright Cyan/Blue Core Fire */
-            .flame-blue-core {
-              position: absolute;
-              inset: -10px 25px 25px -10px;
-              background: #00c3ff;
-              mix-blend-mode: screen;
-              animation: morphSpin1 2.5s linear infinite;
-            }
-
-            /* Core solid ring to hold the logo */
-            .logo-base-ring {
-              position: absolute;
-              inset: -6px;
+              inset: 0;
               border-radius: 50%;
-              border: 2px solid rgba(255, 255, 255, 0.2);
-              box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 0 20px rgba(255,0,60,0.6);
-              z-index: 4;
+              border: 1px dashed rgba(212, 175, 55, 0.4); /* Premium Gold */
+              animation: spinSlow 12s linear infinite;
             }
 
-            /* Morphing & Spinning Keyframes for the Fire */
-            @keyframes morphSpin1 {
-              0% { transform: rotate(0deg) scale(1); border-radius: 60% 40% 50% 50% / 40% 50% 50% 60%; }
-              50% { transform: rotate(180deg) scale(1.15); border-radius: 40% 60% 40% 60% / 50% 40% 60% 50%; }
-              100% { transform: rotate(360deg) scale(1); border-radius: 60% 40% 50% 50% / 40% 50% 50% 60%; }
+            /* Ring 2: Solid Accent Arc */
+            .ring-accent {
+              position: absolute;
+              inset: 10px;
+              border-radius: 50%;
+              border: 2px solid transparent;
+              border-top-color: #D4AF37; /* Solid Gold */
+              border-right-color: rgba(212, 175, 55, 0.2);
+              animation: spinFast 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
             }
 
-            @keyframes morphSpin2 {
-              0% { transform: rotate(360deg) scale(1.15); border-radius: 50% 50% 60% 40% / 60% 40% 50% 50%; }
-              50% { transform: rotate(180deg) scale(1); border-radius: 40% 60% 50% 50% / 50% 60% 40% 50%; }
-              100% { transform: rotate(0deg) scale(1.15); border-radius: 50% 50% 60% 40% / 60% 40% 50% 50%; }
+            /* Ring 3: Inner Glow Line */
+            .ring-inner {
+              position: absolute;
+              inset: 22px;
+              border-radius: 50%;
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.1), 0 0 15px rgba(212, 175, 55, 0.1);
+              animation: pulseRing 2s ease-in-out infinite;
             }
 
-            .main-logo {
-              width: 100%;
-              height: 100%;
-              object-fit: cover; 
+            /* The Logo itself */
+            .premium-logo {
+              width: 120px;
+              height: 120px;
+              object-fit: cover;
               border-radius: 50%;
               position: relative;
-              z-index: 8;
-              box-shadow: inset 0 0 30px rgba(0,0,0,1);
-              background: #020202;
-              border: 2px solid rgba(255, 255, 255, 0.1);
+              z-index: 10;
+              border: 2px solid rgba(212, 175, 55, 0.3);
+              box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+              background: #000;
             }
 
-            /* --- TYPOGRAPHY --- */
-            .content-container {
+            /* --- ANIMATIONS --- */
+            @keyframes spinSlow { 100% { transform: rotate(360deg); } }
+            @keyframes spinFast { 100% { transform: rotate(-360deg); } }
+            @keyframes pulseRing {
+              0%, 100% { transform: scale(1); opacity: 0.8; }
+              50% { transform: scale(1.02); opacity: 1; }
+            }
+
+            /* --- TYPOGRAPHY & LOADING BAR --- */
+            .premium-content {
               display: flex;
               flex-direction: column;
               align-items: center;
@@ -209,149 +148,131 @@ export default function OpeningIntro() {
               text-align: center;
             }
 
-            .main-title {
+            .premium-title {
               font-family: 'Abhaya Libre', 'Inter', serif;
-              font-size: clamp(2.5rem, 6vw, 4.5rem);
+              font-size: clamp(2rem, 5vw, 3.5rem);
               font-weight: 800;
-              color: white;
+              color: #ffffff;
               margin: 0;
-              text-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 20px rgba(255,255,255,0.2);
-              line-height: 1.1;
+              letter-spacing: 0.05em;
+              text-shadow: 0 4px 15px rgba(0,0,0,0.5);
             }
 
-            .main-title .highlight {
-              background: linear-gradient(90deg, #ff003c, #00c3ff);
+            .premium-title span {
+              background: linear-gradient(90deg, #D4AF37, #F3E5AB); /* Gold text gradient */
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
-              filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
             }
 
-            .tagline {
+            .premium-subtitle {
               font-family: 'Inter', sans-serif;
-              font-size: clamp(0.7rem, 2vw, 0.9rem);
-              font-weight: 600;
-              letter-spacing: 0.3em;
-              color: rgba(255,255,255,0.6);
+              font-size: clamp(0.7rem, 2vw, 0.85rem);
+              font-weight: 500;
+              letter-spacing: 0.4em;
+              color: rgba(255, 255, 255, 0.5);
               text-transform: uppercase;
-              margin-top: 20px;
-              display: flex;
-              align-items: center;
-              gap: 15px;
+              margin-top: 15px;
             }
 
-            .tagline .dot {
-              color: rgba(255, 0, 60, 0.8);
-              text-shadow: 0 0 10px #ff003c;
-            }
-
-            .loading-text {
+            /* Professional Progress Bar */
+            .loading-wrapper {
               margin-top: 40px;
-              font-family: 'Inter', sans-serif;
-              font-size: 0.7rem;
-              letter-spacing: 0.2em;
-              color: #888;
-              text-transform: uppercase;
               display: flex;
+              flex-direction: column;
               align-items: center;
-              gap: 8px;
+              gap: 12px;
             }
 
-            .loading-dot {
-              width: 6px;
-              height: 6px;
-              border-radius: 50%;
-              background: #00c3ff;
-              box-shadow: 0 0 10px #00c3ff, 0 0 20px #ff003c;
-              animation: pulseBlueRed 1s infinite alternate;
+            .loading-text-pro {
+              font-family: 'Inter', sans-serif;
+              font-size: 0.65rem;
+              letter-spacing: 0.2em;
+              color: rgba(212, 175, 55, 0.8);
+              text-transform: uppercase;
             }
 
-            @keyframes pulseBlueRed {
-              from { opacity: 0.4; transform: scale(0.8); background: #00c3ff; }
-              to { opacity: 1; transform: scale(1.3); background: #ff003c; }
+            .progress-bar-container {
+              width: 150px;
+              height: 2px;
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 4px;
+              overflow: hidden;
+              position: relative;
             }
 
-            /* --- RESPONSIVE --- */
+            .progress-bar-fill {
+              position: absolute;
+              top: 0; left: 0; bottom: 0;
+              background: linear-gradient(90deg, transparent, #D4AF37, #FFF);
+              width: 50%;
+              border-radius: 4px;
+              animation: loadProgress 3.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            }
+
+            @keyframes loadProgress {
+              0% { width: 0%; left: -50%; }
+              100% { width: 100%; left: 100%; }
+            }
+
             @media (max-width: 768px) {
-              .logo-wrapper { width: 170px; height: 170px; margin-bottom: 30px; }
-              .fire-vortex { inset: -35px; }
-              .tagline { flex-direction: column; gap: 8px; letter-spacing: 0.2em; }
-              .tagline .dot { display: none; }
+              .premium-logo-wrapper { width: 150px; height: 150px; margin-bottom: 30px; }
+              .premium-logo { width: 100px; height: 100px; }
+              .ring-inner { inset: 18px; }
             }
           `}} />
 
-          {/* Background Elements */}
-          <div className="mystic-glow" />
-          
-          <div className="particles-container">
-            {/* Fire sparks flying around */}
-            <div className="firefly f-red" style={{ left: '25%', top: '35%', animationDelay: '0s' }} />
-            <div className="firefly f-blue" style={{ left: '75%', top: '55%', animationDelay: '1s' }} />
-            <div className="firefly f-red" style={{ left: '65%', top: '25%', animationDelay: '2s' }} />
-            <div className="firefly f-blue" style={{ left: '35%', top: '65%', animationDelay: '1.5s' }} />
-            <div className="firefly f-red" style={{ left: '50%', top: '75%', animationDelay: '0.5s' }} />
+          {/* Main Content */}
+          <div className="premium-logo-wrapper">
+            {/* Clean, Sharp Rotating Rings */}
+            <div className="ring-outer" />
+            <div className="ring-accent" />
+            <div className="ring-inner" />
+            
+            <motion.img 
+              src="/logo.png" 
+              alt="Soba Senankaya Logo" 
+              className="premium-logo"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1.2, ease: "easeOut" }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "https://via.placeholder.com/150/000000/D4AF37?text=LOGO";
+              }}
+            />
           </div>
 
-          {/* Main Content */}
-          <div className="content-container">
-            
-            {/* Animated Vortex Fire Logo */}
-            <motion.div 
-              className="logo-wrapper"
-              initial={{ scale: 0.6, opacity: 0, filter: "blur(20px)" }}
-              animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
-              transition={{ duration: 1.8, ease: "easeOut" }}
-            >
-              {/* Layered Fire effect */}
-              <div className="fire-vortex">
-                <div className="flame-red-main" />
-                <div className="flame-blue-main" />
-                <div className="flame-red-core" />
-                <div className="flame-blue-core" />
-              </div>
-              
-              <div className="logo-base-ring" />
-              
-              <img 
-                src="/logo.png" 
-                alt="Soba Senankaya Logo" 
-                className="main-logo"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "https://via.placeholder.com/250/050505/ffffff?text=LOGO";
-                }}
-              />
-            </motion.div>
-
-            {/* Cinematic Text Reveal */}
+          <div className="premium-content">
             <motion.h1 
-              className="main-title"
-              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ delay: 1.2, duration: 1.5, ease: "easeOut" }}
+              className="premium-title"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 1 }}
             >
-              සොබා <span className="highlight">සේනාංකය</span>
+              සොබා <span>සේනාංකය</span>
             </motion.h1>
 
-            <motion.div 
-              className="tagline"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 2, duration: 1.2, ease: "easeOut" }}
-            >
-              ස්වභාවය <span className="dot">•</span> මනුෂ්‍යත්වය <span className="dot">•</span> වගකීම
-            </motion.div>
-
-            {/* Loading Indicator */}
-            <motion.div 
-              className="loading-text"
+            <motion.p 
+              className="premium-subtitle"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 3.5, duration: 1 }}
+              transition={{ delay: 1, duration: 1 }}
             >
-              <span className="loading-dot" />
-              පද්ධතිය ආරම්භ වෙමින් පවතී...
-            </motion.div>
+              ස්වභාවය • මනුෂ්‍යත්වය • වගකීම
+            </motion.p>
 
+            <motion.div 
+              className="loading-wrapper"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.5, duration: 1 }}
+            >
+              <span className="loading-text-pro">SYSTEM INITIALIZATION</span>
+              <div className="progress-bar-container">
+                <div className="progress-bar-fill" />
+              </div>
+            </motion.div>
           </div>
+
         </motion.div>
       )}
     </AnimatePresence>
