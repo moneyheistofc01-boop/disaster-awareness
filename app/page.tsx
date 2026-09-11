@@ -1498,7 +1498,7 @@ export default function HomePage() {
                           item.text
                         }
                       </p>
-                    </motion.div>
+                    </div>
                   </Reveal>
                 );
               }
@@ -2422,3 +2422,4 @@ export default function HomePage() {
       </div>
     </main>
   );
+}
