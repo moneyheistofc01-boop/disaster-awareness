@@ -465,7 +465,7 @@ function ExpandCard({
     <motion.div
       layout
       id={id}
-      className="overflow-hidden rounded-[24px] border border-slate-200/80 bg-white shadow-[0_14px_45px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/[0.035]"
+      className="overflow-hidden rounded-[24px] border border-white/10 bg-white/[0.07] shadow-[0_14px_45px_rgba(0,0,0,0.18)] backdrop-blur-xl dark:border-white/10 dark:bg-[#071a13]/58"
     >
       <button
         type="button"
@@ -931,29 +931,94 @@ export default function HomePage() {
   ];
 
   return (
-    <main className="relative isolate w-full overflow-x-hidden bg-transparent text-slate-900 dark:text-white">
+    <main className="relative min-h-screen w-full overflow-x-hidden bg-[#06110c] text-slate-900 dark:text-white">
       {/* =====================================================
+          PAGE-LEVEL FIXED WATERFALL WALLPAPER
+          Lightweight: one static image per breakpoint + subtle
+          motion on the image/overlay only. Content always sits
+          above the wallpaper.
+      ====================================================== */}
+
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center bg-no-repeat md:hidden"
+        style={{
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=1100&q=70')",
+          willChange: "transform",
+        }}
+        animate={
+          reduceMotion
+            ? undefined
+            : {
+                scale: [1.02, 1.035, 1.02],
+                x: [0, -4, 0],
+                y: [0, 3, 0],
+              }
+        }
+        transition={{
+          duration: 24,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 hidden bg-cover bg-center bg-no-repeat md:block"
+        style={{
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=2200&q=72')",
+          willChange: "transform",
+        }}
+        animate={
+          reduceMotion
+            ? undefined
+            : {
+                scale: [1.02, 1.03, 1.02],
+                x: [0, -6, 0],
+                y: [0, 4, 0],
+              }
+        }
+        transition={{
+          duration: 28,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+
+      {/* Constant readability layer; no extra media/video request. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-[1] bg-[linear-gradient(180deg,rgba(2,12,8,0.88)_0%,rgba(3,18,12,0.72)_35%,rgba(2,12,8,0.84)_72%,rgba(1,7,5,0.96)_100%)]"
+      />
+
+      {/* Subtle live-like atmospheric motion, without video/GIF weight. */}
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-[2] opacity-70"
+        animate={
+          reduceMotion
+            ? undefined
+            : {
+                opacity: [0.52, 0.68, 0.52],
+              }
+        }
+        transition={{
+          duration: 9,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(16,185,129,0.12),transparent_34%),linear-gradient(90deg,rgba(16,185,129,0.08),transparent_32%,transparent_68%,rgba(16,185,129,0.06))]" />
+      </motion.div>
+
+      <div className="relative z-10">
+        {/* =====================================================
           HERO
       ====================================================== */}
 
-      <section className="relative isolate min-h-[650px] overflow-hidden sm:min-h-[700px]">
-        {/* Hero background is supplied by the page-level fixed wallpaper below. */}
-        <div className="pointer-events-none fixed inset-0 -z-50 bg-cover bg-center bg-no-repeat md:hidden"
-          style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1455218873509-8097305ee378?auto=format&fit=crop&w=1400&q=90')",
-          }}
-        />
-
-        <div className="pointer-events-none fixed inset-0 -z-50 hidden bg-cover bg-center bg-no-repeat md:block"
-          style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=2200&q=90')",
-          }}
-        />
-
-        <div className="pointer-events-none fixed inset-0 -z-40 bg-gradient-to-b from-[#03100b]/75 via-[#06150e]/82 to-[#020806]/92" />
-
+      <section className="relative isolate min-h-[590px] overflow-hidden sm:min-h-[700px]">
         {/* Soft animated glow */}
         <motion.div
           className="absolute left-[-80px] top-[20%] -z-10 h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl"
@@ -982,7 +1047,7 @@ export default function HomePage() {
         />
 
         {/* Less vertical space under header */}
-        <div className="mx-auto flex min-h-[650px] w-full max-w-7xl items-center px-5 pb-20 pt-10 sm:min-h-[700px] sm:px-8 sm:pt-12 lg:px-10">
+        <div className="mx-auto flex min-h-[590px] w-full max-w-7xl items-center px-5 pb-16 pt-8 sm:min-h-[700px] sm:px-8 sm:pt-12 lg:px-10">
           <div className="w-full max-w-5xl">
             <Reveal>
               <motion.div
@@ -1027,7 +1092,7 @@ export default function HomePage() {
             </Reveal>
 
             <Reveal delay={0.1}>
-              <h1 className="max-w-5xl text-[2.35rem] font-black leading-[1.02] tracking-[-0.035em] text-white sm:text-6xl md:text-7xl lg:text-[5.4rem]">
+              <h1 className="max-w-[94vw] break-words text-[clamp(1.95rem,9.4vw,2.55rem)] font-black leading-[1.04] tracking-[-0.035em] text-white [overflow-wrap:anywhere] sm:max-w-5xl sm:text-6xl md:text-7xl lg:text-[5.4rem]">
                 {lang === "si" ? (
                   <>
                     <span className="block">
@@ -1131,10 +1196,10 @@ export default function HomePage() {
 
       <section
         id="about"
-        className="mx-auto w-full max-w-7xl px-5 py-16 sm:px-8 sm:py-24 lg:px-10"
+        className="mx-auto w-full max-w-7xl px-5 py-10 sm:px-8 sm:py-20 lg:px-10"
       >
         <Reveal className="mx-auto w-full max-w-5xl">
-          <div className="relative overflow-hidden rounded-[34px] border border-emerald-200/70 bg-white shadow-[0_25px_90px_rgba(15,23,42,0.10)] dark:border-emerald-400/10 dark:bg-[#0a1711]">
+          <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-white/[0.08] shadow-[0_25px_90px_rgba(0,0,0,0.22)] backdrop-blur-xl dark:border-white/10 dark:bg-[#07150f]/65">
             {/* Letter top decoration */}
             <div className="absolute left-0 right-0 top-0 h-1.5 bg-gradient-to-r from-emerald-700 via-emerald-400 to-emerald-700" />
 
@@ -1162,7 +1227,7 @@ export default function HomePage() {
 
               {/* Letter */}
               <div className="mx-auto mt-9 max-w-3xl">
-                <div className="relative rounded-[28px] border border-slate-200 bg-[#fcfdfc] px-6 py-8 shadow-inner dark:border-white/10 dark:bg-white/[0.02] sm:px-10 sm:py-10">
+                <div className="relative rounded-[28px] border border-white/10 bg-white/[0.055] px-6 py-8 shadow-inner backdrop-blur-md dark:border-white/10 dark:bg-white/[0.028] sm:px-10 sm:py-10">
                   {/* Paper styling */}
                   <div className="pointer-events-none absolute inset-0 rounded-[28px] bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.045),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.035),transparent_30%)]" />
 
@@ -1174,7 +1239,7 @@ export default function HomePage() {
                           : "max-h-[520px]"
                       }`}
                     >
-                      <div className="whitespace-pre-line text-[15px] leading-[2.05] tracking-[0.005em] text-slate-700 dark:text-slate-300 sm:text-base sm:leading-[2.15]">
+                      <div className="whitespace-pre-line text-[14px] leading-[1.9] tracking-[0.005em] text-slate-100/90 dark:text-slate-200 sm:text-base sm:leading-[2.15]">
                         {text(
                           introductionLetter,
                           lang
@@ -1182,7 +1247,7 @@ export default function HomePage() {
                       </div>
 
                       {!introExpanded && (
-                        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#fcfdfc] via-[#fcfdfc]/90 to-transparent dark:from-[#0b1711] dark:via-[#0b1711]/90" />
+                        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#07150f]/95 via-[#07150f]/78 to-transparent" />
                       )}
                     </div>
 
@@ -1313,7 +1378,7 @@ export default function HomePage() {
               </div>
 
               {/* Existing intro highlight kept */}
-              <div className="mx-auto mt-7 max-w-3xl rounded-[26px] border border-emerald-200/70 bg-emerald-50 p-5 dark:border-emerald-400/10 dark:bg-emerald-500/[0.06]">
+              <div className="mx-auto mt-7 max-w-3xl rounded-[26px] border border-emerald-300/15 bg-emerald-500/[0.08] p-5 backdrop-blur-md dark:border-emerald-400/10 dark:bg-emerald-500/[0.06]">
                 <div className="flex items-start justify-center gap-4 text-center">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
                     <HeartHandshake size={22} />
@@ -1336,7 +1401,7 @@ export default function HomePage() {
           FOUNDATION
       ====================================================== */}
 
-      <section className="relative w-full overflow-hidden bg-white/35 py-16 backdrop-blur-[1px] dark:bg-black/20 sm:py-24">
+      <section className="relative w-full overflow-hidden bg-transparent py-10 sm:py-20">
         <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">
           <Reveal className="mx-auto max-w-3xl text-center">
             <span className="text-sm font-black uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
@@ -1408,7 +1473,7 @@ export default function HomePage() {
 
       <section
         id="objectives"
-        className="mx-auto w-full max-w-7xl px-5 py-16 sm:px-8 sm:py-24 lg:px-10"
+        className="mx-auto w-full max-w-7xl px-5 py-10 sm:px-8 sm:py-20 lg:px-10"
       >
         <Reveal>
           <span className="text-sm font-black uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
@@ -1447,7 +1512,7 @@ export default function HomePage() {
                           y: -4,
                         }
                   }
-                  className="group flex h-full gap-4 rounded-[26px] border border-slate-200 bg-white p-5 shadow-[0_12px_40px_rgba(15,23,42,0.04)] dark:border-white/10 dark:bg-white/[0.035]"
+                  className="group flex h-full gap-4 rounded-[26px] border border-white/10 bg-white/[0.07] p-5 shadow-[0_12px_40px_rgba(0,0,0,0.16)] backdrop-blur-lg dark:border-white/10 dark:bg-white/[0.045]"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                     <CheckCircle2
@@ -1455,7 +1520,7 @@ export default function HomePage() {
                     />
                   </div>
 
-                  <p className="text-sm leading-8 text-slate-600 dark:text-slate-300 sm:text-base">
+                  <p className="text-sm leading-8 text-slate-100/85 dark:text-slate-200 sm:text-base">
                     {text(
                       item,
                       lang
@@ -1474,7 +1539,7 @@ export default function HomePage() {
 
       <section
         id="action"
-        className="relative w-full overflow-hidden bg-[#062117]/55 py-16 text-white backdrop-blur-[1px] sm:py-24"
+        className="relative w-full overflow-hidden bg-[#062117]/30 py-10 text-white backdrop-blur-md sm:py-20"
       >
         <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
           <Reveal className="mx-auto max-w-3xl text-center">
@@ -1600,7 +1665,7 @@ export default function HomePage() {
 
       <section
         id="membership"
-        className="mx-auto w-full max-w-7xl px-5 py-16 sm:px-8 sm:py-24 lg:px-10"
+        className="mx-auto w-full max-w-7xl px-5 py-10 sm:px-8 sm:py-20 lg:px-10"
       >
         <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr]">
           <div>
@@ -1619,7 +1684,7 @@ export default function HomePage() {
                   : "Become a Guardian of Nature"}
               </h2>
 
-              <p className="mt-5 max-w-2xl text-sm leading-8 text-slate-600 dark:text-slate-300 sm:text-base">
+              <p className="mt-5 max-w-2xl text-sm leading-8 text-slate-100/85 dark:text-slate-200 sm:text-base">
                 {lang ===
                 "si"
                   ? "ස්වභාවධර්මය ආරක්ෂා කිරීමේ වගකීම පිළිගන්නා ඕනෑම ශ්‍රී ලාංකිකයෙකුට මෙම මෙහෙවරට එක්විය හැක."
@@ -1642,7 +1707,7 @@ export default function HomePage() {
                       0.05
                     }
                   >
-                    <div className="flex gap-4 rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.035]">
+                    <div className="flex gap-4 rounded-[24px] border border-white/10 bg-white/[0.065] p-5 shadow-sm backdrop-blur-lg dark:border-white/10 dark:bg-white/[0.045]">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                         <Users
                           size={
@@ -1651,7 +1716,7 @@ export default function HomePage() {
                         />
                       </div>
 
-                      <p className="text-sm leading-8 text-slate-600 dark:text-slate-300">
+                      <p className="text-sm leading-8 text-slate-100/85 dark:text-slate-200">
                         {text(
                           item,
                           lang
@@ -1665,7 +1730,7 @@ export default function HomePage() {
           </div>
 
           <Reveal delay={0.1}>
-            <div className="rounded-[32px] border border-emerald-200/70 bg-emerald-50 p-6 dark:border-emerald-400/10 dark:bg-emerald-500/[0.05] sm:p-8">
+            <div className="rounded-[32px] border border-emerald-300/15 bg-emerald-500/[0.08] p-6 backdrop-blur-xl dark:border-emerald-400/10 dark:bg-emerald-500/[0.055] sm:p-8">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
                   <ShieldCheck
@@ -1681,7 +1746,7 @@ export default function HomePage() {
                 </h3>
               </div>
 
-              <div className="mt-7 rounded-[24px] border border-emerald-200/60 bg-white/60 p-5 dark:border-emerald-400/10 dark:bg-white/[0.025] sm:p-7">
+              <div className="mt-7 rounded-[24px] border border-emerald-200/15 bg-white/[0.055] p-5 backdrop-blur-md dark:border-emerald-400/10 dark:bg-white/[0.025] sm:p-7">
                 <p className="whitespace-pre-line text-sm leading-8 text-slate-700 dark:text-slate-300 sm:text-base sm:leading-9">
                   {text(
                     pledge,
@@ -1874,7 +1939,7 @@ export default function HomePage() {
                             }}
                           >
                             <div className="border-t border-slate-100 px-5 pb-6 pt-5 dark:border-white/5">
-                              <p className="text-sm leading-8 text-slate-600 dark:text-slate-300 sm:text-base">
+                              <p className="text-sm leading-8 text-slate-100/85 dark:text-slate-200 sm:text-base">
                                 {
                                   item.content
                                 }
@@ -1898,7 +1963,7 @@ export default function HomePage() {
 
       <section
         id="comments"
-        className="mx-auto w-full max-w-7xl px-5 py-16 sm:px-8 sm:py-24 lg:px-10"
+        className="mx-auto w-full max-w-7xl px-5 py-10 sm:px-8 sm:py-20 lg:px-10"
       >
         <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
           <Reveal>
@@ -1919,7 +1984,7 @@ export default function HomePage() {
                 : "Ideas & Suggestions"}
             </h2>
 
-            <p className="mt-5 max-w-xl text-sm leading-8 text-slate-600 dark:text-slate-300 sm:text-base">
+            <p className="mt-5 max-w-xl text-sm leading-8 text-slate-100/85 dark:text-slate-200 sm:text-base">
               {lang ===
               "si"
                 ? "ඔබේ අදහසක්, යෝජනාවක් හෝ ස්වභාවධර්මය වෙනුවෙන් කළ හැකි ක්‍රියාවක් අප සමඟ බෙදාගන්න. ඔබ එක් කරන අදහස දාපු ගමන්ම සජීවීව පෙන්වනු ලැබේ."
@@ -2076,7 +2141,7 @@ export default function HomePage() {
                                 )}
                               </div>
 
-                              <p className="mt-2 break-words text-sm leading-7 text-slate-600 dark:text-slate-300">
+                              <p className="mt-2 break-words text-sm leading-7 text-slate-100/85 dark:text-slate-200">
                                 {
                                   comment.comment
                                 }
@@ -2114,7 +2179,7 @@ export default function HomePage() {
           SOCIAL LINKS
       ====================================================== */}
 
-      <section className="mx-auto w-full max-w-7xl px-5 pb-16 sm:px-8 sm:pb-24 lg:px-10">
+      <section className="mx-auto w-full max-w-7xl px-5 pb-10 sm:px-8 sm:pb-20 lg:px-10">
         <div className="grid gap-4 sm:grid-cols-2">
           <Reveal>
             <a
@@ -2463,6 +2528,7 @@ export default function HomePage() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </main>
   );
         }
