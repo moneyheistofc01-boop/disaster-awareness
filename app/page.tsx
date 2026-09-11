@@ -64,6 +64,13 @@ const text = (
     : value.en;
 
 /* =========================================================
+   FACEBOOK PAGE
+   Replace this URL with your real Facebook Page URL.
+========================================================= */
+
+const facebookPageUrl = "#";
+
+/* =========================================================
    FOUNDATION CONTENT
 ========================================================= */
 
@@ -177,6 +184,212 @@ const ethics = [
     en: "I will respect the balance of nature through my actions.",
   },
 ];
+
+/* =========================================================
+   INTRODUCTION LETTER
+========================================================= */
+
+const introductionLetter: LangText = {
+  si: `දයාබර සහෘදයනි,
+
+"සොබා සේනාංකය"
+
+තවත් එක් සමාජ මාධ්‍ය සමූහයක් නොව,
+ඔබත්, මමත් තවත් එක් දරුවෙකු පමණක් වූ
+ස්වභාවධර්මයේ මෑණියන් උදෙසා කැප වූ උත්තරීතර
+රාජකාරියයි.
+
+එමෙන්ම,
+
+ජාතිය, කුලය, ආගම, පාට පක්ෂ යන කුලකයන්ගෙන් ඔබ්බට
+විහිදෙන මනුශ්‍යත්වයේ උපරිම වගකීමයි,වගවීමයි.
+
+……………
+
+සැබවින්ම,
+
+මෙම සමූහය සේනාංකයකි.
+ස්වභාවධර්මය උදෙසාම කැප වූ සේනාංකයකි.
+
+අදහස් හුවමාරු කිරීමකට පමණක් නොව,
+ක්‍රියාවෙන් ද බලගැන්වූ,
+පොදු සමාජ විනය මාලාවක් හුවා දැක්වීමෙන් පමණක් නොව,
+පුද්ගලික විනය තුලින් යහපැවැත්ම උදෙසා
+මාර්ගෝපදේශ සපයනු ලබන වේදිකාවකි.
+
+…………
+
+දයාබර සහෘදයනි,
+
+සිතන්න...මා, ඔබ ලැබුවාවූ මේ මනුෂ්‍යත්වයට කෙතරම්
+සාධාරණයක් අපි ඉටු කර ඇත්ද ?
+
+හෙට මේ මාතෘභූමියේ උපදින අපේ දුවා දරැවනට
+ස්වභාවික තුලනයෙන් හෙබි ලස්සන, සුරක්ෂිත රටක්, ලොවක්
+අපි ඉතුරු කර ඇත්ද ?
+
+අප දැනටමත් ප්‍රමාද යි.
+
+……………
+
+ස්වභාවධර්මය උදෙසා මනුෂ්‍යත්වයේ වගකීම, වගවීම
+නොපිරිහෙලා වහා ඉටුකළ යුතුව ඇත.
+
+තනි තනිව වෙනස් වෙමු.
+අවසානයේ සුන්දර ලොවක් ගොඩනැගේවි.
+
+මන්ද, ස්වයං වෙනසකින් තොර, පොදු වෙනසක් අපේක්ෂා කළ
+නොහැක.
+
+මෙම සමූහය අනෙකුත් ජාලයන්ගෙන් වෙනස් වන්නේ,
+සියලු සාමාජිකයන්ම පාලන ක්‍රියාකරැවන් වන නිසාවෙනි.
+
+……………
+
+ස්වභාවධර්මයේ ආරක්ෂාව උදෙසා
+ඔබගේ වටිනා කාලය මදක් කැප කර,
+ඔබගේ වටිනා අදහස්, යෝජනා හා දායකත්වය ලබා දෙන්න
+මුළු රටම සුවපත් වේවි...!
+
+සුවපත් වූ රටක් තුළ
+ස්වභාවධර්මයෙන් සුරක්ෂිත වූ, අනාගතයක් බිහි වේවි…
+
+………….
+
+සොබා සේනාංකයට
+සොබා ආරක්ෂකයින් (Guardians) බදවා ගනු ලැබේ.
+
+හැකිනම් එක් කරන්න තවත් ආරක්ෂකයින්.
+
+මන්ද, සියළු ලාංකිකයින් ස්වභාවධර්මයේ ආරක්ෂාව උදෙසා
+අවශ්‍යව ඇත.
+
+…………
+
+මෙම සමාජ මාධ්‍ය ජාලය තුළ
+එපා කිසිවිටෙක..
+
+වාදයක්, මන්ද ස්වභාවධර්මවාදය සියළු වාදයන්ට ඔබ්බෙනි.
+
+ආගමක්, මන්ද සියළු ශාස්තෘන්ගේ පරම සත්‍යය වු දේශණාව
+ස්වභාවධර්මය මයි.
+
+එකම ජාතියක්, සේ එක් වෙමු.
+
+…….
+
+අප සියලු දෙනාගේම අම්මා වන ස්වභාවධර්මය
+මේ මොහොතේ අපට කියා දෙමින් සිටින අපූරු පාඩම අවබෝධ
+කර ගනිමු.
+
+……………
+
+ප්‍රමාද වීමට තවත් කාලයක් ඉතිරිව නැත.
+ප්‍රමාදය පසුතැවීමට හේතු වන බව නිසැකය.
+
+මා එකතු වී සිටිමි, ඔබ...?`,
+  en: `Dear friends,
+
+"Soba Senankaya"
+
+is not just another social media group,
+but a supreme responsibility dedicated to
+Mother Nature — a nature that gave both you and me
+the opportunity to exist as human beings.
+
+It is also,
+
+the highest responsibility and accountability of humanity,
+stretching beyond the divisions of race, caste, religion,
+politics, colour and every other form of separation.
+
+……………
+
+Indeed,
+
+this community is a force.
+A force dedicated entirely to nature.
+
+It is not merely a place for exchanging ideas,
+but a platform strengthened through action;
+not merely a place that speaks about social discipline,
+but one that provides guidance for wellbeing
+through personal discipline.
+
+…………
+
+Dear friends,
+
+Think...how much justice have we truly
+done to the humanity we have received?
+
+Have we left behind for the daughters and sons
+who will be born in this motherland tomorrow
+a beautiful and safe country, a beautiful world,
+blessed with natural balance?
+
+We are already late.
+
+……………
+
+The responsibility and accountability of humanity
+towards nature must be fulfilled without delay.
+
+Let us change individually.
+In the end, a beautiful world will be built.
+
+Because, without individual change,
+a collective change cannot be expected.
+
+This community is different from other networks
+because every member is also a responsible actor.
+
+……………
+
+For the protection of nature,
+dedicate a little of your valuable time,
+and share your valuable ideas, suggestions and contribution.
+The whole country will become healthier...!
+
+Within a healthier country,
+a future protected by nature will emerge...
+
+………….
+
+Nature Guardians are being recruited
+to the Soba Senankaya.
+
+If possible, bring more Guardians with you.
+
+Because all Sri Lankans are needed
+for the protection of nature.
+
+…………
+
+Within this social media network,
+
+never allow...
+
+an argument, because naturalism goes beyond all arguments.
+
+a religion, because the ultimate truth taught
+by all spiritual teachers is nature itself.
+
+Let us unite as one human race.
+
+…….
+
+Let us understand the wonderful lesson
+that Mother Nature, the mother of us all,
+is teaching us at this very moment.
+
+……………
+
+There is no more time left for delay.
+Delay will certainly lead to regret.
+
+I have joined. What about you...?`,
+};
 
 /* =========================================================
    REVEAL
@@ -365,6 +578,15 @@ export default function HomePage() {
   ] = useState<
     "responsibility" | "social" | null
   >(null);
+
+  /* =======================================================
+     INTRODUCTION LETTER
+  ======================================================== */
+
+  const [
+    introExpanded,
+    setIntroExpanded,
+  ] = useState(false);
 
   /* Comments */
   const [comments, setComments] =
@@ -928,67 +1150,188 @@ export default function HomePage() {
         id="about"
         className="mx-auto w-full max-w-7xl px-5 py-16 sm:px-8 sm:py-24 lg:px-10"
       >
-        <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-          <Reveal>
-            <div className="relative overflow-hidden rounded-[32px] shadow-[0_25px_80px_rgba(15,23,42,0.12)]">
-              <img
-                src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1400&q=90"
-                alt="Nature"
-                className="h-[320px] w-full object-cover sm:h-[430px]"
-              />
+        <Reveal className="mx-auto w-full max-w-5xl">
+          <div className="relative overflow-hidden rounded-[34px] border border-emerald-200/70 bg-white shadow-[0_25px_90px_rgba(15,23,42,0.10)] dark:border-emerald-400/10 dark:bg-[#0a1711]">
+            {/* Letter top decoration */}
+            <div className="absolute left-0 right-0 top-0 h-1.5 bg-gradient-to-r from-emerald-700 via-emerald-400 to-emerald-700" />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/70 via-transparent to-transparent" />
+            <div className="px-6 py-8 sm:px-10 sm:py-11 lg:px-16 lg:py-14">
+              {/* Heading */}
+              <div className="mx-auto max-w-3xl text-center">
+                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
+                  <Leaf size={14} />
 
-              <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/10 bg-black/20 p-4 backdrop-blur-xl">
-                <div className="flex items-center gap-3 text-white">
-                  <Leaf
-                    size={19}
-                    className="text-emerald-300"
-                  />
+                  {lang ===
+                  "si"
+                    ? "හැඳින්වීම"
+                    : "Introduction"}
+                </span>
 
-                  <p className="text-sm font-bold">
-                    {lang ===
-                    "si"
-                      ? "වෙනස ආරම්භ වන්නේ අපෙන්."
-                      : "Change begins with us."}
-                  </p>
+                <h2 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
+                  {lang ===
+                  "si"
+                    ? "ස්වභාවධර්මය වෙනුවෙන් එක්වන මනුෂ්‍යත්වය"
+                    : "Humanity united for nature"}
+                </h2>
+
+                <div className="mx-auto mt-5 h-px w-20 bg-emerald-300 dark:bg-emerald-500/40" />
+              </div>
+
+              {/* Letter */}
+              <div className="mx-auto mt-9 max-w-3xl">
+                <div className="relative rounded-[28px] border border-slate-200 bg-[#fcfdfc] px-6 py-8 shadow-inner dark:border-white/10 dark:bg-white/[0.02] sm:px-10 sm:py-10">
+                  {/* Paper styling */}
+                  <div className="pointer-events-none absolute inset-0 rounded-[28px] bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.045),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.035),transparent_30%)]" />
+
+                  <div className="relative">
+                    <div
+                      className={`overflow-hidden text-center transition-all duration-500 ${
+                        introExpanded
+                          ? "max-h-[5000px]"
+                          : "max-h-[520px]"
+                      }`}
+                    >
+                      <div className="whitespace-pre-line text-[15px] leading-[2.05] tracking-[0.005em] text-slate-700 dark:text-slate-300 sm:text-base sm:leading-[2.15]">
+                        {text(
+                          introductionLetter,
+                          lang
+                        )}
+                      </div>
+
+                      {!introExpanded && (
+                        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#fcfdfc] via-[#fcfdfc]/90 to-transparent dark:from-[#0b1711] dark:via-[#0b1711]/90" />
+                      )}
+                    </div>
+
+                    {/* Read More */}
+                    <div className="relative mt-5 flex justify-center">
+                      <motion.button
+                        type="button"
+                        onClick={() =>
+                          setIntroExpanded(
+                            (current) =>
+                              !current
+                          )
+                        }
+                        whileTap={
+                          reduceMotion
+                            ? undefined
+                            : {
+                                scale:
+                                  0.97,
+                              }
+                        }
+                        className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-black text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-100 dark:border-emerald-400/10 dark:bg-emerald-500/10 dark:text-emerald-300 dark:hover:bg-emerald-500/15"
+                      >
+                        {introExpanded
+                          ? lang ===
+                            "si"
+                            ? "Read Less"
+                            : "Read Less"
+                          : lang ===
+                            "si"
+                          ? "Read More"
+                          : "Read More"}
+
+                        <motion.span
+                          animate={{
+                            rotate:
+                              introExpanded
+                                ? 180
+                                : 0,
+                          }}
+                          transition={{
+                            duration:
+                              0.25,
+                          }}
+                        >
+                          <ChevronDown
+                            size={
+                              17
+                            }
+                          />
+                        </motion.span>
+                      </motion.button>
+                    </div>
+
+                    {/* Final Facebook Join */}
+                    <AnimatePresence>
+                      {introExpanded && (
+                        <motion.div
+                          initial={
+                            reduceMotion
+                              ? false
+                              : {
+                                  opacity: 0,
+                                  y: 15,
+                                }
+                          }
+                          animate={{
+                            opacity: 1,
+                            y: 0,
+                          }}
+                          transition={{
+                            duration:
+                              0.45,
+                          }}
+                          className="mt-9"
+                        >
+                          <div className="mx-auto h-px max-w-md bg-slate-200 dark:bg-white/10" />
+
+                          <div className="pt-8 text-center">
+                            <p className="text-sm font-bold leading-7 text-slate-500 dark:text-slate-400 sm:text-base">
+                              {lang ===
+                              "si"
+                                ? "සොබාදහම වෙනුවෙන් අප සමඟ එක්වන්න."
+                                : "Join us in standing for nature."}
+                            </p>
+
+                            <a
+                              href={
+                                facebookPageUrl
+                              }
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="group mt-5 inline-flex items-center justify-center gap-3 rounded-2xl bg-emerald-500 px-7 py-4 text-sm font-black text-emerald-950 shadow-[0_14px_35px_rgba(16,185,129,0.20)] transition hover:-translate-y-0.5 hover:bg-emerald-400"
+                            >
+                              <Globe2
+                                size={
+                                  19
+                                }
+                              />
+
+                              <span>
+                                {lang ===
+                                "si"
+                                  ? "සොබාදහමට එක්වන්න"
+                                  : "Join Nature's Movement"}
+                              </span>
+
+                              <ArrowRight
+                                size={
+                                  18
+                                }
+                                className="transition-transform group-hover:translate-x-1"
+                              />
+                            </a>
+
+                            <p className="mt-3 text-[11px] text-slate-400">
+                              {lang ===
+                              "si"
+                                ? "Facebook Page වෙත පිවිසෙන්න"
+                                : "Join us on Facebook"}
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Reveal>
 
-          <div>
-            <Reveal>
-              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
-                <Leaf size={14} />
-                {lang ===
-                "si"
-                  ? "හැඳින්වීම"
-                  : "Introduction"}
-              </span>
-            </Reveal>
-
-            <Reveal delay={0.05}>
-              <h2 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
-                {lang ===
-                "si"
-                  ? "ස්වභාවධර්මය වෙනුවෙන් එක්වන මනුෂ්‍යත්වය"
-                  : "Humanity united for nature"}
-              </h2>
-            </Reveal>
-
-            <Reveal delay={0.1}>
-              <p className="mt-5 max-w-2xl text-sm leading-8 text-slate-600 dark:text-slate-300 sm:text-base">
-                {lang ===
-                "si"
-                  ? "සොබා සේනාංකය තවත් සමාජ මාධ්‍ය කණ්ඩායමක් නොව, මාතෘ ස්වභාවධර්මය වෙනුවෙන් කැප වූ වගකීමකි. ජාති, ආගම්, පක්ෂ හා වෙනත් බෙදීම් ඉක්මවා, ස්වභාවධර්මය ආරක්ෂා කිරීම සඳහා පුද්ගලයාගෙන් ආරම්භ වන වෙනසක් ගොඩනැගීම මෙහි අරමුණයි."
-                  : "Soba Senankaya is not simply another social media group, but a responsibility dedicated to Mother Nature. Beyond divisions of race, religion, politics and other differences, it seeks to build meaningful change beginning with the individual."}
-              </p>
-            </Reveal>
-
-            <Reveal delay={0.15}>
-              <div className="mt-7 rounded-[26px] border border-emerald-200/70 bg-emerald-50 p-5 dark:border-emerald-400/10 dark:bg-emerald-500/[0.06]">
-                <div className="flex items-start gap-4">
+              {/* Existing intro highlight kept */}
+              <div className="mx-auto mt-7 max-w-3xl rounded-[26px] border border-emerald-200/70 bg-emerald-50 p-5 dark:border-emerald-400/10 dark:bg-emerald-500/[0.06]">
+                <div className="flex items-start justify-center gap-4 text-center">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
                     <HeartHandshake size={22} />
                   </div>
@@ -1001,9 +1344,9 @@ export default function HomePage() {
                   </p>
                 </div>
               </div>
-            </Reveal>
+            </div>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* =====================================================
@@ -1782,7 +2125,11 @@ export default function HomePage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <Reveal>
             <a
-              href="#"
+              href={
+                facebookPageUrl
+              }
+              target="_blank"
+              rel="noopener noreferrer"
               className="group flex items-center justify-between rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 dark:border-white/10 dark:bg-white/[0.035]"
             >
               <div className="flex items-center gap-4">
@@ -2108,4 +2455,4 @@ export default function HomePage() {
       </AnimatePresence>
     </main>
   );
-          }
+        }
