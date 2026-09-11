@@ -1,7 +1,11 @@
 // app/components/OpeningIntro.tsx
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react';
 
 const MOBILE_IMAGE = '/ecoguard%20Mobile.webp';
 const DESKTOP_IMAGE = '/ecoguard%20Destop.webp';
@@ -12,24 +16,28 @@ export default function OpeningIntro() {
   const [mobileReady, setMobileReady] = useState(false);
   const [desktopReady, setDesktopReady] = useState(false);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+  /*
+   * IMPORTANT:
+   * No sessionStorage here.
+   *
+   * The intro must appear BEFORE the page is visually revealed on
+   * every fresh website load. The old sessionStorage check caused
+   * the underlying page to paint first and the intro to be mounted/
+   * hidden after the first render.
+   */
 
-    const playedKey = 'sobasenankaya_opening_intro_v2';
-    const hasPlayed = sessionStorage.getItem(playedKey);
-
-    if (hasPlayed) {
-      setVisible(false);
-      return;
-    }
-
-    sessionStorage.setItem(playedKey, 'true');
+  useLayoutEffect(() => {
+    if (typeof document === 'undefined') return;
 
     const previousOverflow = document.body.style.overflow;
-    const previousOverscroll = document.body.style.overscrollBehavior;
+    const previousOverscroll =
+      document.body.style.overscrollBehavior;
+    const previousTouchAction =
+      document.body.style.touchAction;
 
     document.body.style.overflow = 'hidden';
     document.body.style.overscrollBehavior = 'none';
+    document.body.style.touchAction = 'none';
 
     const exitTimer = window.setTimeout(() => {
       setClosing(true);
@@ -37,39 +45,65 @@ export default function OpeningIntro() {
 
     const removeTimer = window.setTimeout(() => {
       setVisible(false);
-      document.body.style.overflow = previousOverflow;
-      document.body.style.overscrollBehavior = previousOverscroll;
+
+      document.body.style.overflow =
+        previousOverflow;
+      document.body.style.overscrollBehavior =
+        previousOverscroll;
+      document.body.style.touchAction =
+        previousTouchAction;
     }, 5900);
 
     return () => {
       window.clearTimeout(exitTimer);
       window.clearTimeout(removeTimer);
-      document.body.style.overflow = previousOverflow;
-      document.body.style.overscrollBehavior = previousOverscroll;
+
+      document.body.style.overflow =
+        previousOverflow;
+      document.body.style.overscrollBehavior =
+        previousOverscroll;
+      document.body.style.touchAction =
+        previousTouchAction;
     };
   }, []);
 
+  /*
+   * Preload both real wallpapers as soon as the intro mounts.
+   * The CSS fallback remains visible until the active image is ready,
+   * so there is no blank frame while the image is loading.
+   */
   useEffect(() => {
     if (!visible) return;
 
     const mobile = new Image();
     mobile.decoding = 'async';
-    mobile.onload = () => setMobileReady(true);
-    mobile.onerror = () => setMobileReady(false);
+    mobile.onload = () =>
+      setMobileReady(true);
+    mobile.onerror = () =>
+      setMobileReady(false);
     mobile.src = MOBILE_IMAGE;
 
     const desktop = new Image();
     desktop.decoding = 'async';
-    desktop.onload = () => setDesktopReady(true);
-    desktop.onerror = () => setDesktopReady(false);
+    desktop.onload = () =>
+      setDesktopReady(true);
+    desktop.onerror = () =>
+      setDesktopReady(false);
     desktop.src = DESKTOP_IMAGE;
+
+    return () => {
+      mobile.onload = null;
+      desktop.onload = null;
+    };
   }, [visible]);
 
   if (!visible) return null;
 
   return (
     <div
-      className={`opening-intro ${closing ? 'is-closing' : ''}`}
+      className={`opening-intro ${
+        closing ? 'is-closing' : ''
+      }`}
       aria-hidden="true"
     >
       <style jsx global>{`
@@ -85,9 +119,14 @@ export default function OpeningIntro() {
           display: grid;
           place-items: center;
           background:
-            radial-gradient(circle at 50% 45%, rgba(11, 23, 54, 0.88) 0%, rgba(3, 6, 16, 0.96) 42%, #010206 100%);
+            radial-gradient(
+              circle at 50% 45%,
+              rgba(11, 23, 54, 0.88) 0%,
+              rgba(3, 6, 16, 0.96) 42%,
+              #010206 100%
+            );
           opacity: 1;
-          transform: scale(1);
+          transform: translate3d(0, 0, 0) scale(1);
           will-change: opacity, transform;
           contain: strict;
           backface-visibility: hidden;
@@ -95,7 +134,11 @@ export default function OpeningIntro() {
         }
 
         .opening-intro.is-closing {
-          animation: openingIntroExit 1.15s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+          animation:
+            openingIntroExit
+            1.15s
+            cubic-bezier(0.76, 0, 0.24, 1)
+            forwards;
         }
 
         .opening-intro__fallback {
@@ -104,7 +147,12 @@ export default function OpeningIntro() {
           z-index: 0;
           overflow: hidden;
           background:
-            radial-gradient(circle at 50% 50%, rgba(9, 24, 55, 0.92) 0%, rgba(2, 8, 20, 0.96) 46%, #000 100%);
+            radial-gradient(
+              circle at 50% 50%,
+              rgba(9, 24, 55, 0.92) 0%,
+              rgba(2, 8, 20, 0.96) 46%,
+              #000 100%
+            );
         }
 
         .opening-intro__fallback::before,
@@ -160,7 +208,7 @@ export default function OpeningIntro() {
           object-fit: cover;
           object-position: center;
           opacity: 0;
-          transform: scale(1.035);
+          transform: translate3d(0, 0, 0) scale(1.035);
           transition:
             opacity 0.65s ease,
             transform 4.8s cubic-bezier(0.16, 1, 0.3, 1);
@@ -174,7 +222,7 @@ export default function OpeningIntro() {
 
         .opening-intro__image.is-ready {
           opacity: 0.97;
-          transform: scale(1);
+          transform: translate3d(0, 0, 0) scale(1);
         }
 
         .opening-intro__image.is-fading {
@@ -203,7 +251,7 @@ export default function OpeningIntro() {
             ),
             radial-gradient(
               circle at 50% 50%,
-              rgba(0, 0, 0, 0.00) 24%,
+              rgba(0, 0, 0, 0) 24%,
               rgba(0, 0, 0, 0.23) 100%
             );
         }
@@ -218,7 +266,7 @@ export default function OpeningIntro() {
           justify-content: center;
           text-align: center;
           padding: 24px;
-          transform: translateZ(0);
+          transform: translate3d(0, 0, 0);
         }
 
         .opening-intro__halo {
@@ -228,7 +276,8 @@ export default function OpeningIntro() {
           width: clamp(210px, 34vw, 390px);
           aspect-ratio: 1;
           border-radius: 999px;
-          transform: translate(-50%, -52%);
+          transform:
+            translate3d(-50%, -52%, 0);
           background:
             radial-gradient(
               circle,
@@ -259,7 +308,11 @@ export default function OpeningIntro() {
           box-shadow:
             0 0 25px rgba(0, 165, 255, 0.16),
             0 0 40px rgba(255, 76, 0, 0.12);
-          animation: openingOrbitPulse 2.6s ease-in-out infinite;
+          animation:
+            openingOrbitPulse
+            2.6s
+            ease-in-out
+            infinite;
         }
 
         .opening-intro__orbit::before,
@@ -276,7 +329,11 @@ export default function OpeningIntro() {
           border-top-color: rgba(255, 94, 28, 0.88);
           border-right-color: rgba(255, 43, 0, 0.34);
           transform: rotate(24deg);
-          animation: openingOrbitSpin 4.8s linear infinite;
+          animation:
+            openingOrbitSpin
+            4.8s
+            linear
+            infinite;
         }
 
         .opening-intro__orbit::after {
@@ -284,7 +341,11 @@ export default function OpeningIntro() {
           border-bottom-color: rgba(0, 168, 255, 0.92);
           border-left-color: rgba(41, 95, 255, 0.34);
           transform: rotate(-18deg);
-          animation: openingOrbitSpinReverse 5.8s linear infinite;
+          animation:
+            openingOrbitSpinReverse
+            5.8s
+            linear
+            infinite;
         }
 
         .opening-intro__logo {
@@ -300,8 +361,15 @@ export default function OpeningIntro() {
             0 0 0 7px rgba(255, 255, 255, 0.02),
             0 12px 48px rgba(0, 0, 0, 0.55);
           opacity: 0;
-          transform: scale(0.72);
-          animation: openingLogoIn 1.25s 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          transform:
+            translate3d(0, 0, 0)
+            scale(0.72);
+          animation:
+            openingLogoIn
+            1.25s
+            0.15s
+            cubic-bezier(0.16, 1, 0.3, 1)
+            forwards;
           will-change: transform, opacity;
         }
 
@@ -314,7 +382,8 @@ export default function OpeningIntro() {
             'Iskoola Pota',
             'Nirmala UI',
             sans-serif;
-          font-size: clamp(1.6rem, 5.8vw, 3.45rem);
+          font-size:
+            clamp(1.6rem, 5.8vw, 3.45rem);
           font-weight: 900;
           line-height: 1.08;
           letter-spacing: -0.035em;
@@ -323,8 +392,14 @@ export default function OpeningIntro() {
             0 3px 18px rgba(0, 0, 0, 0.68),
             0 0 34px rgba(0, 0, 0, 0.36);
           opacity: 0;
-          transform: translateY(14px);
-          animation: openingTextIn 0.9s 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          transform:
+            translate3d(0, 14px, 0);
+          animation:
+            openingTextIn
+            0.9s
+            0.55s
+            cubic-bezier(0.16, 1, 0.3, 1)
+            forwards;
         }
 
         .opening-intro__title-accent {
@@ -340,13 +415,20 @@ export default function OpeningIntro() {
             'Segoe UI',
             system-ui,
             sans-serif;
-          font-size: clamp(0.58rem, 1.7vw, 0.78rem);
+          font-size:
+            clamp(0.58rem, 1.7vw, 0.78rem);
           font-weight: 700;
           letter-spacing: 0.24em;
           text-transform: uppercase;
           opacity: 0;
-          transform: translateY(10px);
-          animation: openingTextIn 0.85s 0.86s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          transform:
+            translate3d(0, 10px, 0);
+          animation:
+            openingTextIn
+            0.85s
+            0.86s
+            cubic-bezier(0.16, 1, 0.3, 1)
+            forwards;
         }
 
         .opening-intro__loading {
@@ -356,7 +438,12 @@ export default function OpeningIntro() {
           gap: 10px;
           margin-top: 24px;
           opacity: 0;
-          animation: openingTextIn 0.8s 1.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation:
+            openingTextIn
+            0.8s
+            1.18s
+            cubic-bezier(0.16, 1, 0.3, 1)
+            forwards;
         }
 
         .opening-intro__loading-label {
@@ -387,79 +474,113 @@ export default function OpeningIntro() {
           inset: 0 auto 0 0;
           width: 34%;
           border-radius: inherit;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 81, 20, 0.92),
-            rgba(255, 255, 255, 0.96),
-            rgba(0, 149, 255, 0.94)
-          );
-          animation: openingProgress 3.3s 0.08s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+          background:
+            linear-gradient(
+              90deg,
+              transparent,
+              rgba(255, 81, 20, 0.92),
+              rgba(255, 255, 255, 0.96),
+              rgba(0, 149, 255, 0.94)
+            );
+          animation:
+            openingProgress
+            3.3s
+            0.08s
+            cubic-bezier(0.33, 1, 0.68, 1)
+            forwards;
           will-change: transform;
         }
 
-        .opening-intro.is-closing .opening-intro__logo-shell {
-          animation: openingLogoExit 1.05s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+        .opening-intro.is-closing
+        .opening-intro__logo-shell {
+          animation:
+            openingLogoExit
+            1.05s
+            cubic-bezier(0.76, 0, 0.24, 1)
+            forwards;
         }
 
-        .opening-intro.is-closing .opening-intro__title,
-        .opening-intro.is-closing .opening-intro__subtitle,
-        .opening-intro.is-closing .opening-intro__loading {
-          animation: openingContentExit 0.82s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+        .opening-intro.is-closing
+        .opening-intro__title,
+        .opening-intro.is-closing
+        .opening-intro__subtitle,
+        .opening-intro.is-closing
+        .opening-intro__loading {
+          animation:
+            openingContentExit
+            0.82s
+            cubic-bezier(0.76, 0, 0.24, 1)
+            forwards;
         }
 
         @keyframes openingLogoIn {
           0% {
             opacity: 0;
-            transform: scale(0.72);
+            transform:
+              translate3d(0, 0, 0)
+              scale(0.72);
           }
           100% {
             opacity: 1;
-            transform: scale(1);
+            transform:
+              translate3d(0, 0, 0)
+              scale(1);
           }
         }
 
         @keyframes openingLogoExit {
           0% {
             opacity: 1;
-            transform: scale(1);
+            transform:
+              translate3d(0, 0, 0)
+              scale(1);
           }
           100% {
             opacity: 0;
-            transform: scale(1.34);
+            transform:
+              translate3d(0, 0, 0)
+              scale(1.34);
           }
         }
 
         @keyframes openingTextIn {
           0% {
             opacity: 0;
-            transform: translateY(14px);
+            transform:
+              translate3d(0, 14px, 0);
           }
           100% {
             opacity: 1;
-            transform: translateY(0);
+            transform:
+              translate3d(0, 0, 0);
           }
         }
 
         @keyframes openingContentExit {
           0% {
             opacity: 1;
-            transform: translateY(0);
+            transform:
+              translate3d(0, 0, 0);
           }
           100% {
             opacity: 0;
-            transform: translateY(-10px);
+            transform:
+              translate3d(0, -10px, 0);
           }
         }
 
         @keyframes openingIntroExit {
           0% {
             opacity: 1;
-            transform: scale(1);
+            transform:
+              translate3d(0, 0, 0)
+              scale(1);
           }
           100% {
             opacity: 0;
-            transform: scale(1.045);
+            transform:
+              translate3d(0, 0, 0)
+              scale(1.045);
           }
         }
 
@@ -572,6 +693,7 @@ export default function OpeningIntro() {
 
         <div className="opening-intro__logo-shell">
           <div className="opening-intro__orbit" />
+
           <img
             src="/logo.png"
             alt="Soba Senankaya"
@@ -595,6 +717,7 @@ export default function OpeningIntro() {
           <span className="opening-intro__loading-label">
             SYSTEM INITIALIZATION
           </span>
+
           <div className="opening-intro__progress" />
         </div>
       </div>
