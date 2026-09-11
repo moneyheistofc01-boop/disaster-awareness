@@ -5,7 +5,6 @@ import React, { useState, useEffect, useLayoutEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function OpeningIntro() {
-  // Page load වෙද්දිම flicker වෙන්නේ නැතුව පේන්න true දීලා තියෙනවා
   const [show, setShow] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
 
@@ -16,13 +15,13 @@ export default function OpeningIntro() {
       if (!hasPlayed) {
         sessionStorage.setItem('sobasenankaya_dragon_intro', 'true'); 
         
-        // Background scroll වෙන එක නවත්තන්න
+        // Prevent background scrolling
         document.body.style.overflow = 'hidden';
 
-        // තත්පර 5.5 කින් Fade Out Animation එක පටන් ගන්නවා
+        // Start fading out after 5.5 seconds
         const exitTimer = setTimeout(() => setIsExiting(true), 5500); 
         
-        // තත්පර 7 කින් සම්පූර්ණයෙන්ම අයින් වෙනවා
+        // Remove completely from DOM after 7 seconds
         const removeTimer = setTimeout(() => {
             setShow(false); 
             document.body.style.overflow = '';
@@ -34,7 +33,6 @@ export default function OpeningIntro() {
           document.body.style.overflow = '';
         };
       } else {
-        // කලින් බලලා තියෙනවා නම් පෙන්නන්නේ නෑ
         setShow(false);
       }
     }
@@ -48,7 +46,6 @@ export default function OpeningIntro() {
         <motion.div 
           className="intro-master-container"
           initial={{ opacity: 1, filter: 'blur(0px)' }}
-          // Cinematic Fade Out
           animate={isExiting ? { opacity: 0, filter: 'blur(15px)', scale: 1.05 } : { opacity: 1, filter: 'blur(0px)', scale: 1 }}
           transition={{ duration: 1.5, ease: "easeInOut" }}
           style={{
@@ -56,28 +53,28 @@ export default function OpeningIntro() {
             inset: 0, 
             width: '100vw',
             height: '100dvh',
-            background: '#020202', // Solid Dark Background
-            zIndex: 2147483647, // Maximum Z-Index
+            background: '#050200', // Deep warm dark background
+            zIndex: 2147483647,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             overflow: 'hidden',
-            pointerEvents: 'all' // Blocks background clicks
+            pointerEvents: 'all'
           }}
         >
           <style dangerouslySetInnerHTML={{ __html: `
-            /* --- MYSTICAL BACKGROUND EFFECTS --- */
+            /* --- MYSTICAL GOLDEN BACKGROUND --- */
             .mystic-glow {
               position: absolute;
               inset: 0;
-              background: radial-gradient(circle at 40% 30%, rgba(255, 0, 60, 0.08) 0%, transparent 50%),
-                          radial-gradient(circle at 60% 70%, rgba(0, 85, 255, 0.08) 0%, transparent 50%),
-                          #020202;
+              background: radial-gradient(circle at 40% 30%, rgba(255, 165, 0, 0.05) 0%, transparent 50%),
+                          radial-gradient(circle at 60% 70%, rgba(255, 215, 0, 0.06) 0%, transparent 50%),
+                          #050200;
               z-index: 1;
             }
 
-            /* --- FLOATING FIREFLIES / MAGIC PARTICLES --- */
+            /* --- FLOATING GOLDEN PARTICLES --- */
             .particles-container {
               position: absolute;
               inset: 0;
@@ -89,32 +86,32 @@ export default function OpeningIntro() {
             .firefly {
               position: absolute;
               border-radius: 50%;
-              animation: floatMagic 6s ease-in-out infinite alternate;
+              animation: floatMagic 5s ease-in-out infinite alternate;
             }
 
-            .f-red {
-              width: 6px; height: 6px;
-              background: #ff003c;
-              box-shadow: 0 0 15px #ff003c, 0 0 30px #ff4d6d;
+            .f-gold {
+              width: 5px; height: 5px;
+              background: #FFD700;
+              box-shadow: 0 0 15px #FFD700, 0 0 25px #FFA500;
             }
 
-            .f-blue {
-              width: 8px; height: 8px;
-              background: #0077ff;
-              box-shadow: 0 0 15px #0077ff, 0 0 30px #00c3ff;
+            .f-orange {
+              width: 7px; height: 7px;
+              background: #FFA500;
+              box-shadow: 0 0 15px #FFA500, 0 0 30px #FF4500;
             }
 
             @keyframes floatMagic {
-              0% { transform: translate(0, 0) scale(0.8); opacity: 0.3; }
-              50% { opacity: 0.8; }
-              100% { transform: translate(30px, -50px) scale(1.2); opacity: 0.3; }
+              0% { transform: translate(0, 0) scale(0.8); opacity: 0.2; }
+              50% { opacity: 0.9; }
+              100% { transform: translate(40px, -60px) scale(1.3); opacity: 0.2; }
             }
 
-            /* --- DRAGON FIRE LOGO RINGS --- */
+            /* --- GOLDEN SPARKLE RING EFFECTS (Like the Image) --- */
             .logo-wrapper {
               position: relative;
-              width: 200px;
-              height: 200px;
+              width: 220px;
+              height: 220px;
               display: flex;
               align-items: center;
               justify-content: center;
@@ -123,42 +120,100 @@ export default function OpeningIntro() {
               margin-bottom: 30px;
             }
 
-            /* Dark Red Inner Fire */
-            .dragon-fire-red {
+            /* Solid Inner Gold Ring */
+            .gold-ring-inner {
               position: absolute;
-              inset: -15px;
+              inset: -8px;
               border-radius: 50%;
-              border: 4px solid transparent;
-              border-top-color: #ff003c;
-              border-right-color: #8b0000;
-              border-bottom-color: #ff4d6d;
-              filter: drop-shadow(0 0 15px rgba(255, 0, 60, 0.8)) blur(1px);
-              animation: spinRight 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+              border: 2px solid rgba(255, 215, 0, 0.6);
+              box-shadow: inset 0 0 15px rgba(255, 165, 0, 0.8), 0 0 15px rgba(255, 215, 0, 0.8);
+              z-index: 5;
+            }
+
+            /* Main Glowing Swirl 1 */
+            .gold-swirl-main {
+              position: absolute;
+              inset: -20px;
+              border-radius: 50%;
+              border: 6px solid transparent;
+              border-top-color: #FFD700;
+              border-right-color: #FFA500;
+              filter: drop-shadow(0 0 20px #FFA500) blur(1px);
+              animation: spinRight 2s cubic-bezier(0.68, -0.15, 0.265, 1.15) infinite;
               z-index: 4;
             }
 
-            /* Blue Outer Fire */
-            .dragon-fire-blue {
+            /* Wide Blurred Glow Swirl 2 */
+            .gold-swirl-outer {
               position: absolute;
-              inset: -30px;
+              inset: -35px;
               border-radius: 50%;
-              border: 4px solid transparent;
-              border-bottom-color: #00c3ff;
-              border-left-color: #00008b;
-              border-top-color: #0055ff;
-              filter: drop-shadow(0 0 20px rgba(0, 195, 255, 0.8)) blur(2px);
-              animation: spinLeft 2.5s linear infinite;
+              border: 12px solid transparent;
+              border-bottom-color: rgba(255, 140, 0, 0.9);
+              border-left-color: rgba(255, 215, 0, 0.6);
+              filter: blur(8px);
+              animation: spinLeft 3s linear infinite;
               z-index: 3;
             }
 
-            /* Mixing Aura */
-            .magic-aura {
+            /* Sparkling Dust / Stars Effect */
+            .sparkle-dust {
               position: absolute;
               inset: -50px;
               border-radius: 50%;
-              background: conic-gradient(from 0deg, rgba(255,0,60,0.15) 0deg, rgba(0,195,255,0.15) 180deg, rgba(255,0,60,0.15) 360deg);
-              filter: blur(25px);
-              animation: spinRight 5s linear infinite;
+              animation: spinRight 8s linear infinite;
+              z-index: 6;
+              pointer-events: none;
+            }
+
+            /* Creating dots using box-shadow trick to match image stars */
+            .sparkle-dust::before {
+              content: '';
+              position: absolute;
+              top: 50%; left: 50%;
+              width: 3px; height: 3px;
+              border-radius: 50%;
+              background: #FFF;
+              box-shadow: 
+                0 -130px 2px #FFD700, 30px -125px 1px #FFF, -40px -120px 3px #FFA500, 70px -100px 1px #FFD700,
+                -80px -90px 2px #FFF, 100px -70px 1px #FFA500, -110px -50px 3px #FFD700, 125px -10px 1px #FFF,
+                -130px 20px 2px #FFA500, 110px 60px 1px #FFD700, -90px 90px 2px #FFF, 60px 110px 3px #FFA500,
+                -30px 125px 1px #FFD700, 0 135px 2px #FFF, 40px 120px 1px #FFA500, -70px 100px 2px #FFD700,
+                90px 80px 1px #FFF, -120px 40px 2px #FFA500, 130px -30px 1px #FFD700, -100px -80px 2px #FFF;
+              filter: drop-shadow(0 0 5px #FFD700) drop-shadow(0 0 10px #FFA500);
+            }
+
+            /* Bright Star Flare */
+            .star-flare {
+              position: absolute;
+              top: -10px;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 40px;
+              height: 4px;
+              background: #FFF;
+              border-radius: 50%;
+              box-shadow: 0 0 20px #FFF, 0 0 40px #FFD700;
+              z-index: 7;
+            }
+            .star-flare::after {
+              content: '';
+              position: absolute;
+              top: 50%; left: 50%;
+              transform: translate(-50%, -50%) rotate(90deg);
+              width: 40px; height: 2px;
+              background: #FFF;
+              border-radius: 50%;
+              box-shadow: 0 0 20px #FFF, 0 0 40px #FFD700;
+            }
+
+            /* Golden Aura Background */
+            .magic-aura {
+              position: absolute;
+              inset: -60px;
+              border-radius: 50%;
+              background: radial-gradient(circle, rgba(255, 165, 0, 0.25) 0%, transparent 65%);
+              filter: blur(20px);
               z-index: 2;
             }
 
@@ -168,16 +223,15 @@ export default function OpeningIntro() {
             .main-logo {
               width: 100%;
               height: 100%;
-              object-fit: cover; /* Keeps it perfectly round */
+              object-fit: cover; 
               border-radius: 50%;
-              border: 2px solid rgba(255,255,255,0.1);
               position: relative;
-              z-index: 5;
-              box-shadow: 0 0 40px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.8);
+              z-index: 8;
+              box-shadow: 0 0 30px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.8);
               background: #050505;
             }
 
-            /* --- TYPOGRAPHY (NATURAL & ELEGANT) --- */
+            /* --- TYPOGRAPHY (MATCHING GOLDEN THEME) --- */
             .content-container {
               display: flex;
               flex-direction: column;
@@ -192,15 +246,16 @@ export default function OpeningIntro() {
               font-weight: 800;
               color: white;
               margin: 0;
-              text-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 20px rgba(255,255,255,0.2);
+              text-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 20px rgba(255,215,0,0.1);
               line-height: 1.1;
             }
 
             .main-title .highlight {
-              background: linear-gradient(90deg, #ff003c, #00c3ff);
+              /* Changed from red/blue to Gold/Orange to match the ring */
+              background: linear-gradient(90deg, #FFD700, #FF8C00);
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
-              filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+              filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.3));
             }
 
             .tagline {
@@ -208,7 +263,7 @@ export default function OpeningIntro() {
               font-size: clamp(0.7rem, 2vw, 0.9rem);
               font-weight: 600;
               letter-spacing: 0.3em;
-              color: rgba(255,255,255,0.6);
+              color: rgba(255,255,255,0.7);
               text-transform: uppercase;
               margin-top: 20px;
               display: flex;
@@ -217,8 +272,8 @@ export default function OpeningIntro() {
             }
 
             .tagline .dot {
-              color: rgba(255, 0, 60, 0.8);
-              text-shadow: 0 0 10px #ff003c;
+              color: #FFA500;
+              text-shadow: 0 0 10px #FFD700;
             }
 
             .loading-text {
@@ -237,22 +292,22 @@ export default function OpeningIntro() {
               width: 6px;
               height: 6px;
               border-radius: 50%;
-              background: #00c3ff;
-              box-shadow: 0 0 10px #00c3ff;
-              animation: pulseBlue 1s infinite alternate;
+              background: #FFD700;
+              box-shadow: 0 0 10px #FFD700;
+              animation: pulseGold 1s infinite alternate;
             }
 
-            @keyframes pulseBlue {
+            @keyframes pulseGold {
               from { opacity: 0.4; transform: scale(0.8); }
               to { opacity: 1; transform: scale(1.3); }
             }
 
-            /* --- RESPONSIVE --- */
+            /* --- RESPONSIVE ADJUSTMENTS --- */
             @media (max-width: 768px) {
-              .logo-wrapper { width: 160px; height: 160px; margin-bottom: 30px; }
-              .dragon-fire-red { inset: -12px; border-width: 3px; }
-              .dragon-fire-blue { inset: -24px; border-width: 3px; }
-              .magic-aura { inset: -35px; }
+              .logo-wrapper { width: 170px; height: 170px; margin-bottom: 30px; }
+              .gold-swirl-main { inset: -15px; border-width: 4px; }
+              .gold-swirl-outer { inset: -25px; border-width: 8px; }
+              .sparkle-dust { transform: scale(0.8); }
               .tagline { flex-direction: column; gap: 8px; letter-spacing: 0.2em; }
               .tagline .dot { display: none; }
             }
@@ -262,17 +317,17 @@ export default function OpeningIntro() {
           <div className="mystic-glow" />
           
           <div className="particles-container">
-            <div className="firefly f-red" style={{ left: '20%', top: '30%', animationDelay: '0s' }} />
-            <div className="firefly f-blue" style={{ left: '80%', top: '60%', animationDelay: '1s' }} />
-            <div className="firefly f-red" style={{ left: '70%', top: '20%', animationDelay: '2s' }} />
-            <div className="firefly f-blue" style={{ left: '30%', top: '70%', animationDelay: '1.5s' }} />
-            <div className="firefly f-red" style={{ left: '50%', top: '80%', animationDelay: '0.5s' }} />
+            <div className="firefly f-gold" style={{ left: '20%', top: '30%', animationDelay: '0s' }} />
+            <div className="firefly f-orange" style={{ left: '80%', top: '60%', animationDelay: '1s' }} />
+            <div className="firefly f-gold" style={{ left: '70%', top: '20%', animationDelay: '2s' }} />
+            <div className="firefly f-orange" style={{ left: '30%', top: '70%', animationDelay: '1.5s' }} />
+            <div className="firefly f-gold" style={{ left: '50%', top: '80%', animationDelay: '0.5s' }} />
           </div>
 
           {/* Main Content */}
           <div className="content-container">
             
-            {/* Animated Logo */}
+            {/* Animated Golden Logo Ring */}
             <motion.div 
               className="logo-wrapper"
               initial={{ scale: 0.6, opacity: 0, filter: "blur(20px)" }}
@@ -280,8 +335,13 @@ export default function OpeningIntro() {
               transition={{ duration: 1.8, ease: "easeOut" }}
             >
               <div className="magic-aura" />
-              <div className="dragon-fire-red" />
-              <div className="dragon-fire-blue" />
+              <div className="sparkle-dust">
+                {/* The bright cross flare on the ring */}
+                <div className="star-flare" />
+              </div>
+              <div className="gold-swirl-outer" />
+              <div className="gold-swirl-main" />
+              <div className="gold-ring-inner" />
               
               <img 
                 src="/logo.png" 
