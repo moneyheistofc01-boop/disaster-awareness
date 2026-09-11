@@ -1,103 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useReducedMotion,
-} from "framer-motion";
+import { useEffect, useState, useLayoutEffect } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
-const INTRO_KEY = "sobasenankaya_intro_seen";
-const INTRO_DURATION = 7000;
-
+const INTRO_KEY = "dual_fire_intro_seen";
+const INTRO_DURATION = 6500; // Total duration before it fades out
 const smoothEase = [0.22, 1, 0.36, 1] as const;
-
-function FloatingLeaf({
-  delay,
-  left,
-  top,
-  size,
-  duration,
-  rotate,
-}: {
-  delay: number;
-  left: string;
-  top: string;
-  size: number;
-  duration: number;
-  rotate: number;
-}) {
-  const reduceMotion = useReducedMotion();
-
-  return (
-    <motion.div
-      initial={{
-        opacity: 0,
-        x: 0,
-        y: 15,
-        rotate: rotate - 8,
-      }}
-      animate={
-        reduceMotion
-          ? {
-              opacity: 0.18,
-              rotate,
-            }
-          : {
-              opacity: [0, 0.18, 0.12, 0],
-              x: [0, 18, -12, 0],
-              y: [15, -8, -28, -45],
-              rotate: [
-                rotate - 8,
-                rotate + 5,
-                rotate - 2,
-                rotate,
-              ],
-            }
-      }
-      transition={{
-        delay,
-        duration,
-        ease: "easeInOut",
-        repeat: Infinity,
-        repeatDelay: 0.5,
-      }}
-      className="pointer-events-none absolute"
-      style={{
-        left,
-        top,
-      }}
-    >
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 40 40"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M34 5C22 6 10 11 7 21C4 30 10 35 18 33C28 31 34 20 34 5Z"
-          fill="rgba(110,231,183,0.12)"
-          stroke="rgba(110,231,183,0.42)"
-          strokeWidth="1"
-        />
-        <path
-          d="M10 29C17 23 23 17 30 9"
-          stroke="rgba(167,243,208,0.42)"
-          strokeWidth="1"
-          strokeLinecap="round"
-        />
-      </svg>
-    </motion.div>
-  );
-}
 
 export default function IntroAnimation() {
   const [showIntro, setShowIntro] = useState(true);
-  const [ready, setReady] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
   const reduceMotion = useReducedMotion();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     let shouldShow = true;
 
     try {
@@ -112,455 +27,285 @@ export default function IntroAnimation() {
       shouldShow = true;
     }
 
-    setReady(true);
-
     if (!shouldShow) {
       setShowIntro(false);
       return;
     }
 
-    const previousOverflow = document.body.style.overflow;
+    // Prevent scrolling while intro is active
     document.body.style.overflow = "hidden";
 
-    const timer = window.setTimeout(() => {
+    // Start Exit Animation (Fade Out)
+    const exitTimer = window.setTimeout(() => {
+      setIsExiting(true);
+    }, INTRO_DURATION - 1500);
+
+    // Completely remove from DOM
+    const removeTimer = window.setTimeout(() => {
       setShowIntro(false);
-      document.body.style.overflow = previousOverflow;
+      document.body.style.overflow = "";
     }, INTRO_DURATION);
 
     return () => {
-      window.clearTimeout(timer);
-      document.body.style.overflow = previousOverflow;
+      window.clearTimeout(exitTimer);
+      window.clearTimeout(removeTimer);
+      document.body.style.overflow = "";
     };
   }, []);
 
-  if (!ready) {
-    return (
-      <div
-        className="fixed inset-0 z-[2147483647] bg-[#020806]"
-        aria-hidden="true"
-      />
-    );
-  }
+  if (!showIntro) return null;
 
   return (
     <AnimatePresence>
       {showIntro && (
         <motion.div
-          key="soba-natural-intro"
-          initial={{
-            opacity: 1,
-          }}
-          exit={{
-            opacity: 0,
-          }}
-          transition={{
-            duration: 1.5,
-            ease: "easeInOut",
-          }}
-          className="fixed inset-0 z-[2147483647] isolate overflow-hidden bg-[#020806]"
+          key="dual-fire-intro"
+          initial={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
+          animate={
+            isExiting
+              ? { opacity: 0, filter: "blur(15px)", scale: 1.05 }
+              : { opacity: 1, filter: "blur(0px)", scale: 1 }
+          }
+          transition={{ duration: 1.5, ease: "easeInOut" }}
           style={{
-            WebkitTransform: "translateZ(0)",
-            transform: "translateZ(0)",
-            WebkitBackfaceVisibility: "hidden",
-            backfaceVisibility: "hidden",
+            position: "fixed",
+            inset: 0,
+            width: "100vw",
+            height: "100dvh",
+            backgroundColor: "#020202",
+            zIndex: 2147483647,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+            pointerEvents: "all",
           }}
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(16,185,129,0.075),transparent_34%),radial-gradient(circle_at_20%_80%,rgba(34,197,94,0.045),transparent_26%),linear-gradient(180deg,#020806_0%,#03100a_52%,#010503_100%)]" />
+          <style dangerouslySetInnerHTML={{ __html: `
+            /* --- BACKGROUND EFFECTS --- */
+            .ambient-glow {
+              position: absolute;
+              inset: 0;
+              background: radial-gradient(circle at center, rgba(30, 30, 255, 0.08) 0%, rgba(255, 30, 30, 0.06) 40%, rgba(2, 2, 2, 1) 70%);
+              z-index: 1;
+            }
 
-          <motion.div
-            initial={{
-              opacity: 0,
-            }}
-            animate={{
-              opacity: 0.6,
-            }}
-            transition={{
-              duration: 2.6,
-              ease: "easeOut",
-            }}
-            className="pointer-events-none absolute inset-x-0 top-0 h-[55%] bg-[radial-gradient(ellipse_at_50%_0%,rgba(134,239,172,0.055),transparent_60%)]"
-          />
+            .bg-particles {
+              position: absolute;
+              inset: 0;
+              opacity: 0.15;
+              background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px);
+              background-size: 40px 40px;
+              z-index: 2;
+            }
 
-          <FloatingLeaf
-            delay={0.8}
-            left="13%"
-            top="23%"
-            size={26}
-            duration={7}
-            rotate={-18}
-          />
+            /* --- DUAL FIRE LOGO RINGS --- */
+            .logo-wrapper {
+              position: relative;
+              width: 220px;
+              height: 220px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border-radius: 50%;
+              z-index: 10;
+              margin-bottom: 40px;
+            }
 
-          <FloatingLeaf
-            delay={1.7}
-            left="79%"
-            top="18%"
-            size={22}
-            duration={8}
-            rotate={18}
-          />
+            .fire-ring-red {
+              position: absolute;
+              inset: -15px;
+              border-radius: 50%;
+              border: 3px solid transparent;
+              border-top: 3px solid #ff003c;
+              border-right: 3px solid #ff4d6d;
+              animation: spinRight 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+              filter: drop-shadow(0 0 15px rgba(255, 0, 60, 0.8));
+              z-index: 4;
+            }
 
-          <FloatingLeaf
-            delay={2.2}
-            left="8%"
-            top="63%"
-            size={20}
-            duration={8.5}
-            rotate={-12}
-          />
+            .fire-ring-blue {
+              position: absolute;
+              inset: -25px;
+              border-radius: 50%;
+              border: 3px solid transparent;
+              border-bottom: 3px solid #00c3ff;
+              border-left: 3px solid #0077ff;
+              animation: spinLeft 2s linear infinite;
+              filter: drop-shadow(0 0 15px rgba(0, 195, 255, 0.8));
+              z-index: 3;
+            }
 
-          <FloatingLeaf
-            delay={2.8}
-            left="86%"
-            top="62%"
-            size={27}
-            duration={9}
-            rotate={15}
-          />
+            .aura-glow {
+              position: absolute;
+              inset: -40px;
+              border-radius: 50%;
+              background: conic-gradient(from 0deg, rgba(255,0,60,0.2) 0deg, rgba(0,195,255,0.2) 180deg, rgba(255,0,60,0.2) 360deg);
+              filter: blur(20px);
+              animation: spinRight 4s linear infinite;
+              z-index: 2;
+            }
 
-          <FloatingLeaf
-            delay={3.5}
-            left="72%"
-            top="78%"
-            size={18}
-            duration={7.5}
-            rotate={20}
-          />
+            @keyframes spinRight { 100% { transform: rotate(360deg); } }
+            @keyframes spinLeft { 100% { transform: rotate(-360deg); } }
 
-          {[...Array(7)].map((_, index) => {
-            const positions = [
-              {
-                left: "17%",
-                top: "40%",
-              },
-              {
-                left: "82%",
-                top: "39%",
-              },
-              {
-                left: "28%",
-                top: "72%",
-              },
-              {
-                left: "69%",
-                top: "68%",
-              },
-              {
-                left: "91%",
-                top: "52%",
-              },
-              {
-                left: "9%",
-                top: "50%",
-              },
-              {
-                left: "50%",
-                top: "16%",
-              },
-            ];
+            .main-logo {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              border-radius: 50%;
+              border: 2px solid rgba(255,255,255,0.1);
+              position: relative;
+              z-index: 5;
+              box-shadow: 0 0 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05);
+              background: #050505;
+            }
 
-            const position = positions[index];
+            /* --- TYPOGRAPHY --- */
+            .content-container {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              z-index: 10;
+              text-align: center;
+            }
 
-            return (
-              <motion.span
-                key={index}
-                initial={{
-                  opacity: 0,
-                  scale: 0.4,
-                }}
-                animate={
-                  reduceMotion
-                    ? {
-                        opacity: 0.2,
-                      }
-                    : {
-                        opacity: [0, 0.32, 0.12, 0],
-                        scale: [0.4, 1, 0.8, 0.4],
-                        y: [8, -4, -10, -18],
-                      }
-                }
-                transition={{
-                  delay: 1 + index * 0.28,
-                  duration: 4.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="pointer-events-none absolute h-1 w-1 rounded-full bg-emerald-300/40"
-                style={{
-                  left: position.left,
-                  top: position.top,
+            .main-title {
+              font-family: 'Inter', system-ui, sans-serif;
+              font-size: clamp(2.5rem, 5vw, 4rem);
+              font-weight: 900;
+              letter-spacing: 0.1em;
+              color: white;
+              margin: 0;
+              text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            }
+
+            .main-title span.blue { color: #00c3ff; text-shadow: 0 0 20px rgba(0, 195, 255, 0.5); }
+            .main-title span.red { color: #ff003c; text-shadow: 0 0 20px rgba(255, 0, 60, 0.5); }
+
+            .tagline {
+              font-family: 'Inter', system-ui, sans-serif;
+              font-size: 0.8rem;
+              font-weight: 700;
+              letter-spacing: 0.5em;
+              color: rgba(255,255,255,0.5);
+              text-transform: uppercase;
+              margin-top: 15px;
+            }
+
+            .details-text {
+              font-size: 0.7rem;
+              font-weight: 600;
+              letter-spacing: 0.2em;
+              color: #888;
+              margin-top: 25px;
+              max-width: 400px;
+              line-height: 1.8;
+            }
+
+            /* --- LOADING PROGRESS --- */
+            .progress-container {
+              margin-top: 40px;
+              width: 180px;
+              height: 2px;
+              background: rgba(255,255,255,0.1);
+              border-radius: 4px;
+              overflow: hidden;
+              position: relative;
+            }
+
+            .progress-bar {
+              height: 100%;
+              width: 100%;
+              background: linear-gradient(90deg, #00c3ff, #ff003c);
+              box-shadow: 0 0 10px rgba(255,0,60,0.5);
+              transform-origin: left;
+            }
+
+            /* --- RESPONSIVE --- */
+            @media (max-width: 768px) {
+              .logo-wrapper { width: 180px; height: 180px; margin-bottom: 30px; }
+              .energy-ring-1 { inset: -12px; }
+              .energy-ring-2 { inset: -20px; }
+              .aura-glow { inset: -30px; }
+              .main-title { font-size: 2.2rem; }
+              .tagline { font-size: 0.65rem; letter-spacing: 0.3em; }
+            }
+          `}} />
+
+          {/* Backgrounds */}
+          <div className="ambient-glow" />
+          <div className="bg-particles" />
+
+          {/* Main Content */}
+          <div className="content-container">
+            
+            {/* Animated Logo */}
+            <motion.div 
+              className="logo-wrapper"
+              initial={{ scale: 0.6, opacity: 0, filter: "blur(20px)" }}
+              animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+              transition={{ duration: 1.8, ease: smoothEase }}
+            >
+              <div className="aura-glow" />
+              <div className="fire-ring-red" />
+              <div className="fire-ring-blue" />
+              <img 
+                src="/logo.png" 
+                alt="Brand Logo" 
+                className="main-logo"
+                onError={(e) => {
+                  // Fallback if logo.png is missing
+                  (e.target as HTMLImageElement).src = "https://via.placeholder.com/250/050505/ffffff?text=LOGO";
                 }}
               />
-            );
-          })}
+            </motion.div>
 
-          <div className="relative z-20 flex min-h-screen items-center justify-center px-6">
-            <div className="flex w-full max-w-xl flex-col items-center text-center">
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  scale: 0.88,
-                }}
-                animate={{
-                  opacity: 1,
-                  scale: 1,
-                }}
-                transition={{
-                  delay: 0.25,
-                  duration: 1.5,
-                  ease: smoothEase,
-                }}
-                className="relative flex h-[190px] w-[190px] items-center justify-center sm:h-[225px] sm:w-[225px]"
-              >
-                <motion.div
-                  initial={{
-                    opacity: 0,
-                    scale: 0.7,
-                  }}
-                  animate={{
-                    opacity: [0, 0.7, 0.42],
-                    scale: [0.7, 1, 0.96],
-                  }}
-                  transition={{
-                    delay: 0.7,
-                    duration: 2.2,
-                    ease: smoothEase,
-                  }}
-                  className="absolute inset-6 rounded-full bg-emerald-400/[0.08] blur-3xl"
-                />
+            {/* Cinematic Text Reveal */}
+            <motion.h1 
+              className="main-title"
+              initial={{ opacity: 0, y: 30, letterSpacing: "0em", filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, letterSpacing: "0.1em", filter: "blur(0px)" }}
+              transition={{ delay: 1.2, duration: 1.5, ease: smoothEase }}
+            >
+              <span className="blue">CYBER</span> <span className="red">NEXUS</span>
+            </motion.h1>
 
-                <motion.div
-                  initial={{
-                    opacity: 0,
-                    scale: 0.72,
-                  }}
-                  animate={{
-                    opacity: 0.35,
-                    scale: 1,
-                  }}
-                  transition={{
-                    delay: 0.55,
-                    duration: 1.7,
-                    ease: smoothEase,
-                  }}
-                  className="absolute inset-0 rounded-full border border-emerald-200/20"
-                />
+            <motion.div 
+              className="tagline"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2, duration: 1.2, ease: smoothEase }}
+            >
+              Next Generation Intelligence
+            </motion.div>
 
-                <motion.div
-                  initial={{
-                    opacity: 0,
-                    scale: 0.78,
-                  }}
-                  animate={{
-                    opacity: 0.55,
-                    scale: 1,
-                  }}
-                  transition={{
-                    delay: 0.95,
-                    duration: 1.8,
-                    ease: smoothEase,
-                  }}
-                  className="absolute inset-3 rounded-full border border-emerald-300/[0.16]"
-                />
+            <motion.p 
+              className="details-text"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 2.8, duration: 1.5 }}
+            >
+              Initializing core protocols. Establishing secure connections.
+              <br/>Please wait while the system boots.
+            </motion.p>
 
-                <motion.div
-                  initial={{
-                    opacity: 0,
-                    rotate: -30,
-                  }}
-                  animate={{
-                    opacity: 0.4,
-                    rotate: 30,
-                  }}
-                  transition={{
-                    delay: 1.2,
-                    duration: 5,
-                    ease: "easeInOut",
-                  }}
-                  className="absolute inset-6 rounded-full border border-dashed border-emerald-300/[0.18]"
-                />
-
-                <motion.div
-                  initial={{
-                    opacity: 0,
-                    scale: 0.72,
-                    y: 10,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    scale: 1,
-                    y: 0,
-                  }}
-                  transition={{
-                    delay: 1.1,
-                    duration: 1.45,
-                    ease: smoothEase,
-                  }}
-                  className="relative flex h-[116px] w-[116px] items-center justify-center rounded-full border border-white/[0.14] bg-white/[0.025] p-3 shadow-[0_0_70px_rgba(16,185,129,0.12)] backdrop-blur-sm sm:h-[136px] sm:w-[136px]"
-                >
-                  <img
-                    src="/logo.png"
-                    alt="සොබා සේනාංකය"
-                    draggable={false}
-                    className="h-full w-full rounded-full object-contain"
-                  />
-                </motion.div>
-
-                <motion.div
-                  initial={{
-                    opacity: 0,
-                    rotate: 0,
-                  }}
-                  animate={
-                    reduceMotion
-                      ? {
-                          opacity: 0.25,
-                        }
-                      : {
-                          opacity: [0, 0.5, 0.1],
-                          rotate: [0, 180, 360],
-                        }
-                  }
-                  transition={{
-                    delay: 1.6,
-                    duration: 4.8,
-                    ease: "linear",
-                  }}
-                  className="absolute inset-[-4px] rounded-full"
-                >
-                  <span className="absolute left-1/2 top-0 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-emerald-300/70" />
-                </motion.div>
-              </motion.div>
-
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  y: 18,
-                  filter: "blur(10px)",
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  filter: "blur(0px)",
-                }}
-                transition={{
-                  delay: 2.45,
-                  duration: 1.35,
-                  ease: smoothEase,
-                }}
-                className="mt-8"
-              >
-                <h1 className="text-[2.25rem] font-black tracking-[-0.035em] text-white sm:text-5xl">
-                  සොබා සේනාංකය
-                </h1>
-
-                <p className="mt-2 text-[9px] font-bold uppercase tracking-[0.34em] text-emerald-300/65 sm:text-[11px]">
-                  SOBA SENANKAYA
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{
-                  width: 0,
-                  opacity: 0,
-                }}
-                animate={{
-                  width: 145,
-                  opacity: 1,
-                }}
-                transition={{
-                  delay: 3,
-                  duration: 1.2,
-                  ease: smoothEase,
-                }}
-                className="mt-6 h-px bg-gradient-to-r from-transparent via-emerald-300/45 to-transparent"
+            {/* Loading Bar */}
+            <motion.div 
+              className="progress-container"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 3.5, duration: 0.8 }}
+            >
+              <motion.div 
+                className="progress-bar"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ delay: 3.8, duration: 1.2, ease: "circOut" }}
               />
+            </motion.div>
 
-              <motion.p
-                initial={{
-                  opacity: 0,
-                  y: 10,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                transition={{
-                  delay: 3.45,
-                  duration: 1.1,
-                  ease: smoothEase,
-                }}
-                className="mt-5 max-w-sm text-[10px] font-medium leading-6 tracking-[0.13em] text-emerald-100/55 sm:text-xs"
-              >
-                ස්වභාවය
-                <span className="mx-2 text-emerald-400/50">
-                  •
-                </span>
-                මනුෂ්‍යත්වය
-                <span className="mx-2 text-emerald-400/50">
-                  •
-                </span>
-                වගකීම
-              </motion.p>
-
-              <motion.p
-                initial={{
-                  opacity: 0,
-                  y: 10,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                transition={{
-                  delay: 4.05,
-                  duration: 1.1,
-                  ease: smoothEase,
-                }}
-                className="mt-5 max-w-md text-xs leading-7 text-white/38 sm:text-sm"
-              >
-                ස්වභාවධර්මය සුරැකීම යනු
-                මනුෂ්‍යත්වයේ අනාගතය
-                සුරැකීමයි.
-              </motion.p>
-
-              <motion.div
-                initial={{
-                  opacity: 0,
-                }}
-                animate={{
-                  opacity: 1,
-                }}
-                transition={{
-                  delay: 4.6,
-                  duration: 0.8,
-                }}
-                className="mt-8 w-[110px]"
-              >
-                <div className="h-px overflow-hidden rounded-full bg-white/[0.06]">
-                  <motion.div
-                    initial={{
-                      x: "-100%",
-                    }}
-                    animate={{
-                      x: "100%",
-                    }}
-                    transition={{
-                      delay: 4.65,
-                      duration: 1.9,
-                      ease: "easeInOut",
-                    }}
-                    className="h-full w-1/2 rounded-full bg-emerald-300/55"
-                  />
-                </div>
-              </motion.div>
-            </div>
           </div>
-
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/45 to-transparent" />
-
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black/20 to-transparent" />
-
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-black/20 to-transparent" />
         </motion.div>
       )}
     </AnimatePresence>
