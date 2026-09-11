@@ -168,28 +168,18 @@ const membershipPoints = [
    ETHICS
 ========================================================= */
 
-const ethics = [
-  {
-    si: "මම ස්වභාවධර්මයට හානි නොකරමි.",
-    en: "I will not harm nature.",
-  },
-  {
-    si: "ස්වභාවධර්මයට හානි කරන ක්‍රියාවන්ට අනුබල නොදෙමි.",
-    en: "I will not support actions that harm nature.",
-  },
-  {
-    si: "ස්වභාවධර්මය ආරක්ෂා කිරීම සඳහා මට කළ හැකි උපරිම දේ කරමි.",
-    en: "I will do my utmost to protect nature.",
-  },
-  {
-    si: "අන් අයද ඒ සඳහා දිරිමත් කරමි.",
-    en: "I will encourage others to do the same.",
-  },
-  {
-    si: "මගේ ක්‍රියාවන් තුළින් ස්වභාවධර්මයේ සමතුලිතතාවයට ගරු කරමි.",
-    en: "I will respect the balance of nature through my actions.",
-  },
-];
+const pledge: LangText = {
+  si: `සොබා සේනාංකයේ ප්‍රතිඥාව
+
+මා අද දින මේ මොහොතේ සිට, ස්වභාවධර්මයට ගරු කරමින්, අනුගත වෙමින් මේ මහ පොළෝ තලය, වා තලය, සාගරය, ජල සම්පත්, ගහකොළ සහ සියලු ජීවීන්ගේ යහපැවැත්ම සුරැකීමටත්; ස්වකීය වාසිය උදෙසා ස්වභාවධර්මයේ සමතුලිතතාවයට හානි වන කිසිදු ක්‍රියාවක් නොකිරීමටත්, එවැනි ක්‍රියාවකට ක්‍රියාවෙන් හෝ වචනයෙන් අනුබල නොදීමටත්; ස්වභාවධර්මයට සිදුවන හානි වැළැක්වීමට නීත්‍යනුකූලව, සාමකාමීව හා වගකීමෙන්, වගවීමෙන් යුතුව මාගේ හැකි උපරිම දායකත්වය ලබා දීමටත්; ස්වභාවධර්මය සාක්ෂි කොටගෙන, සොබා සේනාංකයේ අරමුණු හා ආචාරධර්මවලට අනුගතව, ස්වයං විනයෙන් හා මනුෂ්‍යත්වයෙන් යුතුව මාගේ මාතෘභූමියේ ආරක්ෂාව උදෙසා කටයුතු කිරීමටත් මෙයින් ප්‍රතිඥා දෙමි. /දිවුරැම් දෙමි.
+
+“සොබා සේනාංකය - සොබාදහම වෙනුවෙන් මනුෂ්‍යත්වයේ ප්‍රතිඥාවයි.”`,
+  en: `Soba Senankaya Pledge
+
+From this moment onward, I pledge to respect and live in harmony with nature, and to protect the wellbeing of the earth, atmosphere, oceans, water resources, forests, vegetation, and all living beings; to refrain from any act that harms the balance of nature for my own benefit, and never to support such acts by word or deed; to make my utmost contribution lawfully, peacefully, responsibly, and with accountability to prevent harm to nature; and, with nature as my witness, to uphold the aims and ethics of Soba Senankaya and work with self-discipline and humanity for the protection of my motherland.
+
+“Soba Senankaya - Humanity's pledge for nature.”`,
+};
 
 /* =========================================================
    INTRODUCTION LETTER
@@ -1699,48 +1689,58 @@ export default function HomePage() {
                 <h3 className="text-xl font-black text-emerald-950 dark:text-emerald-200 sm:text-2xl">
                   {lang ===
                   "si"
-                    ? "ස්වභාවධර්මයේ ප්‍රතිඥාව"
-                    : "Nature's Pledge"}
+                    ? "සොබා සේනාංකයේ ප්‍රතිඥාව"
+                    : "Soba Senankaya Pledge"}
                 </h3>
               </div>
 
-              <div className="mt-7 space-y-4">
-                {ethics.map(
-                  (
-                    item,
-                    index
-                  ) => (
-                    <div
-                      key={
-                        index
-                      }
-                      className="flex gap-3"
-                    >
-                      <CheckCircle2
-                        size={
-                          19
-                        }
-                        className="mt-1 shrink-0 text-emerald-600 dark:text-emerald-300"
-                      />
-
-                      <p className="text-sm leading-8 text-slate-700 dark:text-slate-300">
-                        {text(
-                          item,
-                          lang
-                        )}
-                      </p>
-                    </div>
-                  )
-                )}
+              <div className="mt-7 rounded-[24px] border border-emerald-200/60 bg-white/60 p-5 dark:border-emerald-400/10 dark:bg-white/[0.025] sm:p-7">
+                <p className="whitespace-pre-line text-sm leading-8 text-slate-700 dark:text-slate-300 sm:text-base sm:leading-9">
+                  {text(
+                    pledge,
+                    lang
+                  )}
+                </p>
               </div>
 
               <div className="mt-7 border-t border-emerald-200 pt-6 dark:border-emerald-400/10">
-                <p className="text-sm font-black leading-7 text-emerald-900 dark:text-emerald-200">
-                  {lang ===
-                  "si"
-                    ? "සොබා සේනාංකය - සොබාදහම වෙනුවෙන් මනුෂ්‍යත්වයේ ප්‍රතිඥාවයි."
-                    : "Soba Senankaya - Humanity's pledge for nature."}
-                </p>
+                <div className="text-center">
+                  <a
+                    href={
+                      facebookPageUrl
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center justify-center gap-3 rounded-2xl bg-emerald-500 px-7 py-4 text-sm font-black text-emerald-950 shadow-[0_14px_35px_rgba(16,185,129,0.20)] transition hover:-translate-y-0.5 hover:bg-emerald-400"
+                  >
+                    <Globe2
+                      size={
+                        19
+                      }
+                    />
+
+                    <span>
+                      {lang ===
+                      "si"
+                        ? "Facebook වෙත එක්වන්න"
+                        : "Join us on Facebook"}
+                    </span>
+
+                    <ArrowRight
+                      size={
+                        18
+                      }
+                      className="transition-transform group-hover:translate-x-1"
+                    />
+                  </a>
+
+                  <p className="mt-3 text-[11px] text-slate-400">
+                    {lang ===
+                    "si"
+                      ? "සොබා සේනාංකය සමඟ එක්වන්න"
+                      : "Join the Soba Senankaya community"}
+                  </p>
+                </div>
               </div>
             </div>
           </Reveal>
