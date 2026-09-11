@@ -393,53 +393,13 @@ I have joined. What about you...?`,
 
 function Reveal({
   children,
-  delay = 0,
   className = "",
 }: {
   children: React.ReactNode;
   delay?: number;
   className?: string;
 }) {
-  const reduceMotion =
-    useReducedMotion();
-
-  return (
-    <motion.div
-      initial={
-        reduceMotion
-          ? false
-          : {
-              opacity: 0,
-              y: 20,
-            }
-      }
-      whileInView={
-        reduceMotion
-          ? undefined
-          : {
-              opacity: 1,
-              y: 0,
-            }
-      }
-      viewport={{
-        once: true,
-        amount: 0.12,
-      }}
-      transition={{
-        duration: 0.6,
-        delay,
-        ease: [
-          0.22,
-          1,
-          0.36,
-          1,
-        ],
-      }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }
 
 /* =========================================================
@@ -462,10 +422,9 @@ function ExpandCard({
   onClick: () => void;
 }) {
   return (
-    <motion.div
-      layout
+    <div
       id={id}
-      className="overflow-hidden rounded-[24px] border border-white/10 bg-white/[0.07] shadow-[0_14px_45px_rgba(0,0,0,0.18)] backdrop-blur-xl dark:border-white/10 dark:bg-[#071a13]/58"
+      className="overflow-hidden rounded-[24px] border border-white/10 bg-[#071a13]/92 shadow-[0_14px_45px_rgba(0,0,0,0.18)] dark:border-white/10 dark:bg-[#071a13]/58"
     >
       <button
         type="button"
@@ -544,7 +503,7 @@ function ExpandCard({
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }
 
@@ -934,131 +893,52 @@ export default function HomePage() {
     <main className="relative min-h-screen w-full overflow-x-hidden bg-[#06110c] text-slate-900 dark:text-white">
       {/* =====================================================
           PAGE-LEVEL FIXED WATERFALL WALLPAPER
-          Lightweight: one static image per breakpoint + subtle
-          motion on the image/overlay only. Content always sits
-          above the wallpaper.
+          Static only: no video/GIF, no scroll listener and no
+          continuous transform/opacity animation.
       ====================================================== */}
 
-      <motion.div
+      <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center bg-no-repeat md:hidden"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=1100&q=70')",
-          willChange: "transform",
-        }}
-        animate={
-          reduceMotion
-            ? undefined
-            : {
-                scale: [1.02, 1.035, 1.02],
-                x: [0, -4, 0],
-                y: [0, 3, 0],
-              }
-        }
-        transition={{
-          duration: 24,
-          repeat: Infinity,
-          ease: "easeInOut",
+            "url('https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=1000&q=65')",
         }}
       />
 
-      <motion.div
+      <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0 hidden bg-cover bg-center bg-no-repeat md:block"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=2200&q=72')",
-          willChange: "transform",
-        }}
-        animate={
-          reduceMotion
-            ? undefined
-            : {
-                scale: [1.02, 1.03, 1.02],
-                x: [0, -6, 0],
-                y: [0, 4, 0],
-              }
-        }
-        transition={{
-          duration: 28,
-          repeat: Infinity,
-          ease: "easeInOut",
+            "url('https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=1800&q=68')",
         }}
       />
 
-      {/* Constant readability layer; no extra media/video request. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-[1] bg-[linear-gradient(180deg,rgba(2,12,8,0.88)_0%,rgba(3,18,12,0.72)_35%,rgba(2,12,8,0.84)_72%,rgba(1,7,5,0.96)_100%)]"
+        className="pointer-events-none fixed inset-0 z-[1] bg-[#03130d]/72"
       />
 
-      {/* Subtle live-like atmospheric motion, without video/GIF weight. */}
-      <motion.div
+      <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-[2] opacity-70"
-        animate={
-          reduceMotion
-            ? undefined
-            : {
-                opacity: [0.52, 0.68, 0.52],
-              }
-        }
-        transition={{
-          duration: 9,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(16,185,129,0.12),transparent_34%),linear-gradient(90deg,rgba(16,185,129,0.08),transparent_32%,transparent_68%,rgba(16,185,129,0.06))]" />
-      </motion.div>
+        className="pointer-events-none fixed inset-0 z-[2] bg-[radial-gradient(circle_at_50%_30%,rgba(16,185,129,0.09),transparent_38%)]"
+      />
 
       <div className="relative z-10">
         {/* =====================================================
           HERO
       ====================================================== */}
 
-      <section className="relative isolate min-h-[590px] overflow-hidden sm:min-h-[700px]">
-        {/* Soft animated glow */}
-        <motion.div
-          className="absolute left-[-80px] top-[20%] -z-10 h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl"
-          animate={
-            reduceMotion
-              ? undefined
-              : {
-                  x: [
-                    0,
-                    35,
-                    0,
-                  ],
-                  y: [
-                    0,
-                    20,
-                    0,
-                  ],
-                }
-          }
-          transition={{
-            duration: 10,
-            repeat:
-              Infinity,
-            ease: "easeInOut",
-          }}
-        />
+      <section className="relative isolate min-h-[560px] overflow-hidden sm:min-h-[700px]">
+        {/* Lightweight static hero accent */}
+        <div className="pointer-events-none absolute left-[-80px] top-[20%] -z-10 h-56 w-56 rounded-full bg-emerald-400/10 blur-3xl" />
 
         {/* Less vertical space under header */}
-        <div className="mx-auto flex min-h-[590px] w-full max-w-7xl items-center px-5 pb-16 pt-8 sm:min-h-[700px] sm:px-8 sm:pt-12 lg:px-10">
+        <div className="mx-auto flex min-h-[560px] w-full max-w-7xl items-center px-5 pb-14 pt-8 sm:min-h-[700px] sm:px-8 sm:pt-12 lg:px-10">
           <div className="w-full max-w-5xl">
             <Reveal>
-              <motion.div
-                whileHover={
-                  reduceMotion
-                    ? undefined
-                    : {
-                        y: -2,
-                      }
-                }
-                className="mb-6 inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/10 px-3 py-2 pr-4 text-sm font-bold text-white backdrop-blur-xl"
+              <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/10 px-3 py-2 pr-4 text-sm font-bold text-white"
               >
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-400/10">
                   <img
@@ -1079,7 +959,7 @@ export default function HomePage() {
                   size={15}
                   className="text-emerald-300"
                 />
-              </motion.div>
+              </div>
             </Reveal>
 
             <Reveal delay={0.06}>
@@ -1092,7 +972,7 @@ export default function HomePage() {
             </Reveal>
 
             <Reveal delay={0.1}>
-              <h1 className="max-w-[94vw] break-words text-[clamp(1.95rem,9.4vw,2.55rem)] font-black leading-[1.04] tracking-[-0.035em] text-white [overflow-wrap:anywhere] sm:max-w-5xl sm:text-6xl md:text-7xl lg:text-[5.4rem]">
+              <h1 className="max-w-full min-w-0 break-words text-[clamp(1.85rem,8.6vw,2.55rem)] font-black leading-[1.07] tracking-[-0.035em] text-white [overflow-wrap:anywhere] sm:max-w-5xl sm:text-6xl md:text-7xl lg:text-[5.4rem]">
                 {lang === "si" ? (
                   <>
                     <span className="block">
@@ -1153,7 +1033,7 @@ export default function HomePage() {
 
                 <a
                   href="#comments"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-xl transition hover:bg-white/15"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white/15"
                 >
                   <MessageCircle size={17} />
 
@@ -1167,27 +1047,9 @@ export default function HomePage() {
           </div>
         </div>
 
-        <motion.div
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/65"
-          animate={
-            reduceMotion
-              ? undefined
-              : {
-                  y: [
-                    0,
-                    7,
-                    0,
-                  ],
-                }
-          }
-          transition={{
-            duration: 2.2,
-            repeat:
-              Infinity,
-          }}
-        >
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/65">
           <ArrowDown size={20} />
-        </motion.div>
+        </div>
       </section>
 
       {/* =====================================================
@@ -1196,10 +1058,10 @@ export default function HomePage() {
 
       <section
         id="about"
-        className="mx-auto w-full max-w-7xl px-5 py-10 sm:px-8 sm:py-20 lg:px-10"
+        className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 sm:py-16 lg:px-10"
       >
         <Reveal className="mx-auto w-full max-w-5xl">
-          <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-white/[0.08] shadow-[0_25px_90px_rgba(0,0,0,0.22)] backdrop-blur-xl dark:border-white/10 dark:bg-[#07150f]/65">
+          <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-[#071b13]/92 shadow-[0_25px_90px_rgba(0,0,0,0.22)] dark:border-white/10 dark:bg-[#07150f]/65">
             {/* Letter top decoration */}
             <div className="absolute left-0 right-0 top-0 h-1.5 bg-gradient-to-r from-emerald-700 via-emerald-400 to-emerald-700" />
 
@@ -1215,7 +1077,7 @@ export default function HomePage() {
                     : "Introduction"}
                 </span>
 
-                <h2 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
+                <h2 className="mt-4 break-words text-[clamp(1.75rem,7vw,2.35rem)] font-black leading-tight tracking-tight sm:text-4xl lg:text-5xl">
                   {lang ===
                   "si"
                     ? "ස්වභාවධර්මය වෙනුවෙන් එක්වන මනුෂ්‍යත්වය"
@@ -1227,7 +1089,7 @@ export default function HomePage() {
 
               {/* Letter */}
               <div className="mx-auto mt-9 max-w-3xl">
-                <div className="relative rounded-[28px] border border-white/10 bg-white/[0.055] px-6 py-8 shadow-inner backdrop-blur-md dark:border-white/10 dark:bg-white/[0.028] sm:px-10 sm:py-10">
+                <div className="relative rounded-[28px] border border-white/10 bg-[#081a13]/90 px-6 py-8 shadow-inner dark:border-white/10 dark:bg-white/[0.028] sm:px-10 sm:py-10">
                   {/* Paper styling */}
                   <div className="pointer-events-none absolute inset-0 rounded-[28px] bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.045),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.035),transparent_30%)]" />
 
@@ -1378,7 +1240,7 @@ export default function HomePage() {
               </div>
 
               {/* Existing intro highlight kept */}
-              <div className="mx-auto mt-7 max-w-3xl rounded-[26px] border border-emerald-300/15 bg-emerald-500/[0.08] p-5 backdrop-blur-md dark:border-emerald-400/10 dark:bg-emerald-500/[0.06]">
+              <div className="mx-auto mt-7 max-w-3xl rounded-[26px] border border-emerald-300/15 bg-[#063424]/88 p-5 dark:border-emerald-400/10 dark:bg-emerald-500/[0.06]">
                 <div className="flex items-start justify-center gap-4 text-center">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
                     <HeartHandshake size={22} />
@@ -1411,7 +1273,7 @@ export default function HomePage() {
                 : "Our Foundation"}
             </span>
 
-            <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+            <h2 className="mt-3 break-words text-[clamp(1.75rem,7vw,2.35rem)] font-black leading-tight tracking-tight sm:text-4xl">
               {lang ===
               "si"
                 ? "දැක්ම • මෙහෙවර • ප්‍රධාන අරමුණ"
@@ -1473,7 +1335,7 @@ export default function HomePage() {
 
       <section
         id="objectives"
-        className="mx-auto w-full max-w-7xl px-5 py-10 sm:px-8 sm:py-20 lg:px-10"
+        className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 sm:py-16 lg:px-10"
       >
         <Reveal>
           <span className="text-sm font-black uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
@@ -1483,7 +1345,7 @@ export default function HomePage() {
               : "Our Objectives"}
           </span>
 
-          <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+          <h2 className="mt-3 break-words text-[clamp(1.75rem,7vw,2.35rem)] font-black leading-tight tracking-tight sm:text-4xl">
             {lang ===
             "si"
               ? "ස්වභාවික සමතුලිතතාව වෙනුවෙන්"
@@ -1505,14 +1367,8 @@ export default function HomePage() {
                 }
               >
                 <motion.div
-                  whileHover={
-                    reduceMotion
-                      ? undefined
-                      : {
-                          y: -4,
-                        }
                   }
-                  className="group flex h-full gap-4 rounded-[26px] border border-white/10 bg-white/[0.07] p-5 shadow-[0_12px_40px_rgba(0,0,0,0.16)] backdrop-blur-lg dark:border-white/10 dark:bg-white/[0.045]"
+                  className="group flex h-full gap-4 rounded-[26px] border border-white/10 bg-[#071a13]/92 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.16)] dark:border-white/10 dark:bg-[#071a13]/92"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                     <CheckCircle2
@@ -1539,7 +1395,7 @@ export default function HomePage() {
 
       <section
         id="action"
-        className="relative w-full overflow-hidden bg-[#062117]/30 py-10 text-white backdrop-blur-md sm:py-20"
+        className="relative w-full overflow-hidden bg-[#062117]/30 py-10 text-white sm:py-20"
       >
         <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
           <Reveal className="mx-auto max-w-3xl text-center">
@@ -1622,14 +1478,8 @@ export default function HomePage() {
                     }
                   >
                     <motion.div
-                      whileHover={
-                        reduceMotion
-                          ? undefined
-                          : {
-                              y: -5,
-                            }
                       }
-                      className="h-full rounded-[28px] border border-white/10 bg-white/[0.05] p-6 backdrop-blur-xl"
+                      className="h-full rounded-[28px] border border-white/10 bg-[#071a13]/92 p-6"
                     >
                       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-400/10 text-emerald-300">
                         <Icon
@@ -1665,7 +1515,7 @@ export default function HomePage() {
 
       <section
         id="membership"
-        className="mx-auto w-full max-w-7xl px-5 py-10 sm:px-8 sm:py-20 lg:px-10"
+        className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 sm:py-16 lg:px-10"
       >
         <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr]">
           <div>
@@ -1677,7 +1527,7 @@ export default function HomePage() {
                   : "Membership"}
               </span>
 
-              <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+              <h2 className="mt-3 break-words text-[clamp(1.75rem,7vw,2.35rem)] font-black leading-tight tracking-tight sm:text-4xl">
                 {lang ===
                 "si"
                   ? "සොබා ආරක්ෂකයෙකු වන්න"
@@ -1707,7 +1557,7 @@ export default function HomePage() {
                       0.05
                     }
                   >
-                    <div className="flex gap-4 rounded-[24px] border border-white/10 bg-white/[0.065] p-5 shadow-sm backdrop-blur-lg dark:border-white/10 dark:bg-white/[0.045]">
+                    <div className="flex gap-4 rounded-[24px] border border-white/10 bg-[#071a13]/92 p-5 shadow-sm dark:border-white/10 dark:bg-[#071a13]/92">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                         <Users
                           size={
@@ -1730,7 +1580,7 @@ export default function HomePage() {
           </div>
 
           <Reveal delay={0.1}>
-            <div className="rounded-[32px] border border-emerald-300/15 bg-emerald-500/[0.08] p-6 backdrop-blur-xl dark:border-emerald-400/10 dark:bg-emerald-500/[0.055] sm:p-8">
+            <div className="rounded-[32px] border border-emerald-300/15 bg-[#063424]/88 p-6 dark:border-emerald-400/10 dark:bg-emerald-500/[0.055] sm:p-8">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
                   <ShieldCheck
@@ -1746,7 +1596,7 @@ export default function HomePage() {
                 </h3>
               </div>
 
-              <div className="mt-7 rounded-[24px] border border-emerald-200/15 bg-white/[0.055] p-5 backdrop-blur-md dark:border-emerald-400/10 dark:bg-white/[0.025] sm:p-7">
+              <div className="mt-7 rounded-[24px] border border-emerald-200/15 bg-[#081a13]/90 p-5 dark:border-emerald-400/10 dark:bg-white/[0.025] sm:p-7">
                 <p className="whitespace-pre-line text-sm leading-8 text-slate-700 dark:text-slate-300 sm:text-base sm:leading-9">
                   {text(
                     pledge,
@@ -1805,7 +1655,7 @@ export default function HomePage() {
 
       <section
         id="message"
-        className="relative w-full overflow-hidden bg-slate-100/30 py-16 backdrop-blur-[1px] dark:bg-black/25 sm:py-24"
+        className="relative w-full overflow-hidden bg-slate-100/30 py-16 dark:bg-black/25 sm:py-24"
       >
         <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
           <Reveal>
@@ -1818,7 +1668,7 @@ export default function HomePage() {
                     : "Message of Nature"}
                 </span>
 
-                <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+                <h2 className="mt-3 break-words text-[clamp(1.75rem,7vw,2.35rem)] font-black leading-tight tracking-tight sm:text-4xl">
                   {lang ===
                   "si"
                     ? "නවතම නිවේදන"
@@ -1861,8 +1711,7 @@ export default function HomePage() {
                       0.05
                     }
                   >
-                    <motion.div
-                      layout
+                    <div
                       className={`overflow-hidden rounded-[28px] border bg-white shadow-[0_14px_45px_rgba(15,23,42,0.05)] transition-colors dark:bg-white/[0.035] ${
                         open
                           ? "border-emerald-300 dark:border-emerald-400/20"
@@ -1948,7 +1797,7 @@ export default function HomePage() {
                           </motion.div>
                         )}
                       </AnimatePresence>
-                    </motion.div>
+                    </div>
                   </Reveal>
                 );
               }
@@ -1963,7 +1812,7 @@ export default function HomePage() {
 
       <section
         id="comments"
-        className="mx-auto w-full max-w-7xl px-5 py-10 sm:px-8 sm:py-20 lg:px-10"
+        className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 sm:py-16 lg:px-10"
       >
         <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
           <Reveal>
@@ -1977,7 +1826,7 @@ export default function HomePage() {
                 : "Live Ideas"}
             </span>
 
-            <h2 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl">
+            <h2 className="mt-4 break-words text-[clamp(1.75rem,7vw,2.35rem)] font-black leading-tight tracking-tight sm:text-4xl">
               {lang ===
               "si"
                 ? "අදහස් හා යෝජනා"
@@ -2179,7 +2028,7 @@ export default function HomePage() {
           SOCIAL LINKS
       ====================================================== */}
 
-      <section className="mx-auto w-full max-w-7xl px-5 pb-10 sm:px-8 sm:pb-20 lg:px-10">
+      <section className="mx-auto w-full max-w-7xl px-5 pb-8 sm:px-8 sm:pb-16 lg:px-10">
         <div className="grid gap-4 sm:grid-cols-2">
           <Reveal>
             <a
@@ -2188,7 +2037,7 @@ export default function HomePage() {
               }
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center justify-between rounded-[26px] border border-slate-200/70 bg-white/75 p-5 shadow-sm backdrop-blur-md transition hover:-translate-y-1 dark:border-white/10 dark:bg-black/25"
+              className="group flex items-center justify-between rounded-[26px] border border-slate-200/70 bg-white/75 p-5 shadow-sm transition hover:-translate-y-1 dark:border-white/10 dark:bg-black/25"
             >
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#1877F2]/10 text-[#1877F2] dark:bg-[#1877F2]/15 dark:text-[#4c9cff]">
@@ -2232,7 +2081,7 @@ export default function HomePage() {
               href="#"
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center justify-between rounded-[26px] border border-slate-200/70 bg-white/75 p-5 shadow-sm backdrop-blur-md transition hover:-translate-y-1 dark:border-white/10 dark:bg-black/25"
+              className="group flex items-center justify-between rounded-[26px] border border-slate-200/70 bg-white/75 p-5 shadow-sm transition hover:-translate-y-1 dark:border-white/10 dark:bg-black/25"
             >
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FF0000]/10 text-[#FF0000] dark:bg-[#FF0000]/15 dark:text-[#ff4d4d]">
@@ -2278,9 +2127,53 @@ export default function HomePage() {
       </section>
 
       {/* =====================================================
-          NO FOOTER HERE
-          Footer.tsx will be added separately.
+          FOOTER
       ====================================================== */}
+
+      <footer className="border-t border-white/10 bg-[#020b07]/95 px-5 py-9 text-white sm:px-8 lg:px-10">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-3">
+            <img
+              src="/logo.png"
+              alt="සොබා සේනාංකය"
+              className="h-11 w-11 shrink-0 rounded-full object-contain"
+            />
+            <div className="min-w-0">
+              <p className="break-words text-base font-black">
+                {lang === "si" ? "සොබා සේනාංකය" : "Soba Senankaya"}
+              </p>
+              <p className="mt-1 break-words text-xs leading-5 text-white/55">
+                {lang === "si"
+                  ? "ස්වභාදහම උදෙසා මනුෂ්‍යයත්වයේ මෙහෙවර"
+                  : "Humanity's mission for nature"}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-bold text-white/55">
+            <a
+              href={facebookPageUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition hover:text-emerald-300"
+            >
+              Facebook
+            </a>
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition hover:text-emerald-300"
+            >
+              YouTube
+            </a>
+            <span>
+              © {new Date().getFullYear()}{" "}
+              {lang === "si" ? "සොබා සේනාංකය" : "Soba Senankaya"}
+            </span>
+          </div>
+        </div>
+      </footer>
 
       {/* =====================================================
           COMMENT MODAL
@@ -2298,7 +2191,7 @@ export default function HomePage() {
             exit={{
               opacity: 0,
             }}
-            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md"
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4"
             onMouseDown={(
               event
             ) => {
@@ -2531,4 +2424,3 @@ export default function HomePage() {
       </div>
     </main>
   );
-        }
