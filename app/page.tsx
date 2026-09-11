@@ -937,8 +937,13 @@ export default function HomePage() {
       ====================================================== */}
 
       <section className="relative isolate min-h-[650px] overflow-hidden sm:min-h-[700px]">
+        {/*
+          Fixed natural background layers.
+          Mobile and desktop use separate waterfall images while the
+          background remains visually anchored as the hero content scrolls.
+        */}
         <motion.div
-          className="absolute inset-0 -z-30 bg-cover bg-center"
+          className="absolute inset-0 -z-30 bg-cover bg-center bg-fixed md:hidden"
           initial={
             reduceMotion
               ? false
@@ -959,7 +964,33 @@ export default function HomePage() {
           }}
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=2200&q=90')",
+              "url('https://images.unsplash.com/photo-1455218873509-8097305ee378?auto=format&fit=crop&w=1400&q=90')",
+          }}
+        />
+
+        <motion.div
+          className="absolute inset-0 -z-30 hidden bg-cover bg-center bg-fixed md:block"
+          initial={
+            reduceMotion
+              ? false
+              : {
+                  scale: 1.06,
+                }
+          }
+          animate={
+            reduceMotion
+              ? undefined
+              : {
+                  scale: 1,
+                }
+          }
+          transition={{
+            duration: 1.8,
+            ease: "easeOut",
+          }}
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=2200&q=90')",
           }}
         />
 
@@ -1048,11 +1079,11 @@ export default function HomePage() {
                     </span>
 
                     <span className="mt-1 block text-emerald-300">
-                      ස්වභාවයට මනුෂ්‍යත්වයේ
+                      ස්වභාදහම උදෙසා
                     </span>
 
                     <span className="block">
-                      වගකීම.
+                      මනුෂ්‍යයත්වයේ මෙහෙවර.
                     </span>
                   </>
                 ) : (
@@ -1062,7 +1093,7 @@ export default function HomePage() {
                     </span>
 
                     <span className="mt-1 block text-emerald-300">
-                      Humanity's responsibility
+                      Humanity's mission
                     </span>
 
                     <span className="block">
