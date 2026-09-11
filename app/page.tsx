@@ -931,72 +931,28 @@ export default function HomePage() {
   ];
 
   return (
-    <main className="w-full overflow-x-hidden bg-[#f6f9f7] text-slate-900 dark:bg-[#06100c] dark:text-white">
+    <main className="relative isolate w-full overflow-x-hidden bg-transparent text-slate-900 dark:text-white">
       {/* =====================================================
           HERO
       ====================================================== */}
 
       <section className="relative isolate min-h-[650px] overflow-hidden sm:min-h-[700px]">
-        {/*
-          Fixed natural background layers.
-          Mobile and desktop use separate waterfall images while the
-          background remains visually anchored as the hero content scrolls.
-        */}
-        <motion.div
-          className="absolute inset-0 -z-30 bg-cover bg-center bg-fixed md:hidden"
-          initial={
-            reduceMotion
-              ? false
-              : {
-                  scale: 1.06,
-                }
-          }
-          animate={
-            reduceMotion
-              ? undefined
-              : {
-                  scale: 1,
-                }
-          }
-          transition={{
-            duration: 1.8,
-            ease: "easeOut",
-          }}
+        {/* Hero background is supplied by the page-level fixed wallpaper below. */}
+        <div className="pointer-events-none fixed inset-0 -z-50 bg-cover bg-center bg-no-repeat md:hidden"
           style={{
             backgroundImage:
               "url('https://images.unsplash.com/photo-1455218873509-8097305ee378?auto=format&fit=crop&w=1400&q=90')",
           }}
         />
 
-        <motion.div
-          className="absolute inset-0 -z-30 hidden bg-cover bg-center bg-fixed md:block"
-          initial={
-            reduceMotion
-              ? false
-              : {
-                  scale: 1.06,
-                }
-          }
-          animate={
-            reduceMotion
-              ? undefined
-              : {
-                  scale: 1,
-                }
-          }
-          transition={{
-            duration: 1.8,
-            ease: "easeOut",
-          }}
+        <div className="pointer-events-none fixed inset-0 -z-50 hidden bg-cover bg-center bg-no-repeat md:block"
           style={{
             backgroundImage:
               "url('https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=2200&q=90')",
           }}
         />
 
-        <div className="absolute inset-0 -z-20 bg-gradient-to-r from-[#03100b]/95 via-[#06150e]/75 to-[#07130d]/30" />
-
-        <div className="absolute inset-0 -z-20 bg-gradient-to-t from-[#03100b] via-transparent to-[#03100b]/25" />
+        <div className="pointer-events-none fixed inset-0 -z-40 bg-gradient-to-b from-[#03100b]/75 via-[#06150e]/82 to-[#020806]/92" />
 
         {/* Soft animated glow */}
         <motion.div
@@ -1071,7 +1027,7 @@ export default function HomePage() {
             </Reveal>
 
             <Reveal delay={0.1}>
-              <h1 className="max-w-5xl text-[3.15rem] font-black leading-[0.98] tracking-[-0.04em] text-white sm:text-6xl md:text-7xl lg:text-[5.4rem]">
+              <h1 className="max-w-5xl text-[2.35rem] font-black leading-[1.02] tracking-[-0.035em] text-white sm:text-6xl md:text-7xl lg:text-[5.4rem]">
                 {lang === "si" ? (
                   <>
                     <span className="block">
@@ -1380,7 +1336,7 @@ export default function HomePage() {
           FOUNDATION
       ====================================================== */}
 
-      <section className="relative w-full overflow-hidden bg-white py-16 dark:bg-[#08130f] sm:py-24">
+      <section className="relative w-full overflow-hidden bg-white/35 py-16 backdrop-blur-[1px] dark:bg-black/20 sm:py-24">
         <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">
           <Reveal className="mx-auto max-w-3xl text-center">
             <span className="text-sm font-black uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
@@ -1518,7 +1474,7 @@ export default function HomePage() {
 
       <section
         id="action"
-        className="relative w-full overflow-hidden bg-[#062117] py-16 text-white sm:py-24"
+        className="relative w-full overflow-hidden bg-[#062117]/55 py-16 text-white backdrop-blur-[1px] sm:py-24"
       >
         <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
           <Reveal className="mx-auto max-w-3xl text-center">
@@ -1784,7 +1740,7 @@ export default function HomePage() {
 
       <section
         id="message"
-        className="relative w-full overflow-hidden bg-slate-100 py-16 dark:bg-[#07120d] sm:py-24"
+        className="relative w-full overflow-hidden bg-slate-100/30 py-16 backdrop-blur-[1px] dark:bg-black/25 sm:py-24"
       >
         <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
           <Reveal>
@@ -2167,13 +2123,17 @@ export default function HomePage() {
               }
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center justify-between rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 dark:border-white/10 dark:bg-white/[0.035]"
+              className="group flex items-center justify-between rounded-[26px] border border-slate-200/70 bg-white/75 p-5 shadow-sm backdrop-blur-md transition hover:-translate-y-1 dark:border-white/10 dark:bg-black/25"
             >
               <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
-                  <Globe2
-                    size={22}
-                  />
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#1877F2]/10 text-[#1877F2] dark:bg-[#1877F2]/15 dark:text-[#4c9cff]">
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    className="h-6 w-6 fill-current"
+                  >
+                    <path d="M13.4 21v-8h2.7l.4-3h-3.1V8.1c0-.9.3-1.5 1.6-1.5h1.7V3.9c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1V10H8v3h2.3v8h3.1Z" />
+                  </svg>
                 </div>
 
                 <div>
@@ -2205,25 +2165,38 @@ export default function HomePage() {
           <Reveal delay={0.05}>
             <a
               href="#"
-              className="group flex items-center justify-between rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 dark:border-white/10 dark:bg-white/[0.035]"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center justify-between rounded-[26px] border border-slate-200/70 bg-white/75 p-5 shadow-sm backdrop-blur-md transition hover:-translate-y-1 dark:border-white/10 dark:bg-black/25"
             >
               <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-100 text-green-600 dark:bg-green-500/10 dark:text-green-400">
-                  <MessageCircle
-                    size={22}
-                  />
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FF0000]/10 text-[#FF0000] dark:bg-[#FF0000]/15 dark:text-[#ff4d4d]">
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    className="h-6 w-6"
+                  >
+                    <path
+                      d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="m9.7 15.8 6.2-3.8-6.2-3.8v7.6Z"
+                      fill="white"
+                    />
+                  </svg>
                 </div>
 
                 <div>
                   <p className="font-black">
-                    WhatsApp
+                    YouTube
                   </p>
 
                   <p className="mt-1 text-xs text-slate-500">
                     {lang ===
                     "si"
-                      ? "අප සමඟ සම්බන්ධ වන්න"
-                      : "Connect with us"}
+                      ? "අපගේ වීඩියෝ නරඹන්න"
+                      : "Watch our videos"}
                   </p>
                 </div>
               </div>
