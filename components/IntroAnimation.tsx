@@ -1,294 +1,603 @@
 // app/components/OpeningIntro.tsx
-'use client'
+'use client';
 
-import React, { useState, useEffect, useLayoutEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import React, { useEffect, useState } from 'react';
+
+const MOBILE_IMAGE = '/ecoguard%20Mobile.webp';
+const DESKTOP_IMAGE = '/ecoguard%20Destop.webp';
 
 export default function OpeningIntro() {
-  const [show, setShow] = useState(true);
-  const [isExiting, setIsExiting] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const [closing, setClosing] = useState(false);
+  const [mobileReady, setMobileReady] = useState(false);
+  const [desktopReady, setDesktopReady] = useState(false);
 
-  useLayoutEffect(() => {
-    if (typeof window !== 'undefined') {
-      const hasPlayed = sessionStorage.getItem('sobasenankaya_dragon_intro');
-      
-      if (!hasPlayed) {
-        sessionStorage.setItem('sobasenankaya_dragon_intro', 'true'); 
-        
-        document.body.style.overflow = 'hidden';
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
 
-        const exitTimer = setTimeout(() => setIsExiting(true), 4500); 
-        
-        const removeTimer = setTimeout(() => {
-            setShow(false); 
-            document.body.style.overflow = '';
-        }, 5500);
+    const playedKey = 'sobasenankaya_opening_intro_v2';
+    const hasPlayed = sessionStorage.getItem(playedKey);
 
-        return () => {
-          clearTimeout(exitTimer);
-          clearTimeout(removeTimer);
-          document.body.style.overflow = '';
-        };
-      } else {
-        setShow(false);
-      }
+    if (hasPlayed) {
+      setVisible(false);
+      return;
     }
+
+    sessionStorage.setItem(playedKey, 'true');
+
+    const previousOverflow = document.body.style.overflow;
+    const previousOverscroll = document.body.style.overscrollBehavior;
+
+    document.body.style.overflow = 'hidden';
+    document.body.style.overscrollBehavior = 'none';
+
+    const exitTimer = window.setTimeout(() => {
+      setClosing(true);
+    }, 4700);
+
+    const removeTimer = window.setTimeout(() => {
+      setVisible(false);
+      document.body.style.overflow = previousOverflow;
+      document.body.style.overscrollBehavior = previousOverscroll;
+    }, 5900);
+
+    return () => {
+      window.clearTimeout(exitTimer);
+      window.clearTimeout(removeTimer);
+      document.body.style.overflow = previousOverflow;
+      document.body.style.overscrollBehavior = previousOverscroll;
+    };
   }, []);
 
-  if (!show) return null;
+  useEffect(() => {
+    if (!visible) return;
+
+    const mobile = new Image();
+    mobile.decoding = 'async';
+    mobile.onload = () => setMobileReady(true);
+    mobile.onerror = () => setMobileReady(false);
+    mobile.src = MOBILE_IMAGE;
+
+    const desktop = new Image();
+    desktop.decoding = 'async';
+    desktop.onload = () => setDesktopReady(true);
+    desktop.onerror = () => setDesktopReady(false);
+    desktop.src = DESKTOP_IMAGE;
+  }, [visible]);
+
+  if (!visible) return null;
 
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.div 
-          className="premium-intro-container"
-          initial={{ opacity: 1 }}
-          animate={isExiting ? { opacity: 0, scale: 1.05 } : { opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: "easeInOut" }}
-          style={{
-            position: 'fixed',
-            inset: 0, 
-            width: '100vw',
-            height: '100dvh',
-            background: '#050505',
-            zIndex: 2147483647,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden',
-            pointerEvents: 'all'
-          }}
-        >
-          <style dangerouslySetInnerHTML={{ __html: `
-            /* --- PREMIUM BACKGROUND --- */
-            .premium-intro-container::before {
-              content: '';
-              position: absolute;
-              inset: 0;
-              background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-              background-size: 40px 40px;
-              opacity: 0.5;
-              z-index: 1;
-              pointer-events: none;
-            }
+    <div
+      className={`opening-intro ${closing ? 'is-closing' : ''}`}
+      aria-hidden="true"
+    >
+      <style jsx global>{`
+        .opening-intro {
+          position: fixed;
+          inset: 0;
+          z-index: 2147483647;
+          width: 100vw;
+          height: 100dvh;
+          min-height: 100svh;
+          overflow: hidden;
+          isolation: isolate;
+          display: grid;
+          place-items: center;
+          background:
+            radial-gradient(circle at 50% 45%, rgba(11, 23, 54, 0.88) 0%, rgba(3, 6, 16, 0.96) 42%, #010206 100%);
+          opacity: 1;
+          transform: scale(1);
+          will-change: opacity, transform;
+          contain: strict;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+        }
 
-            /* --- LOGO WRAPPER & DUAL FLAME RINGS --- */
-            .premium-logo-wrapper {
-              position: relative;
-              width: 190px;
-              height: 190px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              margin-bottom: 40px;
-              z-index: 10;
-            }
+        .opening-intro.is-closing {
+          animation: openingIntroExit 1.15s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+        }
 
-            /* 1. Red Flame Ring - Spinning Clockwise (Right) */
-            .ring-fire-red {
-              position: absolute;
-              inset: -8px;
-              border-radius: 50%;
-              border: 3px solid transparent;
-              border-top-color: #ff003c;
-              border-right-color: #ff4d6d;
-              box-shadow: 0 0 15px rgba(255, 0, 60, 0.7);
-              animation: spinClockwise 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-              z-index: 3;
-            }
+        .opening-intro__fallback {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          overflow: hidden;
+          background:
+            radial-gradient(circle at 50% 50%, rgba(9, 24, 55, 0.92) 0%, rgba(2, 8, 20, 0.96) 46%, #000 100%);
+        }
 
-            /* 2. Blue Flame Ring - Spinning Counter-Clockwise (Left) */
-            .ring-fire-blue {
-              position: absolute;
-              inset: -18px;
-              border-radius: 50%;
-              border: 3px solid transparent;
-              border-bottom-color: #00c3ff;
-              border-left-color: #0055ff;
-              box-shadow: 0 0 15px rgba(0, 195, 255, 0.7);
-              animation: spinCounterClockwise 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-              z-index: 2;
-            }
+        .opening-intro__fallback::before,
+        .opening-intro__fallback::after {
+          content: '';
+          position: absolute;
+          inset: -14%;
+          pointer-events: none;
+        }
 
-            /* 3. Outer Golden Dashed Orbit */
-            .ring-outer {
-              position: absolute;
-              inset: -30px;
-              border-radius: 50%;
-              border: 1px dashed rgba(212, 175, 55, 0.3);
-              animation: spinClockwise 15s linear infinite;
-              z-index: 1;
-            }
+        .opening-intro__fallback::before {
+          background:
+            radial-gradient(
+              ellipse at 15% 50%,
+              rgba(255, 56, 0, 0.98) 0%,
+              rgba(238, 46, 0, 0.72) 14%,
+              rgba(94, 8, 0, 0.34) 27%,
+              transparent 44%
+            ),
+            radial-gradient(
+              ellipse at 85% 50%,
+              rgba(0, 98, 255, 1) 0%,
+              rgba(0, 49, 190, 0.74) 16%,
+              rgba(18, 23, 103, 0.36) 28%,
+              transparent 45%
+            );
+          filter: blur(18px) saturate(1.18);
+          transform: scale(1.08);
+        }
 
-            /* Inner Core Ring */
-            .ring-inner {
-              position: absolute;
-              inset: 4px;
-              border-radius: 50%;
-              border: 1px solid rgba(255, 255, 255, 0.15);
-              box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.1);
-              z-index: 4;
-            }
+        .opening-intro__fallback::after {
+          background:
+            conic-gradient(
+              from 90deg,
+              transparent 0deg,
+              rgba(255, 57, 0, 0.82) 36deg,
+              transparent 92deg,
+              transparent 180deg,
+              rgba(0, 97, 255, 0.78) 235deg,
+              transparent 300deg
+            );
+          filter: blur(52px);
+          opacity: 0.72;
+          mix-blend-mode: screen;
+        }
 
-            /* The Logo itself */
-            .premium-logo {
-              width: 120px;
-              height: 120px;
-              object-fit: cover;
-              border-radius: 50%;
-              position: relative;
-              z-index: 10;
-              border: 2px solid rgba(212, 175, 55, 0.4);
-              box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
-              background: #000;
-            }
+        .opening-intro__image {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center;
+          opacity: 0;
+          transform: scale(1.035);
+          transition:
+            opacity 0.65s ease,
+            transform 4.8s cubic-bezier(0.16, 1, 0.3, 1);
+          will-change: opacity, transform;
+          pointer-events: none;
+          user-select: none;
+          -webkit-user-drag: none;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+        }
 
-            /* --- ANIMATION DIRECTIONS --- */
-            @keyframes spinClockwise { 
-              100% { transform: rotate(360deg); } 
-            }
-            @keyframes spinCounterClockwise { 
-              100% { transform: rotate(-360deg); } 
-            }
+        .opening-intro__image.is-ready {
+          opacity: 0.97;
+          transform: scale(1);
+        }
 
-            /* --- TYPOGRAPHY & LOADING BAR --- */
-            .premium-content {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              z-index: 10;
-              text-align: center;
-            }
+        .opening-intro__image.is-fading {
+          opacity: 0;
+        }
 
-            .premium-title {
-              font-family: 'Abhaya Libre', 'Inter', serif;
-              font-size: clamp(2rem, 5vw, 3.5rem);
-              font-weight: 800;
-              color: #ffffff;
-              margin: 0;
-              letter-spacing: 0.05em;
-              text-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            }
+        .opening-intro__image--mobile {
+          display: block;
+        }
 
-            .premium-title span {
-              background: linear-gradient(90deg, #D4AF37, #F3E5AB);
-              -webkit-background-clip: text;
-              -webkit-text-fill-color: transparent;
-            }
+        .opening-intro__image--desktop {
+          display: none;
+        }
 
-            .premium-subtitle {
-              font-family: 'Inter', sans-serif;
-              font-size: clamp(0.7rem, 2vw, 0.85rem);
-              font-weight: 500;
-              letter-spacing: 0.4em;
-              color: rgba(255, 255, 255, 0.5);
-              text-transform: uppercase;
-              margin-top: 15px;
-            }
+        .opening-intro__shade {
+          position: absolute;
+          inset: 0;
+          z-index: 2;
+          pointer-events: none;
+          background:
+            linear-gradient(
+              180deg,
+              rgba(0, 0, 0, 0.26) 0%,
+              rgba(0, 0, 0, 0.10) 32%,
+              rgba(0, 0, 0, 0.28) 100%
+            ),
+            radial-gradient(
+              circle at 50% 50%,
+              rgba(0, 0, 0, 0.00) 24%,
+              rgba(0, 0, 0, 0.23) 100%
+            );
+        }
 
-            .loading-wrapper {
-              margin-top: 40px;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              gap: 12px;
-            }
+        .opening-intro__content {
+          position: relative;
+          z-index: 5;
+          display: flex;
+          width: min(90vw, 760px);
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 24px;
+          transform: translateZ(0);
+        }
 
-            .loading-text-pro {
-              font-family: 'Inter', sans-serif;
-              font-size: 0.65rem;
-              letter-spacing: 0.2em;
-              color: rgba(212, 175, 55, 0.8);
-              text-transform: uppercase;
-            }
+        .opening-intro__halo {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: clamp(210px, 34vw, 390px);
+          aspect-ratio: 1;
+          border-radius: 999px;
+          transform: translate(-50%, -52%);
+          background:
+            radial-gradient(
+              circle,
+              rgba(255, 255, 255, 0.18) 0%,
+              rgba(0, 177, 255, 0.09) 26%,
+              rgba(0, 74, 255, 0.06) 46%,
+              transparent 70%
+            );
+          filter: blur(12px);
+          opacity: 0.92;
+          pointer-events: none;
+        }
 
-            .progress-bar-container {
-              width: 150px;
-              height: 2px;
-              background: rgba(255, 255, 255, 0.1);
-              border-radius: 4px;
-              overflow: hidden;
-              position: relative;
-            }
+        .opening-intro__logo-shell {
+          position: relative;
+          display: grid;
+          place-items: center;
+          width: clamp(135px, 31vw, 250px);
+          aspect-ratio: 1;
+          margin-bottom: 22px;
+        }
 
-            .progress-bar-fill {
-              position: absolute;
-              top: 0; left: 0; bottom: 0;
-              background: linear-gradient(90deg, transparent, #D4AF37, #FFF);
-              width: 50%;
-              border-radius: 4px;
-              animation: loadProgress 3.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-            }
+        .opening-intro__orbit {
+          position: absolute;
+          inset: -4%;
+          border-radius: 50%;
+          border: 1px solid rgba(255, 255, 255, 0.22);
+          box-shadow:
+            0 0 25px rgba(0, 165, 255, 0.16),
+            0 0 40px rgba(255, 76, 0, 0.12);
+          animation: openingOrbitPulse 2.6s ease-in-out infinite;
+        }
 
-            @keyframes loadProgress {
-              0% { width: 0%; left: -50%; }
-              100% { width: 100%; left: 100%; }
-            }
+        .opening-intro__orbit::before,
+        .opening-intro__orbit::after {
+          content: '';
+          position: absolute;
+          inset: -7%;
+          border-radius: 50%;
+          border: 1px solid transparent;
+          pointer-events: none;
+        }
 
-            @media (max-width: 768px) {
-              .premium-logo-wrapper { width: 160px; height: 160px; margin-bottom: 30px; }
-              .premium-logo { width: 100px; height: 100px; }
-            }
-          `}} />
+        .opening-intro__orbit::before {
+          border-top-color: rgba(255, 94, 28, 0.88);
+          border-right-color: rgba(255, 43, 0, 0.34);
+          transform: rotate(24deg);
+          animation: openingOrbitSpin 4.8s linear infinite;
+        }
 
-          {/* Main Content */}
-          <div className="premium-logo-wrapper">
-            {/* Counter-rotating Flame Rings */}
-            <div className="ring-outer" />
-            <div className="ring-fire-blue" /> {/* Rotates Left (Counter-clockwise) */}
-            <div className="ring-fire-red" />  {/* Rotates Right (Clockwise) */}
-            <div className="ring-inner" />
-            
-            <motion.img 
-              src="/logo.png" 
-              alt="Soba Senankaya Logo" 
-              className="premium-logo"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = "https://via.placeholder.com/150/000000/D4AF37?text=LOGO";
-              }}
-            />
-          </div>
+        .opening-intro__orbit::after {
+          inset: -11%;
+          border-bottom-color: rgba(0, 168, 255, 0.92);
+          border-left-color: rgba(41, 95, 255, 0.34);
+          transform: rotate(-18deg);
+          animation: openingOrbitSpinReverse 5.8s linear infinite;
+        }
 
-          <div className="premium-content">
-            <motion.h1 
-              className="premium-title"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 1 }}
-            >
-              සොබා <span>සේනාංකය</span>
-            </motion.h1>
+        .opening-intro__logo {
+          position: relative;
+          z-index: 2;
+          width: 66%;
+          height: 66%;
+          border-radius: 50%;
+          object-fit: contain;
+          background: rgba(0, 0, 0, 0.54);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          box-shadow:
+            0 0 0 7px rgba(255, 255, 255, 0.02),
+            0 12px 48px rgba(0, 0, 0, 0.55);
+          opacity: 0;
+          transform: scale(0.72);
+          animation: openingLogoIn 1.25s 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
 
-            <motion.p 
-              className="premium-subtitle"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1, duration: 1 }}
-            >
-              ස්වභාවය • මනුෂ්‍යත්වය • වගකීම
-            </motion.p>
+        .opening-intro__title {
+          margin: 0;
+          max-width: 90vw;
+          color: #fff;
+          font-family:
+            'Noto Sans Sinhala',
+            'Iskoola Pota',
+            'Nirmala UI',
+            sans-serif;
+          font-size: clamp(1.6rem, 5.8vw, 3.45rem);
+          font-weight: 900;
+          line-height: 1.08;
+          letter-spacing: -0.035em;
+          text-wrap: balance;
+          text-shadow:
+            0 3px 18px rgba(0, 0, 0, 0.68),
+            0 0 34px rgba(0, 0, 0, 0.36);
+          opacity: 0;
+          transform: translateY(14px);
+          animation: openingTextIn 0.9s 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
 
-            <motion.div 
-              className="loading-wrapper"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.5, duration: 1 }}
-            >
-              <span className="loading-text-pro">SYSTEM INITIALIZATION</span>
-              <div className="progress-bar-container">
-                <div className="progress-bar-fill" />
-              </div>
-            </motion.div>
-          </div>
+        .opening-intro__title-accent {
+          color: #61e7bb;
+        }
 
-        </motion.div>
-      )}
-    </AnimatePresence>
+        .opening-intro__subtitle {
+          margin-top: 12px;
+          max-width: 88vw;
+          color: rgba(255, 255, 255, 0.62);
+          font-family:
+            Inter,
+            'Segoe UI',
+            system-ui,
+            sans-serif;
+          font-size: clamp(0.58rem, 1.7vw, 0.78rem);
+          font-weight: 700;
+          letter-spacing: 0.24em;
+          text-transform: uppercase;
+          opacity: 0;
+          transform: translateY(10px);
+          animation: openingTextIn 0.85s 0.86s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .opening-intro__loading {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          margin-top: 24px;
+          opacity: 0;
+          animation: openingTextIn 0.8s 1.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .opening-intro__loading-label {
+          color: rgba(255, 255, 255, 0.72);
+          font-family:
+            Inter,
+            'Segoe UI',
+            system-ui,
+            sans-serif;
+          font-size: 0.56rem;
+          font-weight: 800;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+        }
+
+        .opening-intro__progress {
+          position: relative;
+          width: min(170px, 44vw);
+          height: 2px;
+          overflow: hidden;
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.14);
+        }
+
+        .opening-intro__progress::before {
+          content: '';
+          position: absolute;
+          inset: 0 auto 0 0;
+          width: 34%;
+          border-radius: inherit;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 81, 20, 0.92),
+            rgba(255, 255, 255, 0.96),
+            rgba(0, 149, 255, 0.94)
+          );
+          animation: openingProgress 3.3s 0.08s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+          will-change: transform;
+        }
+
+        .opening-intro.is-closing .opening-intro__logo-shell {
+          animation: openingLogoExit 1.05s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+        }
+
+        .opening-intro.is-closing .opening-intro__title,
+        .opening-intro.is-closing .opening-intro__subtitle,
+        .opening-intro.is-closing .opening-intro__loading {
+          animation: openingContentExit 0.82s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+        }
+
+        @keyframes openingLogoIn {
+          0% {
+            opacity: 0;
+            transform: scale(0.72);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes openingLogoExit {
+          0% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(1.34);
+          }
+        }
+
+        @keyframes openingTextIn {
+          0% {
+            opacity: 0;
+            transform: translateY(14px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes openingContentExit {
+          0% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+        }
+
+        @keyframes openingIntroExit {
+          0% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(1.045);
+          }
+        }
+
+        @keyframes openingOrbitSpin {
+          to {
+            transform: rotate(384deg);
+          }
+        }
+
+        @keyframes openingOrbitSpinReverse {
+          to {
+            transform: rotate(-378deg);
+          }
+        }
+
+        @keyframes openingOrbitPulse {
+          0%,
+          100% {
+            transform: scale(1);
+            opacity: 0.72;
+          }
+          50% {
+            transform: scale(1.025);
+            opacity: 1;
+          }
+        }
+
+        @keyframes openingProgress {
+          0% {
+            transform: translateX(-135%);
+          }
+          100% {
+            transform: translateX(420%);
+          }
+        }
+
+        @media (min-width: 769px) {
+          .opening-intro__image--mobile {
+            display: none;
+          }
+
+          .opening-intro__image--desktop {
+            display: block;
+          }
+
+          .opening-intro__content {
+            width: min(82vw, 900px);
+          }
+        }
+
+        @media (max-width: 768px) {
+          .opening-intro__content {
+            padding-inline: 18px;
+          }
+
+          .opening-intro__logo-shell {
+            margin-bottom: 18px;
+          }
+
+          .opening-intro__title {
+            max-width: 86vw;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .opening-intro *,
+          .opening-intro::before,
+          .opening-intro::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            scroll-behavior: auto !important;
+          }
+
+          .opening-intro__image {
+            transition: none;
+          }
+        }
+      `}</style>
+
+      <div className="opening-intro__fallback" />
+
+      <img
+        src={MOBILE_IMAGE}
+        alt=""
+        decoding="async"
+        fetchPriority="high"
+        draggable={false}
+        className={`opening-intro__image opening-intro__image--mobile ${
+          mobileReady ? 'is-ready' : ''
+        } ${closing ? 'is-fading' : ''}`}
+        onLoad={() => setMobileReady(true)}
+      />
+
+      <img
+        src={DESKTOP_IMAGE}
+        alt=""
+        decoding="async"
+        fetchPriority="high"
+        draggable={false}
+        className={`opening-intro__image opening-intro__image--desktop ${
+          desktopReady ? 'is-ready' : ''
+        } ${closing ? 'is-fading' : ''}`}
+        onLoad={() => setDesktopReady(true)}
+      />
+
+      <div className="opening-intro__shade" />
+
+      <div className="opening-intro__content">
+        <div className="opening-intro__halo" />
+
+        <div className="opening-intro__logo-shell">
+          <div className="opening-intro__orbit" />
+          <img
+            src="/logo.png"
+            alt="Soba Senankaya"
+            draggable={false}
+            className="opening-intro__logo"
+          />
+        </div>
+
+        <h1 className="opening-intro__title">
+          සොබා{' '}
+          <span className="opening-intro__title-accent">
+            සේනාංකය
+          </span>
+        </h1>
+
+        <p className="opening-intro__subtitle">
+          ස්වභාවය • මනුෂ්‍යත්වය • වගකීම
+        </p>
+
+        <div className="opening-intro__loading">
+          <span className="opening-intro__loading-label">
+            SYSTEM INITIALIZATION
+          </span>
+          <div className="opening-intro__progress" />
+        </div>
+      </div>
+    </div>
   );
 }
