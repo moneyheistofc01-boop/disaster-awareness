@@ -15,13 +15,10 @@ export default function OpeningIntro() {
       if (!hasPlayed) {
         sessionStorage.setItem('sobasenankaya_dragon_intro', 'true'); 
         
-        // Background scroll වෙන එක නවත්තන්න
         document.body.style.overflow = 'hidden';
 
-        // තත්පර 5.5 කින් Fade Out Animation එක පටන් ගන්නවා
         const exitTimer = setTimeout(() => setIsExiting(true), 5500); 
         
-        // තත්පර 7 කින් සම්පූර්ණයෙන්ම අයින් වෙනවා
         const removeTimer = setTimeout(() => {
             setShow(false); 
             document.body.style.overflow = '';
@@ -53,7 +50,7 @@ export default function OpeningIntro() {
             inset: 0, 
             width: '100vw',
             height: '100dvh',
-            background: '#020202', // Deep Dark Background
+            background: '#030102', // Very dark background to pop the fire
             zIndex: 2147483647,
             display: 'flex',
             flexDirection: 'column',
@@ -68,13 +65,13 @@ export default function OpeningIntro() {
             .mystic-glow {
               position: absolute;
               inset: 0;
-              background: radial-gradient(circle at 30% 70%, rgba(255, 0, 60, 0.1) 0%, transparent 50%),
-                          radial-gradient(circle at 70% 30%, rgba(0, 119, 255, 0.1) 0%, transparent 50%),
-                          #020202;
+              background: radial-gradient(circle at 35% 65%, rgba(255, 0, 40, 0.08) 0%, transparent 55%),
+                          radial-gradient(circle at 65% 35%, rgba(0, 85, 255, 0.08) 0%, transparent 55%),
+                          #030102;
               z-index: 1;
             }
 
-            /* --- FLOATING FIREFLIES / SPARKS --- */
+            /* --- FLOATING FIRE SPARKS --- */
             .particles-container {
               position: absolute;
               inset: 0;
@@ -86,7 +83,7 @@ export default function OpeningIntro() {
             .firefly {
               position: absolute;
               border-radius: 50%;
-              animation: floatMagic 6s ease-in-out infinite alternate;
+              animation: floatMagic 3s ease-in-out infinite alternate;
             }
 
             .f-red {
@@ -103,94 +100,92 @@ export default function OpeningIntro() {
 
             @keyframes floatMagic {
               0% { transform: translate(0, 0) scale(0.8); opacity: 0.3; }
-              50% { opacity: 0.9; }
-              100% { transform: translate(30px, -50px) scale(1.3); opacity: 0.3; }
+              50% { opacity: 1; }
+              100% { transform: translate(40px, -80px) scale(1.4); opacity: 0; }
             }
 
-            /* --- EPIC RED & BLUE FLUID FLAME EFFECT (Like the Video) --- */
+            /* --- EPIC RED & BLUE FIRE VORTEX --- */
             .logo-wrapper {
               position: relative;
-              width: 200px;
-              height: 200px;
+              width: 210px;
+              height: 210px;
               display: flex;
               align-items: center;
               justify-content: center;
               border-radius: 50%;
               z-index: 10;
-              margin-bottom: 30px;
+              margin-bottom: 35px;
             }
 
-            /* Deep Blue Plasma Flame */
-            .plasma-blue {
+            .fire-vortex {
               position: absolute;
-              inset: -35px -10px -35px -55px; /* Offset to the left */
-              background: #0055ff;
-              border-radius: 45% 55% 40% 60% / 55% 45% 60% 40%;
-              filter: blur(25px);
-              animation: flowBlue 4s linear infinite;
+              inset: -50px;
+              z-index: 1;
+              filter: blur(14px); /* Blurs the shapes to look like fluid fire */
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+
+            /* Deep Red Leaping Flames */
+            .flame-red-main {
+              position: absolute;
+              inset: 0px;
+              background: linear-gradient(45deg, #8b0000, #ff002b);
               mix-blend-mode: screen;
-              z-index: 2;
-              opacity: 0.85;
+              box-shadow: 0 0 40px #ff002b;
+              animation: morphSpin1 3s linear infinite;
             }
 
-            /* Intense Red Plasma Flame */
-            .plasma-red {
+            /* Blue Leaping Flames */
+            .flame-blue-main {
               position: absolute;
-              inset: -10px -55px -35px -10px; /* Offset to the right */
-              background: #ff003c;
-              border-radius: 55% 45% 60% 40% / 45% 55% 40% 60%;
-              filter: blur(25px);
-              animation: flowRed 5s linear infinite;
+              inset: 10px -15px -15px 10px;
+              background: linear-gradient(45deg, #001188, #0055ff);
               mix-blend-mode: screen;
-              z-index: 3;
-              opacity: 0.85;
+              box-shadow: 0 0 40px #0055ff;
+              animation: morphSpin2 4s linear infinite;
             }
 
-            /* Bright Cyan/Blue Core Highlights */
-            .plasma-cyan {
+            /* Bright Red/Orange Core Fire */
+            .flame-red-core {
               position: absolute;
-              inset: -45px 15px 15px -45px;
+              inset: 25px -10px 15px 25px;
+              background: #ff3333;
+              mix-blend-mode: screen;
+              animation: morphSpin2 2.2s linear infinite;
+            }
+
+            /* Bright Cyan/Blue Core Fire */
+            .flame-blue-core {
+              position: absolute;
+              inset: -10px 25px 25px -10px;
               background: #00c3ff;
-              border-radius: 50%;
-              filter: blur(30px);
-              opacity: 0.6;
-              animation: flowBlue 3s linear infinite reverse;
-              z-index: 1;
+              mix-blend-mode: screen;
+              animation: morphSpin1 2.5s linear infinite;
             }
 
-            /* Bright Orange/Red Core Highlights */
-            .plasma-orange {
+            /* Core solid ring to hold the logo */
+            .logo-base-ring {
               position: absolute;
-              inset: 15px -45px -45px 15px;
-              background: #ff4d6d;
+              inset: -6px;
               border-radius: 50%;
-              filter: blur(30px);
-              opacity: 0.6;
-              animation: flowRed 4s linear infinite reverse;
-              z-index: 1;
-            }
-
-            /* The Ring Core separating flames from the logo */
-            .flame-core-ring {
-              position: absolute;
-              inset: -8px;
-              border-radius: 50%;
-              border: 2px solid rgba(255, 255, 255, 0.1);
-              box-shadow: -15px -15px 40px rgba(0, 119, 255, 0.6), 15px 15px 40px rgba(255, 0, 60, 0.6);
+              border: 2px solid rgba(255, 255, 255, 0.2);
+              box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 0 20px rgba(255,0,60,0.6);
               z-index: 4;
             }
 
-            /* Animations for Fluid Shape Shifting & Spinning */
-            @keyframes flowBlue {
-              0% { transform: rotate(0deg) scale(0.9); border-radius: 45% 55% 40% 60% / 55% 45% 60% 40%; }
-              50% { transform: rotate(180deg) scale(1.1); border-radius: 60% 40% 55% 45% / 40% 60% 45% 55%; }
-              100% { transform: rotate(360deg) scale(0.9); border-radius: 45% 55% 40% 60% / 55% 45% 60% 40%; }
+            /* Morphing & Spinning Keyframes for the Fire */
+            @keyframes morphSpin1 {
+              0% { transform: rotate(0deg) scale(1); border-radius: 60% 40% 50% 50% / 40% 50% 50% 60%; }
+              50% { transform: rotate(180deg) scale(1.15); border-radius: 40% 60% 40% 60% / 50% 40% 60% 50%; }
+              100% { transform: rotate(360deg) scale(1); border-radius: 60% 40% 50% 50% / 40% 50% 50% 60%; }
             }
 
-            @keyframes flowRed {
-              0% { transform: rotate(360deg) scale(1.1); border-radius: 55% 45% 60% 40% / 45% 55% 40% 60%; }
-              50% { transform: rotate(180deg) scale(0.9); border-radius: 40% 60% 45% 55% / 60% 40% 55% 45%; }
-              100% { transform: rotate(0deg) scale(1.1); border-radius: 55% 45% 60% 40% / 45% 55% 40% 60%; }
+            @keyframes morphSpin2 {
+              0% { transform: rotate(360deg) scale(1.15); border-radius: 50% 50% 60% 40% / 60% 40% 50% 50%; }
+              50% { transform: rotate(180deg) scale(1); border-radius: 40% 60% 50% 50% / 50% 60% 40% 50%; }
+              100% { transform: rotate(0deg) scale(1.15); border-radius: 50% 50% 60% 40% / 60% 40% 50% 50%; }
             }
 
             .main-logo {
@@ -200,9 +195,9 @@ export default function OpeningIntro() {
               border-radius: 50%;
               position: relative;
               z-index: 8;
-              box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+              box-shadow: inset 0 0 30px rgba(0,0,0,1);
               background: #020202;
-              border: 2px solid rgba(255, 255, 255, 0.15);
+              border: 2px solid rgba(255, 255, 255, 0.1);
             }
 
             /* --- TYPOGRAPHY --- */
@@ -266,20 +261,19 @@ export default function OpeningIntro() {
               height: 6px;
               border-radius: 50%;
               background: #00c3ff;
-              box-shadow: 0 0 10px #00c3ff;
-              animation: pulseBlue 1s infinite alternate;
+              box-shadow: 0 0 10px #00c3ff, 0 0 20px #ff003c;
+              animation: pulseBlueRed 1s infinite alternate;
             }
 
-            @keyframes pulseBlue {
-              from { opacity: 0.4; transform: scale(0.8); }
-              to { opacity: 1; transform: scale(1.3); }
+            @keyframes pulseBlueRed {
+              from { opacity: 0.4; transform: scale(0.8); background: #00c3ff; }
+              to { opacity: 1; transform: scale(1.3); background: #ff003c; }
             }
 
             /* --- RESPONSIVE --- */
             @media (max-width: 768px) {
-              .logo-wrapper { width: 160px; height: 160px; margin-bottom: 30px; }
-              .plasma-blue { inset: -25px -5px -25px -40px; }
-              .plasma-red { inset: -5px -40px -25px -5px; }
+              .logo-wrapper { width: 170px; height: 170px; margin-bottom: 30px; }
+              .fire-vortex { inset: -35px; }
               .tagline { flex-direction: column; gap: 8px; letter-spacing: 0.2em; }
               .tagline .dot { display: none; }
             }
@@ -289,28 +283,33 @@ export default function OpeningIntro() {
           <div className="mystic-glow" />
           
           <div className="particles-container">
-            <div className="firefly f-red" style={{ left: '20%', top: '30%', animationDelay: '0s' }} />
-            <div className="firefly f-blue" style={{ left: '80%', top: '60%', animationDelay: '1s' }} />
-            <div className="firefly f-red" style={{ left: '70%', top: '20%', animationDelay: '2s' }} />
-            <div className="firefly f-blue" style={{ left: '30%', top: '70%', animationDelay: '1.5s' }} />
-            <div className="firefly f-red" style={{ left: '50%', top: '80%', animationDelay: '0.5s' }} />
+            {/* Fire sparks flying around */}
+            <div className="firefly f-red" style={{ left: '25%', top: '35%', animationDelay: '0s' }} />
+            <div className="firefly f-blue" style={{ left: '75%', top: '55%', animationDelay: '1s' }} />
+            <div className="firefly f-red" style={{ left: '65%', top: '25%', animationDelay: '2s' }} />
+            <div className="firefly f-blue" style={{ left: '35%', top: '65%', animationDelay: '1.5s' }} />
+            <div className="firefly f-red" style={{ left: '50%', top: '75%', animationDelay: '0.5s' }} />
           </div>
 
           {/* Main Content */}
           <div className="content-container">
             
-            {/* Animated Fluid Red & Blue Flame Logo */}
+            {/* Animated Vortex Fire Logo */}
             <motion.div 
               className="logo-wrapper"
               initial={{ scale: 0.6, opacity: 0, filter: "blur(20px)" }}
               animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
               transition={{ duration: 1.8, ease: "easeOut" }}
             >
-              <div className="plasma-cyan" />
-              <div className="plasma-orange" />
-              <div className="plasma-blue" />
-              <div className="plasma-red" />
-              <div className="flame-core-ring" />
+              {/* Layered Fire effect */}
+              <div className="fire-vortex">
+                <div className="flame-red-main" />
+                <div className="flame-blue-main" />
+                <div className="flame-red-core" />
+                <div className="flame-blue-core" />
+              </div>
+              
+              <div className="logo-base-ring" />
               
               <img 
                 src="/logo.png" 
