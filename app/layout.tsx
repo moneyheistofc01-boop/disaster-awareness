@@ -179,26 +179,76 @@ export default function RootLayout({
       lang="si"
       suppressHydrationWarning
     >
+      <head>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              html {
+                background: #000;
+              }
+
+              html,
+              body {
+                width: 100%;
+                min-height: 100%;
+                margin: 0;
+                padding: 0;
+              }
+
+              body {
+                overflow-x: hidden;
+                background: #000;
+              }
+
+              body:has(.opening-intro) {
+                overflow: hidden !important;
+                overscroll-behavior: none !important;
+                background: #000 !important;
+              }
+
+              body:has(.opening-intro) #site-content {
+                visibility: hidden !important;
+                pointer-events: none !important;
+                user-select: none !important;
+              }
+
+              #site-content {
+                min-height: 100vh;
+                width: 100%;
+              }
+
+              @media (prefers-reduced-motion: reduce) {
+                html,
+                body {
+                  scroll-behavior: auto;
+                }
+              }
+            `,
+          }}
+        />
+      </head>
+
       <body
         className="
           min-h-screen
           overflow-x-hidden
-          bg-[#f6f9f7]
+          bg-black
           text-slate-900
           antialiased
-          transition-colors
-          duration-300
-          dark:bg-[#06100c]
+          dark:bg-black
           dark:text-white
         "
       >
         <ThemeProviderContext>
           <LanguageProvider>
             <IntroAnimation />
-            <Header />
-            {children}
-            <Footer />
-            <ShareButton />
+
+            <div id="site-content">
+              <Header />
+              {children}
+              <Footer />
+              <ShareButton />
+            </div>
           </LanguageProvider>
         </ThemeProviderContext>
       </body>
