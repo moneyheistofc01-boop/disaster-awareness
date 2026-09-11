@@ -6,8 +6,6 @@ import {
   ArrowUpRight,
   Leaf,
   ShieldCheck,
-  Facebook,
-  Youtube,
 } from "lucide-react";
 
 export default function Footer() {
@@ -241,7 +239,15 @@ export default function Footer() {
                   hover:bg-[#1877F2]/20
                 "
               >
-                <Facebook size={18} aria-hidden="true" />
+                <svg
+                  viewBox="0 0 24 24"
+                  width="18"
+                  height="18"
+                  aria-hidden="true"
+                  fill="currentColor"
+                >
+                  <path d="M14 8h3V4h-3c-3.31 0-5 1.69-5 5v3H6v4h3v6h4v-6h3l1-4h-4V9c0-.67.33-1 1-1Z" />
+                </svg>
                 <span>Facebook</span>
               </a>
 
@@ -259,7 +265,15 @@ export default function Footer() {
                   hover:bg-[#FF0000]/20
                 "
               >
-                <Youtube size={19} aria-hidden="true" />
+                <svg
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  aria-hidden="true"
+                  fill="currentColor"
+                >
+                  <path d="M23.5 6.2a3 3 0 0 0-2.12-2.12C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.58A3 3 0 0 0 .5 6.2 31.3 31.3 0 0 0 0 12a31.3 31.3 0 0 0 .5 5.8 3 3 0 0 0 2.12 2.12C4.5 20.5 12 20.5 12 20.5s7.5 0 9.38-.58a3 3 0 0 0 2.12-2.12A31.3 31.3 0 0 0 24 12a31.3 31.3 0 0 0-.5-5.8ZM9.75 15.5v-7L16 12l-6.25 3.5Z" />
+                </svg>
                 <span>YouTube</span>
               </a>
             </div>
