@@ -497,7 +497,7 @@ function ExpandCard({
               duration: 0.3,
             }}
           >
-            <div className="border-t border-slate-100 px-5 pb-6 pt-5 text-sm leading-8 text-slate-600 dark:border-white/5 dark:text-slate-300 sm:px-6 sm:text-base">
+            <div className="border-t border-slate-100 px-5 pb-6 pt-5 text-sm leading-8 text-slate-600 dark:border-white/5 dark:text-slate-100 sm:px-6 sm:text-base">
               {content}
             </div>
           </motion.div>
@@ -891,11 +891,6 @@ export default function HomePage() {
 
   return (
     <main className="relative min-h-screen w-full overflow-x-hidden bg-[#06110c] text-slate-900 dark:text-white">
-      {/* =====================================================
-          PAGE-LEVEL FIXED WATERFALL WALLPAPER
-          Static only: no video/GIF, no scroll listener and no
-          continuous transform/opacity animation.
-      ====================================================== */}
 
       <div
         aria-hidden="true"
@@ -917,7 +912,7 @@ export default function HomePage() {
 
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-[1] bg-[#03130d]/72"
+        className="pointer-events-none fixed inset-0 z-[1] bg-[#03130d]/82"
       />
 
       <div
@@ -926,19 +921,13 @@ export default function HomePage() {
       />
 
       <div className="relative z-10">
-        {/* =====================================================
-          HERO
-      ====================================================== */}
 
       <section className="relative isolate min-h-[560px] overflow-hidden sm:min-h-[700px]">
-        {/* Lightweight static hero accent */}
         <div className="pointer-events-none absolute left-[-80px] top-[20%] -z-10 h-56 w-56 rounded-full bg-emerald-400/10 blur-3xl" />
-
-        {/* Less vertical space under header */}
         <div className="mx-auto flex min-h-[560px] w-full max-w-7xl items-center px-5 pb-14 pt-8 sm:min-h-[700px] sm:px-8 sm:pt-12 lg:px-10">
           <div className="w-full max-w-5xl">
             <Reveal>
-              <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/10 px-3 py-2 pr-4 text-sm font-bold text-white"
+              <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-white/15 bg-[#071a13]/92 px-3 py-2 pr-4 text-sm font-bold text-white"
               >
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-400/10">
                   <img
@@ -1006,7 +995,7 @@ export default function HomePage() {
             </Reveal>
 
             <Reveal delay={0.16}>
-              <p className="mt-6 max-w-2xl text-sm leading-7 text-white/75 sm:text-base sm:leading-8">
+              <p className="mt-6 max-w-2xl text-sm leading-7 text-white/88 sm:text-base sm:leading-8">
                 {lang ===
                 "si"
                   ? "ස්වභාවධර්මය සුරැකීම යනු පරිසරය සුරැකීම පමණක් නොව, මනුෂ්‍යත්වයේ අනාගතය සුරැකීමයි."
@@ -1033,7 +1022,7 @@ export default function HomePage() {
 
                 <a
                   href="#comments"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white/15"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-[#071a13]/92 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white/15"
                 >
                   <MessageCircle size={17} />
 
@@ -1052,21 +1041,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* =====================================================
-          INTRO
-      ====================================================== */}
-
       <section
         id="about"
         className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 sm:py-16 lg:px-10"
       >
         <Reveal className="mx-auto w-full max-w-5xl">
-          <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-[#071b13]/92 shadow-[0_25px_90px_rgba(0,0,0,0.22)] dark:border-white/10 dark:bg-[#07150f]/65">
-            {/* Letter top decoration */}
+          <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-[#071b13]/96 shadow-[0_25px_90px_rgba(0,0,0,0.22)] dark:border-white/10 dark:bg-[#06140d]/94">
             <div className="absolute left-0 right-0 top-0 h-1.5 bg-gradient-to-r from-emerald-700 via-emerald-400 to-emerald-700" />
 
             <div className="px-6 py-8 sm:px-10 sm:py-11 lg:px-16 lg:py-14">
-              {/* Heading */}
               <div className="mx-auto max-w-3xl text-center">
                 <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                   <Leaf size={14} />
@@ -1086,11 +1069,8 @@ export default function HomePage() {
 
                 <div className="mx-auto mt-5 h-px w-20 bg-emerald-300 dark:bg-emerald-500/40" />
               </div>
-
-              {/* Letter */}
-              <div className="mx-auto mt-9 max-w-3xl">
-                <div className="relative rounded-[28px] border border-white/10 bg-[#081a13]/90 px-6 py-8 shadow-inner dark:border-white/10 dark:bg-white/[0.028] sm:px-10 sm:py-10">
-                  {/* Paper styling */}
+              <div className="mx-auto mt-8 w-full max-w-3xl">
+                <div className="relative rounded-[28px] border border-white/10 bg-[#071710]/97 px-6 py-8 shadow-inner dark:border-white/10 dark:bg-[#0a1a13]/93 sm:px-10 sm:py-10">
                   <div className="pointer-events-none absolute inset-0 rounded-[28px] bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.045),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.035),transparent_30%)]" />
 
                   <div className="relative">
@@ -1101,7 +1081,7 @@ export default function HomePage() {
                           : "max-h-[520px]"
                       }`}
                     >
-                      <div className="whitespace-pre-line text-[14px] leading-[1.9] tracking-[0.005em] text-slate-100/90 dark:text-slate-200 sm:text-base sm:leading-[2.15]">
+                      <div className="whitespace-pre-line text-[14px] leading-[2.05] tracking-[0.001em] text-slate-100/90 dark:text-slate-200 sm:text-base sm:leading-[2.05]">
                         {text(
                           introductionLetter,
                           lang
@@ -1109,11 +1089,9 @@ export default function HomePage() {
                       </div>
 
                       {!introExpanded && (
-                        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#07150f]/95 via-[#07150f]/78 to-transparent" />
+                        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#071710]/98 via-[#071710]/88 to-transparent" />
                       )}
                     </div>
-
-                    {/* Read More */}
                     <div className="relative mt-5 flex justify-center">
                       <motion.button
                         type="button"
@@ -1163,8 +1141,6 @@ export default function HomePage() {
                         </motion.span>
                       </motion.button>
                     </div>
-
-                    {/* Final Facebook Join */}
                     <AnimatePresence>
                       {introExpanded && (
                         <motion.div
@@ -1186,7 +1162,7 @@ export default function HomePage() {
                           }}
                           className="mt-9"
                         >
-                          <div className="mx-auto h-px max-w-md bg-slate-200 dark:bg-white/10" />
+                          <div className="mx-auto h-px max-w-md bg-slate-200 dark:bg-[#071a13]/92" />
 
                           <div className="pt-8 text-center">
                             <p className="text-sm font-bold leading-7 text-slate-500 dark:text-slate-400 sm:text-base">
@@ -1238,9 +1214,7 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-
-              {/* Existing intro highlight kept */}
-              <div className="mx-auto mt-7 max-w-3xl rounded-[26px] border border-emerald-300/15 bg-[#063424]/88 p-5 dark:border-emerald-400/10 dark:bg-emerald-500/[0.06]">
+              <div className="mx-auto mt-7 max-w-3xl rounded-[26px] border border-emerald-300/15 bg-[#063424]/88 p-5 dark:border-emerald-400/10 dark:bg-[#07261a]/94">
                 <div className="flex items-start justify-center gap-4 text-center">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
                     <HeartHandshake size={22} />
@@ -1258,10 +1232,6 @@ export default function HomePage() {
           </div>
         </Reveal>
       </section>
-
-      {/* =====================================================
-          FOUNDATION
-      ====================================================== */}
 
       <section className="relative w-full overflow-hidden bg-transparent py-10 sm:py-20">
         <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">
@@ -1329,10 +1299,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* =====================================================
-          OBJECTIVES
-      ====================================================== */}
-
       <section
         id="objectives"
         className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 sm:py-16 lg:px-10"
@@ -1375,7 +1341,7 @@ export default function HomePage() {
                     />
                   </div>
 
-                  <p className="text-sm leading-8 text-slate-100/85 dark:text-slate-200 sm:text-base">
+                  <p className="text-sm leading-8 text-slate-100/93 dark:text-slate-200 sm:text-base">
                     {text(
                       item,
                       lang
@@ -1387,10 +1353,6 @@ export default function HomePage() {
           )}
         </div>
       </section>
-
-      {/* =====================================================
-          ACTION STRUCTURE
-      ====================================================== */}
 
       <section
         id="action"
@@ -1409,7 +1371,7 @@ export default function HomePage() {
                 : "Action Structure"}
             </h2>
 
-            <p className="mt-4 text-sm leading-8 text-emerald-50/70 sm:text-base">
+            <p className="mt-4 text-sm leading-8 text-emerald-50/86 sm:text-base">
               {lang ===
               "si"
                 ? "ස්වභාවධර්මය වෙනුවෙන් වෙනස පුද්ගලයාගෙන් ආරම්භ වී සමාජය දක්වා ගමන් කරයි."
@@ -1493,7 +1455,7 @@ export default function HomePage() {
                         }
                       </h3>
 
-                      <p className="mt-3 text-sm leading-8 text-emerald-50/70">
+                      <p className="mt-3 text-sm leading-8 text-emerald-50/86">
                         {
                           item.text
                         }
@@ -1506,10 +1468,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* =====================================================
-          MEMBERSHIP
-      ====================================================== */}
 
       <section
         id="membership"
@@ -1532,7 +1490,7 @@ export default function HomePage() {
                   : "Become a Guardian of Nature"}
               </h2>
 
-              <p className="mt-5 max-w-2xl text-sm leading-8 text-slate-100/85 dark:text-slate-200 sm:text-base">
+              <p className="mt-5 max-w-2xl text-sm leading-8 text-slate-100/93 dark:text-slate-200 sm:text-base">
                 {lang ===
                 "si"
                   ? "ස්වභාවධර්මය ආරක්ෂා කිරීමේ වගකීම පිළිගන්නා ඕනෑම ශ්‍රී ලාංකිකයෙකුට මෙම මෙහෙවරට එක්විය හැක."
@@ -1564,7 +1522,7 @@ export default function HomePage() {
                         />
                       </div>
 
-                      <p className="text-sm leading-8 text-slate-100/85 dark:text-slate-200">
+                      <p className="text-sm leading-8 text-slate-100/93 dark:text-slate-200">
                         {text(
                           item,
                           lang
@@ -1578,7 +1536,7 @@ export default function HomePage() {
           </div>
 
           <Reveal delay={0.1}>
-            <div className="rounded-[32px] border border-emerald-300/15 bg-[#063424]/88 p-6 dark:border-emerald-400/10 dark:bg-emerald-500/[0.055] sm:p-8">
+            <div className="rounded-[32px] border border-emerald-300/15 bg-[#063424]/88 p-6 dark:border-emerald-400/10 dark:bg-[#07261a]/94 sm:p-8">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
                   <ShieldCheck
@@ -1594,7 +1552,7 @@ export default function HomePage() {
                 </h3>
               </div>
 
-              <div className="mt-7 rounded-[24px] border border-emerald-200/15 bg-[#081a13]/90 p-5 dark:border-emerald-400/10 dark:bg-white/[0.025] sm:p-7">
+              <div className="mt-7 rounded-[24px] border border-emerald-200/15 bg-[#071710]/97 p-5 dark:border-emerald-400/10 dark:bg-[#0a1a13]/93 sm:p-7">
                 <p className="whitespace-pre-line text-sm leading-8 text-slate-700 dark:text-slate-300 sm:text-base sm:leading-9">
                   {text(
                     pledge,
@@ -1647,13 +1605,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* =====================================================
-          MESSAGE OF NATURE
-      ====================================================== */}
-
       <section
         id="message"
-        className="relative w-full overflow-hidden bg-slate-100/30 py-16 dark:bg-black/25 sm:py-24"
+        className="relative w-full overflow-hidden bg-[#06140d]/82 py-16 dark:bg-[#06140d]/90 sm:py-24"
       >
         <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
           <Reveal>
@@ -1684,8 +1638,6 @@ export default function HomePage() {
           <Reveal delay={0.06}>
             <LatestAnnouncements />
           </Reveal>
-
-          {/* Interactive subfolders */}
           <div className="mt-9 grid gap-4 sm:grid-cols-2">
             {messageFolders.map(
               (
@@ -1710,7 +1662,7 @@ export default function HomePage() {
                     }
                   >
                     <div
-                      className={`overflow-hidden rounded-[28px] border bg-white shadow-[0_14px_45px_rgba(15,23,42,0.05)] transition-colors dark:bg-white/[0.035] ${
+                      className={`overflow-hidden rounded-[28px] border bg-white shadow-[0_14px_45px_rgba(15,23,42,0.05)] transition-colors dark:bg-[#0a1a13]/93 ${
                         open
                           ? "border-emerald-300 dark:border-emerald-400/20"
                           : "border-slate-200 dark:border-white/10"
@@ -1786,7 +1738,7 @@ export default function HomePage() {
                             }}
                           >
                             <div className="border-t border-slate-100 px-5 pb-6 pt-5 dark:border-white/5">
-                              <p className="text-sm leading-8 text-slate-100/85 dark:text-slate-200 sm:text-base">
+                              <p className="text-sm leading-8 text-slate-100/93 dark:text-slate-200 sm:text-base">
                                 {
                                   item.content
                                 }
@@ -1803,10 +1755,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* =====================================================
-          LIVE COMMENTS
-      ====================================================== */}
 
       <section
         id="comments"
@@ -1831,7 +1779,7 @@ export default function HomePage() {
                 : "Ideas & Suggestions"}
             </h2>
 
-            <p className="mt-5 max-w-xl text-sm leading-8 text-slate-100/85 dark:text-slate-200 sm:text-base">
+            <p className="mt-5 max-w-xl text-sm leading-8 text-slate-100/93 dark:text-slate-200 sm:text-base">
               {lang ===
               "si"
                 ? "ඔබේ අදහසක්, යෝජනාවක් හෝ ස්වභාවධර්මය වෙනුවෙන් කළ හැකි ක්‍රියාවක් අප සමඟ බෙදාගන්න. ඔබ එක් කරන අදහස දාපු ගමන්ම සජීවීව පෙන්වනු ලැබේ."
@@ -1867,7 +1815,7 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal delay={0.08}>
-            <div className="rounded-[30px] border border-slate-200 bg-white p-4 shadow-[0_20px_70px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/[0.035] sm:p-6">
+            <div className="rounded-[30px] border border-slate-200 bg-white p-4 shadow-[0_20px_70px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-[#0a1a13]/93 sm:p-6">
               <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-4 dark:border-white/5">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
@@ -1960,7 +1908,7 @@ export default function HomePage() {
                             opacity: 1,
                             y: 0,
                           }}
-                          className="rounded-[24px] border border-slate-200/80 bg-slate-50/70 p-4 dark:border-white/5 dark:bg-white/[0.025]"
+                          className="rounded-[24px] border border-slate-200/80 bg-slate-50/70 p-4 dark:border-white/5 dark:bg-[#0a1a13]/93"
                         >
                           <div className="flex items-start gap-3">
                             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
@@ -1988,7 +1936,7 @@ export default function HomePage() {
                                 )}
                               </div>
 
-                              <p className="mt-2 break-words text-sm leading-7 text-slate-100/85 dark:text-slate-200">
+                              <p className="mt-2 break-words text-sm leading-7 text-slate-100/93 dark:text-slate-200">
                                 {
                                   comment.comment
                                 }
@@ -2022,10 +1970,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* =====================================================
-          SOCIAL LINKS
-      ====================================================== */}
-
       <section className="mx-auto w-full max-w-7xl px-5 pb-8 sm:px-8 sm:pb-16 lg:px-10">
         <div className="grid gap-4 sm:grid-cols-2">
           <Reveal>
@@ -2035,7 +1979,7 @@ export default function HomePage() {
               }
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center justify-between rounded-[26px] border border-slate-200/70 bg-white/75 p-5 shadow-sm transition hover:-translate-y-1 dark:border-white/10 dark:bg-black/25"
+              className="group flex items-center justify-between rounded-[26px] border border-slate-200/70 bg-[#eef5f1]/96 p-5 shadow-sm transition hover:-translate-y-1 dark:border-white/10 dark:bg-[#06140d]/90"
             >
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#1877F2]/10 text-[#1877F2] dark:bg-[#1877F2]/15 dark:text-[#4c9cff]">
@@ -2079,7 +2023,7 @@ export default function HomePage() {
               href="#"
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center justify-between rounded-[26px] border border-slate-200/70 bg-white/75 p-5 shadow-sm transition hover:-translate-y-1 dark:border-white/10 dark:bg-black/25"
+              className="group flex items-center justify-between rounded-[26px] border border-slate-200/70 bg-[#eef5f1]/96 p-5 shadow-sm transition hover:-translate-y-1 dark:border-white/10 dark:bg-[#06140d]/90"
             >
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FF0000]/10 text-[#FF0000] dark:bg-[#FF0000]/15 dark:text-[#ff4d4d]">
@@ -2123,10 +2067,6 @@ export default function HomePage() {
           </Reveal>
         </div>
       </section>
-
-      {/* =====================================================
-          FOOTER
-      ====================================================== */}
 
       <footer className="border-t border-white/10 bg-[#020b07]/95 px-5 py-9 text-white sm:px-8 lg:px-10">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
@@ -2172,10 +2112,6 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
-
-      {/* =====================================================
-          COMMENT MODAL
-      ====================================================== */}
 
       <AnimatePresence>
         {commentModalOpen && (
@@ -2369,7 +2305,7 @@ export default function HomePage() {
                     disabled={
                       commentSubmitting
                     }
-                    className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-slate-300 transition hover:bg-white/10 disabled:opacity-50"
+                    className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-slate-300 transition hover:bg-[#071a13]/92 disabled:opacity-50"
                   >
                     {lang ===
                     "si"
