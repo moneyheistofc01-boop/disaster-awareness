@@ -399,7 +399,8 @@ function MusicPlayer() {
     const audio = new Audio('/eco-music.mp3');
     audio.preload = 'auto';
     audio.loop = true;
-    audio.volume = 0.075;
+    audio.autoplay = true;
+    audio.volume = 0.06;
     audioRef.current = audio;
 
     const syncPlayback = () => {
@@ -424,6 +425,8 @@ function MusicPlayer() {
     };
 
     const tryPlay = () => {
+      if (!audio.paused) return;
+
       audio.play().catch(() => undefined);
     };
 
@@ -483,7 +486,7 @@ function MusicPlayer() {
 
   return (
     <>
-      <div className="fixed right-3 top-[73px] z-[450] hidden md:block sm:right-5 sm:top-[79px]">
+      <div data-music-player className="fixed right-3 top-[73px] z-[450] hidden md:block sm:right-5 sm:top-[79px]">
         <div className="music-player-shell flex items-center gap-1 rounded-full border border-emerald-300/20 bg-[#06160f]/96 p-1.5 shadow-[0_14px_38px_rgba(0,0,0,0.28)]">
           <button
             type="button"
@@ -1135,6 +1138,26 @@ export default function HomePage() {
         className="pointer-events-none fixed inset-0 z-[2] bg-[radial-gradient(circle_at_50%_30%,rgba(16,185,129,0.09),transparent_38%)]"
       />
 
+      <style jsx global>{`
+        #message [style*="touch-action"] {
+          touch-action: auto !important;
+          overscroll-behavior-y: auto;
+          overscroll-behavior-x: contain;
+        }
+
+        html,
+        body {
+          overflow-x: hidden;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .music-player-shell *,
+          [data-music-player] * {
+            animation: none !important;
+          }
+        }
+      `}</style>
+
       <div className="relative z-10">
 
       <section className="relative isolate min-h-[560px] overflow-hidden sm:min-h-[700px]">
@@ -1518,15 +1541,15 @@ export default function HomePage() {
         id="objectives"
         className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 sm:py-16 lg:px-10"
       >
-        <Reveal>
-          <span className="text-sm font-black uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
+        <Reveal className="mx-auto w-full max-w-3xl text-center">
+          <span className="text-center text-sm font-black uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
             {lang ===
             "si"
               ? "අපගේ අරමුණු"
               : "Our Objectives"}
           </span>
 
-          <h2 className="mt-3 break-words text-[clamp(1.75rem,7vw,2.35rem)] font-black leading-tight tracking-tight sm:text-4xl">
+          <h2 className="mt-3 text-center break-words text-[clamp(1.75rem,7vw,2.35rem)] font-black leading-tight tracking-tight sm:text-4xl">
             {lang ===
             "si"
               ? "ස්වභාවික සමතුලිතතාව වෙනුවෙන්"
