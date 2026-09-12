@@ -4,6 +4,7 @@ import {
   FormEvent,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -389,106 +390,213 @@ I have joined. What about you...?`,
 };
 
 
-function MusicControl() {
-  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+function MusicPlayer() {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
 
   useEffect(() => {
-    const audio = new Audio("/eco-music.mp3");
+    const audio = new Audio('/eco-music.mp3');
+    audio.preload = 'auto';
     audio.loop = true;
-    audio.preload = "auto";
-    audio.volume = 0.10;
+    audio.volume = 0.075;
     audioRef.current = audio;
 
-    const start = () => {
-      audio.muted = false;
-      audio.play().then(() => setPlaying(true)).catch(() => {});
-      window.removeEventListener("pointerdown", start);
-      window.removeEventListener("touchstart", start);
-      window.removeEventListener("keydown", start);
+    const syncPlayback = () => {
+      setPlaying(!audio.paused);
+      setMuted(audio.muted);
     };
 
-    audio.play()
-      .then(() => setPlaying(true))
-      .catch(() => {
-        window.addEventListener("pointerdown", start, { once: true, passive: true });
-        window.addEventListener("touchstart", start, { once: true, passive: true });
-        window.addEventListener("keydown", start, { once: true });
-      });
+    const handleTimeUpdate = () => {
+      if (!Number.isFinite(audio.duration) || audio.duration <= 0) {
+        return;
+      }
+
+      const fadeDuration = 2.2;
+      const fromEnd = audio.duration - audio.currentTime;
+      const edgeFactor = Math.min(
+        1,
+        audio.currentTime / fadeDuration,
+        fromEnd / fadeDuration
+      );
+
+      audio.volume = 0.008 + 0.067 * Math.max(0, edgeFactor);
+    };
+
+    const tryPlay = () => {
+      audio.play().catch(() => undefined);
+    };
+
+    audio.addEventListener('play', syncPlayback);
+    audio.addEventListener('pause', syncPlayback);
+    audio.addEventListener('volumechange', syncPlayback);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+
+    tryPlay();
+
+    window.addEventListener('pointerdown', tryPlay, {
+      once: true,
+      passive: true,
+    });
+
+    window.addEventListener('touchstart', tryPlay, {
+      once: true,
+      passive: true,
+    });
+
+    window.addEventListener('keydown', tryPlay, {
+      once: true,
+    });
 
     return () => {
       audio.pause();
-      audio.src = "";
+      audio.currentTime = 0;
+      audio.removeEventListener('play', syncPlayback);
+      audio.removeEventListener('pause', syncPlayback);
+      audio.removeEventListener('volumechange', syncPlayback);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      window.removeEventListener('pointerdown', tryPlay);
+      window.removeEventListener('touchstart', tryPlay);
+      window.removeEventListener('keydown', tryPlay);
       audioRef.current = null;
-      window.removeEventListener("pointerdown", start);
-      window.removeEventListener("touchstart", start);
-      window.removeEventListener("keydown", start);
     };
   }, []);
 
-  const toggle = () => {
+  const togglePlayback = () => {
     const audio = audioRef.current;
     if (!audio) return;
 
     if (audio.paused) {
-      audio.play().then(() => setPlaying(true)).catch(() => {});
+      audio.play().catch(() => undefined);
     } else {
       audio.pause();
-      setPlaying(false);
     }
   };
 
   const toggleMute = () => {
     const audio = audioRef.current;
     if (!audio) return;
+
     audio.muted = !audio.muted;
     setMuted(audio.muted);
   };
 
   return (
-    <div className="fixed right-4 top-[calc(env(safe-area-inset-top)+84px)] z-[170] sm:right-6 sm:top-[92px]">
-      <div className="flex items-center gap-1.5 rounded-full border border-emerald-300/15 bg-[#071a13]/94 p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-md">
-        <button
-          type="button"
-          onClick={toggle}
-          aria-label={playing ? "Pause music" : "Play music"}
-          className={`relative flex h-11 w-11 items-center justify-center rounded-full border border-emerald-300/10 text-emerald-200 transition ${
-            playing ? "bg-emerald-400/15" : "bg-white/[0.04]"
-          }`}
-        >
-          <span className={`absolute inset-0 rounded-full border border-emerald-300/20 ${playing ? "animate-ping opacity-20" : "opacity-0"}`} />
-          {playing ? (
-            <svg viewBox="0 0 24 24" className="relative h-5 w-5 fill-current">
-              <path d="M7 5.8A1.8 1.8 0 0 1 9.8 4.3l7.7 5.9a2.2 2.2 0 0 1 0 3.5l-7.7 5.9A1.8 1.8 0 0 1 7 18.1V5.8Z" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" className="relative h-5 w-5 fill-current">
-              <path d="M6.5 5.2A1.7 1.7 0 0 1 9 3.8l9 6.2a2.4 2.4 0 0 1 0 4l-9 6.2a1.7 1.7 0 0 1-2.5-1.4V5.2Z" />
-            </svg>
-          )}
-        </button>
+    <>
+      <div className="fixed right-3 top-[73px] z-[450] sm:right-5 sm:top-[79px]">
+        <div className="music-player-shell flex items-center gap-1 rounded-full border border-emerald-300/20 bg-[#06160f]/96 p-1.5 shadow-[0_14px_38px_rgba(0,0,0,0.28)]">
+          <button
+            type="button"
+            onClick={togglePlayback}
+            aria-label={
+              playing ? 'Turn music off' : 'Turn music on'
+            }
+            title={
+              playing ? 'Turn music off' : 'Turn music on'
+            }
+            className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-emerald-300/15 text-emerald-200 transition-colors active:scale-95 ${
+              playing
+                ? 'bg-emerald-400/15'
+                : 'bg-white/[0.035]'
+            }`}
+          >
+            {playing ? (
+              <span className="relative flex h-5 items-end gap-[3px]">
+                <span className="h-2 w-[3px] rounded-full bg-emerald-200 animate-[musicPulse_0.75s_ease-in-out_infinite]" />
+                <span className="h-4 w-[3px] rounded-full bg-emerald-200 animate-[musicPulse_0.95s_ease-in-out_0.08s_infinite]" />
+                <span className="h-3 w-[3px] rounded-full bg-emerald-200 animate-[musicPulse_0.8s_ease-in-out_0.18s_infinite]" />
+                <span className="h-5 w-[3px] rounded-full bg-emerald-200 animate-[musicPulse_1.05s_ease-in-out_0.04s_infinite]" />
+              </span>
+            ) : (
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5 fill-none stroke-current"
+                strokeWidth="1.9"
+                aria-hidden="true"
+              >
+                <path d="M9 18V6l10-2v12" />
+                <circle cx="6" cy="18" r="3" />
+                <circle cx="16" cy="16" r="3" />
+              </svg>
+            )}
+          </button>
 
-        <button
-          type="button"
-          onClick={toggleMute}
-          aria-label={muted ? "Unmute music" : "Mute music"}
-          className="flex h-11 w-11 items-center justify-center rounded-full text-emerald-200/80 transition hover:bg-white/[0.04]"
-        >
-          {muted ? (
-            <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="1.8">
-              <path d="M4 10v4h4l5 4V6l-5 4H4Z" />
-              <path d="m17 9 4 6M21 9l-4 6" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="1.8">
-              <path d="M4 10v4h4l5 4V6l-5 4H4Z" />
-              <path d="M17 9.5a4 4 0 0 1 0 5M19.5 7a7.5 7.5 0 0 1 0 10" />
-            </svg>
-          )}
-        </button>
+          <button
+            type="button"
+            onClick={toggleMute}
+            aria-label={
+              muted ? 'Unmute music' : 'Mute music'
+            }
+            title={
+              muted ? 'Unmute music' : 'Mute music'
+            }
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-emerald-200/70 transition-colors active:scale-95 hover:bg-white/[0.04]"
+          >
+            {muted ? (
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5 fill-none stroke-current"
+                strokeWidth="1.8"
+                aria-hidden="true"
+              >
+                <path d="M4 9v6h4l5 4V5L8 9H4Z" />
+                <path d="m17 9 4 6M21 9l-4 6" />
+              </svg>
+            ) : (
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5 fill-none stroke-current"
+                strokeWidth="1.8"
+                aria-hidden="true"
+              >
+                <path d="M4 9v6h4l5 4V5L8 9H4Z" />
+                <path d="M17 9.5a4 4 0 0 1 0 5M19.5 7a7.5 7.5 0 0 1 0 10" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
-    </div>
+
+      <style jsx global>{`
+        .music-player-shell {
+          opacity: 0;
+          transform: translate3d(18px, -8px, 0) scale(0.92);
+          animation: musicPlayerAppear 0.75s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+
+        @keyframes musicPlayerAppear {
+          from {
+            opacity: 0;
+            transform: translate3d(18px, -8px, 0) scale(0.92);
+          }
+          to {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
+          }
+        }
+
+        @keyframes musicPulse {
+          0%,
+          100% {
+            transform: scaleY(0.45);
+            opacity: 0.68;
+          }
+          50% {
+            transform: scaleY(1);
+            opacity: 1;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .music-player-shell {
+            animation: none;
+            opacity: 1;
+            transform: none;
+          }
+        }
+      `}</style>
+    </>
   );
 }
 
@@ -529,7 +637,7 @@ function ExpandCard({
   return (
     <div
       id={id}
-      className="overflow-hidden rounded-[24px] border border-white/10 bg-[#071a13]/92 shadow-[0_14px_45px_rgba(0,0,0,0.18)]  "
+      className="overflow-hidden rounded-[24px] border border-white/10 bg-[#071a13]/92 shadow-[0_14px_45px_rgba(0,0,0,0.18)] dark:border-white/10 dark:bg-[#071a13]/58"
     >
       <button
         type="button"
@@ -558,12 +666,12 @@ function ExpandCard({
             transition={{
               duration: 0.4,
             }}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700  "
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
           >
             <Icon size={22} />
           </motion.div>
 
-          <span className="break-words text-base font-black text-white  sm:text-lg">
+          <span className="break-words text-base font-black text-slate-900 dark:text-white sm:text-lg">
             {title}
           </span>
         </div>
@@ -577,7 +685,7 @@ function ExpandCard({
           transition={{
             duration: 0.25,
           }}
-          className="shrink-0 text-slate-500"
+          className="shrink-0 text-slate-400"
         >
           <ChevronDown size={21} />
         </motion.div>
@@ -602,7 +710,7 @@ function ExpandCard({
               duration: 0.3,
             }}
           >
-            <div className="border-t border-slate-100 px-5 pb-6 pt-5 text-sm leading-8 text-slate-300   sm:px-6 sm:text-base">
+            <div className="border-t border-slate-100 px-5 pb-6 pt-5 text-sm leading-8 text-slate-600 dark:border-white/5 dark:text-slate-100 sm:px-6 sm:text-base">
               {content}
             </div>
           </motion.div>
@@ -994,11 +1102,10 @@ export default function HomePage() {
     },
   ];
 
-
-      <MusicControl />
-
   return (
-    <main className="relative min-h-screen w-full overflow-x-hidden bg-[#06110c] text-white ">
+    <>
+      <MusicPlayer />
+      <main className="relative min-h-screen w-full overflow-x-hidden bg-[#06110c] text-slate-900 dark:text-white">
 
       <div
         aria-hidden="true"
@@ -1130,7 +1237,7 @@ export default function HomePage() {
 
                 <a
                   href="#comments"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-[#071a13]/92 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#0a1711]/15"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-[#071a13]/92 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white/15"
                 >
                   <MessageCircle size={17} />
 
@@ -1154,12 +1261,12 @@ export default function HomePage() {
         className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 sm:py-16 lg:px-10"
       >
         <Reveal className="mx-auto w-full max-w-5xl">
-          <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-[#071b13]/96 shadow-[0_25px_90px_rgba(0,0,0,0.22)]  ">
+          <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-[#071b13]/96 shadow-[0_25px_90px_rgba(0,0,0,0.22)] dark:border-white/10 dark:bg-[#06140d]/94">
             <div className="absolute left-0 right-0 top-0 h-1.5 bg-gradient-to-r from-emerald-700 via-emerald-400 to-emerald-700" />
 
             <div className="px-6 py-8 sm:px-10 sm:py-11 lg:px-16 lg:py-14">
               <div className="mx-auto max-w-3xl text-center">
-                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-emerald-700  ">
+                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                   <Leaf size={14} />
 
                   {lang ===
@@ -1175,10 +1282,10 @@ export default function HomePage() {
                     : "Humanity united for nature"}
                 </h2>
 
-                <div className="mx-auto mt-5 h-px w-20 bg-emerald-300 " />
+                <div className="mx-auto mt-5 h-px w-20 bg-emerald-300 dark:bg-emerald-500/40" />
               </div>
               <div className="mx-auto mt-8 w-full max-w-3xl">
-                <div className="relative rounded-[28px] border border-white/10 bg-[#071710]/97 px-6 py-8 shadow-inner   sm:px-10 sm:py-10">
+                <div className="relative rounded-[28px] border border-white/10 bg-[#071710]/97 px-6 py-8 shadow-inner dark:border-white/10 dark:bg-[#0a1a13]/93 sm:px-10 sm:py-10">
                   <div className="pointer-events-none absolute inset-0 rounded-[28px] bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.045),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.035),transparent_30%)]" />
 
                   <div className="relative">
@@ -1189,7 +1296,7 @@ export default function HomePage() {
                           : "max-h-[520px]"
                       }`}
                     >
-                      <div className="whitespace-pre-line text-[14px] leading-[2.05] tracking-[0.001em] text-slate-100/90  sm:text-base sm:leading-[2.05]">
+                      <div className="whitespace-pre-line text-[14px] leading-[2.05] tracking-[0.001em] text-slate-100/90 dark:text-slate-200 sm:text-base sm:leading-[2.05]">
                         {text(
                           introductionLetter,
                           lang
@@ -1217,7 +1324,7 @@ export default function HomePage() {
                                   0.97,
                               }
                         }
-                        className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-black text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-100    "
+                        className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-black text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-100 dark:border-emerald-400/10 dark:bg-emerald-500/10 dark:text-emerald-300 dark:hover:bg-emerald-500/15"
                       >
                         {introExpanded
                           ? lang ===
@@ -1270,10 +1377,10 @@ export default function HomePage() {
                           }}
                           className="mt-9"
                         >
-                          <div className="mx-auto h-px max-w-md bg-slate-200 " />
+                          <div className="mx-auto h-px max-w-md bg-slate-200 dark:bg-[#071a13]/92" />
 
                           <div className="pt-8 text-center">
-                            <p className="text-sm font-bold leading-7 text-slate-500  sm:text-base">
+                            <p className="text-sm font-bold leading-7 text-slate-500 dark:text-slate-400 sm:text-base">
                               {lang ===
                               "si"
                                 ? "සොබාදහම වෙනුවෙන් අප සමඟ එක්වන්න."
@@ -1309,7 +1416,7 @@ export default function HomePage() {
                               />
                             </a>
 
-                            <p className="mt-3 text-[11px] text-slate-500">
+                            <p className="mt-3 text-[11px] text-slate-400">
                               {lang ===
                               "si"
                                 ? "Facebook Page වෙත පිවිසෙන්න"
@@ -1322,13 +1429,13 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-              <div className="mx-auto mt-7 max-w-3xl rounded-[26px] border border-emerald-300/15 bg-[#063424]/88 p-5  ">
+              <div className="mx-auto mt-7 max-w-3xl rounded-[26px] border border-emerald-300/15 bg-[#063424]/88 p-5 dark:border-emerald-400/10 dark:bg-[#07261a]/94">
                 <div className="flex items-start justify-center gap-4 text-center">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 ">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
                     <HeartHandshake size={22} />
                   </div>
 
-                  <p className="text-sm font-bold leading-7 text-emerald-900  sm:text-base">
+                  <p className="text-sm font-bold leading-7 text-emerald-900 dark:text-emerald-200 sm:text-base">
                     {lang ===
                     "si"
                       ? "තනි තනිව වෙනස් වෙමු. අවසානයේ සුන්දර ලොවක් ගොඩනැගේවි."
@@ -1344,7 +1451,7 @@ export default function HomePage() {
       <section className="relative w-full overflow-hidden bg-transparent py-10 sm:py-20">
         <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">
           <Reveal className="mx-auto max-w-3xl text-center">
-            <span className="text-sm font-black uppercase tracking-[0.18em] text-emerald-600 ">
+            <span className="text-sm font-black uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
               {lang ===
               "si"
                 ? "අපගේ පදනම"
@@ -1412,7 +1519,7 @@ export default function HomePage() {
         className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 sm:py-16 lg:px-10"
       >
         <Reveal>
-          <span className="text-sm font-black uppercase tracking-[0.18em] text-emerald-600 ">
+          <span className="text-sm font-black uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
             {lang ===
             "si"
               ? "අපගේ අරමුණු"
@@ -1441,15 +1548,15 @@ export default function HomePage() {
                 }
               >
                 <div
-                  className="group flex h-full gap-4 rounded-[26px] border border-white/10 bg-[#071a13]/92 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.16)]  "
+                  className="group flex h-full gap-4 rounded-[26px] border border-white/10 bg-[#071a13]/92 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.16)] dark:border-white/10 dark:bg-[#071a13]/92"
                 >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700  ">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                     <CheckCircle2
                       size={21}
                     />
                   </div>
 
-                  <p className="text-sm leading-8 text-slate-100/93  sm:text-base">
+                  <p className="text-sm leading-8 text-slate-100/93 dark:text-slate-200 sm:text-base">
                     {text(
                       item,
                       lang
@@ -1584,7 +1691,7 @@ export default function HomePage() {
         <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr]">
           <div>
             <Reveal>
-              <span className="text-sm font-black uppercase tracking-[0.18em] text-emerald-600 ">
+              <span className="text-sm font-black uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
                 {lang ===
                 "si"
                   ? "සාමාජිකත්වය"
@@ -1598,7 +1705,7 @@ export default function HomePage() {
                   : "Become a Guardian of Nature"}
               </h2>
 
-              <p className="mt-5 max-w-2xl text-sm leading-8 text-slate-100/93  sm:text-base">
+              <p className="mt-5 max-w-2xl text-sm leading-8 text-slate-100/93 dark:text-slate-200 sm:text-base">
                 {lang ===
                 "si"
                   ? "ස්වභාවධර්මය ආරක්ෂා කිරීමේ වගකීම පිළිගන්නා ඕනෑම ශ්‍රී ලාංකිකයෙකුට මෙම මෙහෙවරට එක්විය හැක."
@@ -1621,8 +1728,8 @@ export default function HomePage() {
                       0.05
                     }
                   >
-                    <div className="flex gap-4 rounded-[24px] border border-white/10 bg-[#071a13]/92 p-5 shadow-sm  ">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700  ">
+                    <div className="flex gap-4 rounded-[24px] border border-white/10 bg-[#071a13]/92 p-5 shadow-sm dark:border-white/10 dark:bg-[#071a13]/92">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                         <Users
                           size={
                             19
@@ -1630,7 +1737,7 @@ export default function HomePage() {
                         />
                       </div>
 
-                      <p className="text-sm leading-8 text-slate-100/93 ">
+                      <p className="text-sm leading-8 text-slate-100/93 dark:text-slate-200">
                         {text(
                           item,
                           lang
@@ -1644,15 +1751,15 @@ export default function HomePage() {
           </div>
 
           <Reveal delay={0.1}>
-            <div className="rounded-[32px] border border-emerald-300/15 bg-[#063424]/88 p-6   sm:p-8">
+            <div className="rounded-[32px] border border-emerald-300/15 bg-[#063424]/88 p-6 dark:border-emerald-400/10 dark:bg-[#07261a]/94 sm:p-8">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-700 ">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
                   <ShieldCheck
                     size={23}
                   />
                 </div>
 
-                <h3 className="text-xl font-black text-emerald-950  sm:text-2xl">
+                <h3 className="text-xl font-black text-emerald-950 dark:text-emerald-200 sm:text-2xl">
                   {lang ===
                   "si"
                     ? "සොබා සේනාංකයේ ප්‍රතිඥාව"
@@ -1660,8 +1767,8 @@ export default function HomePage() {
                 </h3>
               </div>
 
-              <div className="mt-7 rounded-[24px] border border-emerald-200/15 bg-[#071710]/97 p-5   sm:p-7">
-                <p className="whitespace-pre-line text-sm leading-8 text-slate-200  sm:text-base sm:leading-9">
+              <div className="mt-7 rounded-[24px] border border-emerald-200/15 bg-[#071710]/97 p-5 dark:border-emerald-400/10 dark:bg-[#0a1a13]/93 sm:p-7">
+                <p className="whitespace-pre-line text-sm leading-8 text-slate-700 dark:text-slate-300 sm:text-base sm:leading-9">
                   {text(
                     pledge,
                     lang
@@ -1669,12 +1776,10 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div className="mt-7 border-t border-emerald-200 pt-6 ">
+              <div className="mt-7 border-t border-emerald-200 pt-6 dark:border-emerald-400/10">
                 <div className="text-center">
                   <a
-                    href={
-                      facebookPageUrl
-                    }
+                    href={facebookPageUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group inline-flex items-center justify-center gap-3 rounded-2xl bg-emerald-500 px-7 py-4 text-sm font-black text-emerald-950 shadow-[0_14px_35px_rgba(16,185,129,0.20)] transition hover:-translate-y-0.5 hover:bg-emerald-400"
@@ -1700,7 +1805,7 @@ export default function HomePage() {
                     />
                   </a>
 
-                  <p className="mt-3 text-[11px] text-slate-500">
+                  <p className="mt-3 text-[11px] text-slate-400">
                     {lang ===
                     "si"
                       ? "සොබා සේනාංකය සමඟ එක්වන්න"
@@ -1715,13 +1820,13 @@ export default function HomePage() {
 
       <section
         id="message"
-        className="relative w-full overflow-hidden bg-[#06140d]/82 py-16  sm:py-24"
+        className="relative w-full overflow-hidden bg-[#06140d]/82 py-16 dark:bg-[#06140d]/90 sm:py-24"
       >
         <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
           <Reveal>
             <div className="mb-8 flex items-end justify-between gap-4">
               <div>
-                <span className="text-sm font-black uppercase tracking-[0.18em] text-emerald-600 ">
+                <span className="text-sm font-black uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
                   {lang ===
                   "si"
                     ? "ස්වභාවධර්මයේ පණිවිඩය"
@@ -1770,10 +1875,10 @@ export default function HomePage() {
                     }
                   >
                     <div
-                      className={`overflow-hidden rounded-[28px] border bg-[#0a1711] shadow-[0_14px_45px_rgba(15,23,42,0.05)] transition-colors  ${
+                      className={`overflow-hidden rounded-[28px] border bg-white shadow-[0_14px_45px_rgba(15,23,42,0.05)] transition-colors dark:bg-[#0a1a13]/93 ${
                         open
-                          ? "border-emerald-300 "
-                          : "border-white/10 "
+                          ? "border-emerald-300 dark:border-emerald-400/20"
+                          : "border-slate-200 dark:border-white/10"
                       }`}
                     >
                       <button
@@ -1785,7 +1890,7 @@ export default function HomePage() {
                         }
                         className="group flex w-full items-center gap-4 p-5 text-left"
                       >
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700  ">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                           <Icon
                             size={
                               22
@@ -1794,13 +1899,13 @@ export default function HomePage() {
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-base font-black text-white  sm:text-lg">
+                          <h3 className="text-base font-black text-slate-900 dark:text-white sm:text-lg">
                             {
                               item.title
                             }
                           </h3>
 
-                          <p className="mt-1 text-sm leading-6 text-slate-500 ">
+                          <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
                             {
                               item.shortText
                             }
@@ -1845,8 +1950,8 @@ export default function HomePage() {
                                 0.3,
                             }}
                           >
-                            <div className="border-t border-slate-100 px-5 pb-6 pt-5 ">
-                              <p className="text-sm leading-8 text-slate-100/93  sm:text-base">
+                            <div className="border-t border-slate-100 px-5 pb-6 pt-5 dark:border-white/5">
+                              <p className="text-sm leading-8 text-slate-100/93 dark:text-slate-200 sm:text-base">
                                 {
                                   item.content
                                 }
@@ -1870,7 +1975,7 @@ export default function HomePage() {
       >
         <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
           <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-emerald-700  ">
+            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
               <MessageCircle
                 size={14}
               />
@@ -1887,7 +1992,7 @@ export default function HomePage() {
                 : "Ideas & Suggestions"}
             </h2>
 
-            <p className="mt-5 max-w-xl text-sm leading-8 text-slate-100/93  sm:text-base">
+            <p className="mt-5 max-w-xl text-sm leading-8 text-slate-100/93 dark:text-slate-200 sm:text-base">
               {lang ===
               "si"
                 ? "ඔබේ අදහසක්, යෝජනාවක් හෝ ස්වභාවධර්මය වෙනුවෙන් කළ හැකි ක්‍රියාවක් අප සමඟ බෙදාගන්න. ඔබ එක් කරන අදහස දාපු ගමන්ම සජීවීව පෙන්වනු ලැබේ."
@@ -1923,10 +2028,10 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal delay={0.08}>
-            <div className="rounded-[30px] border border-white/10 bg-[#0a1711] p-4 shadow-[0_20px_70px_rgba(15,23,42,0.06)]   sm:p-6">
-              <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-4 ">
+            <div className="rounded-[30px] border border-slate-200 bg-white p-4 shadow-[0_20px_70px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-[#0a1a13]/93 sm:p-6">
+              <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-4 dark:border-white/5">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-600 ">
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
                     {comments.length}{" "}
                     {lang ===
                     "si"
@@ -1942,7 +2047,7 @@ export default function HomePage() {
                   </h3>
                 </div>
 
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700  ">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                   <MessageCircle
                     size={
                       19
@@ -1970,7 +2075,7 @@ export default function HomePage() {
               ) : visibleComments.length ===
                 0 ? (
                 <div className="flex min-h-[240px] flex-col items-center justify-center text-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 text-slate-500 ">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 text-slate-400 dark:bg-white/5">
                     <MessageCircle
                       size={
                         26
@@ -2016,10 +2121,10 @@ export default function HomePage() {
                             opacity: 1,
                             y: 0,
                           }}
-                          className="rounded-[24px] border border-white/10/80 bg-[#06140d]/70 p-4  "
+                          className="rounded-[24px] border border-slate-200/80 bg-slate-50/70 p-4 dark:border-white/5 dark:bg-[#0a1a13]/93"
                         >
                           <div className="flex items-start gap-3">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700  ">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                               <Users
                                 size={
                                   18
@@ -2037,20 +2142,20 @@ export default function HomePage() {
 
                                 {index ===
                                   0 && (
-                                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black uppercase text-emerald-700  ">
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black uppercase text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
                                     Live
                                   </span>
                                 )}
                               </div>
 
-                              <p className="mt-2 break-words text-sm leading-7 text-slate-100/93 ">
+                              <p className="mt-2 break-words text-sm leading-7 text-slate-100/93 dark:text-slate-200">
                                 {
                                   comment.comment
                                 }
                               </p>
 
-                              <p className="mt-3 text-[10px] text-slate-500">
+                              <p className="mt-3 text-[10px] text-slate-400">
                                 {
                                   comment.created_at
                                 }
@@ -2066,7 +2171,7 @@ export default function HomePage() {
 
               {comments.length >
                 12 && (
-                <p className="mt-4 text-center text-xs text-slate-500">
+                <p className="mt-4 text-center text-xs text-slate-400">
                   {lang ===
                   "si"
                     ? "නවතම අදහස් 12 පෙන්වයි."
@@ -2082,15 +2187,13 @@ export default function HomePage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <Reveal>
             <a
-              href={
-                facebookPageUrl
-              }
+              href={facebookPageUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center justify-between rounded-[26px] border border-white/10/70 bg-[#eef5f1]/96 p-5 shadow-sm transition hover:-translate-y-1  "
+              className="group flex items-center justify-between rounded-[26px] border border-slate-200/70 bg-[#eef5f1]/96 p-5 shadow-sm transition hover:-translate-y-1 dark:border-white/10 dark:bg-[#06140d]/90"
             >
               <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#1877F2]/10 text-[#1877F2]  ">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#1877F2]/10 text-[#1877F2] dark:bg-[#1877F2]/15 dark:text-[#4c9cff]">
                   <svg
                     viewBox="0 0 24 24"
                     aria-hidden="true"
@@ -2131,10 +2234,10 @@ export default function HomePage() {
               href={youtubePageUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center justify-between rounded-[26px] border border-white/10/70 bg-[#eef5f1]/96 p-5 shadow-sm transition hover:-translate-y-1  "
+              className="group flex items-center justify-between rounded-[26px] border border-slate-200/70 bg-[#eef5f1]/96 p-5 shadow-sm transition hover:-translate-y-1 dark:border-white/10 dark:bg-[#06140d]/90"
             >
               <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FF0000]/10 text-[#FF0000]  ">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FF0000]/10 text-[#FF0000] dark:bg-[#FF0000]/15 dark:text-[#ff4d4d]">
                   <svg
                     viewBox="0 0 24 24"
                     aria-hidden="true"
@@ -2175,51 +2278,6 @@ export default function HomePage() {
           </Reveal>
         </div>
       </section>
-
-      <footer className="border-t border-white/10 bg-[#020b07]/95 px-5 py-9 text-white sm:px-8 lg:px-10">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex min-w-0 items-center gap-3">
-            <img
-              src="/logo.png"
-              alt="සොබා සේනාංකය"
-              className="h-11 w-11 shrink-0 rounded-full object-contain"
-            />
-            <div className="min-w-0">
-              <p className="break-words text-base font-black">
-                {lang === "si" ? "සොබා සේනාංකය" : "Soba Senankaya"}
-              </p>
-              <p className="mt-1 break-words text-xs leading-5 text-white/55">
-                {lang === "si"
-                  ? "ස්වභාදහම උදෙසා මනුෂ්‍යයත්වයේ මෙහෙවර"
-                  : "Humanity's mission for nature"}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-bold text-white/55">
-            <a
-              href={facebookPageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition hover:text-emerald-300"
-            >
-              Facebook
-            </a>
-            <a
-              href={youtubePageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition hover:text-emerald-300"
-            >
-              YouTube
-            </a>
-            <span>
-              © {new Date().getFullYear()}{" "}
-              {lang === "si" ? "සොබා සේනාංකය" : "Soba Senankaya"}
-            </span>
-          </div>
-        </div>
-      </footer>
 
       <AnimatePresence>
         {commentModalOpen && (
@@ -2339,7 +2397,7 @@ export default function HomePage() {
                       commentSubmitting
                     }
                     required
-                    className="h-13 w-full rounded-2xl border border-white/10 bg-[#0a1711]/[0.035] px-4 text-white outline-none placeholder:text-slate-300 focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/10 disabled:opacity-50"
+                    className="h-13 w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 text-white outline-none placeholder:text-slate-600 focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/10 disabled:opacity-50"
                   />
                 </div>
 
@@ -2384,7 +2442,7 @@ export default function HomePage() {
                       commentSubmitting
                     }
                     required
-                    className="w-full resize-none rounded-2xl border border-white/10 bg-[#0a1711]/[0.035] px-4 py-3 leading-7 text-white outline-none placeholder:text-slate-300 focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/10 disabled:opacity-50"
+                    className="w-full resize-none rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 leading-7 text-white outline-none placeholder:text-slate-600 focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/10 disabled:opacity-50"
                   />
                 </div>
 
@@ -2413,7 +2471,7 @@ export default function HomePage() {
                     disabled={
                       commentSubmitting
                     }
-                    className="rounded-2xl border border-white/10 bg-[#0a1711]/5 px-5 py-3 text-sm font-bold text-slate-300 transition hover:bg-[#071a13]/92 disabled:opacity-50"
+                    className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-slate-300 transition hover:bg-[#071a13]/92 disabled:opacity-50"
                   >
                     {lang ===
                     "si"
@@ -2465,5 +2523,6 @@ export default function HomePage() {
       </AnimatePresence>
       </div>
     </main>
+    </>
   );
 }
