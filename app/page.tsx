@@ -4,6 +4,7 @@ import {
   FormEvent,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -395,300 +396,127 @@ function MusicPlayer() {
   const [muted, setMuted] = useState(false);
 
   useEffect(() => {
-    const audio = new Audio("/eco-music.mp3");
-
-    audio.preload = "auto";
+    const audio = new Audio('/eco-music.mp3');
+    audio.preload = 'auto';
     audio.loop = true;
-    audio.volume = 0.06;
+    audio.volume = 0.075;
     audioRef.current = audio;
 
-    const unlockAndPlay = () => {
-      audio.muted = false;
-      audio.volume = 0.018;
-
-      audio.play()
-        .then(() => {
-          setMuted(false);
-          setPlaying(true);
-        })
-        .catch(() => {
-          setPlaying(false);
-        });
+    const syncPlayback = () => {
+      setPlaying(!audio.paused);
+      setMuted(audio.muted);
     };
 
-    audio.play()
-      .then(() => {
-        setPlaying(true);
-      })
-      .catch(() => {
-        audio.muted = true;
-
-        audio.play()
-          .then(() => {
-            setPlaying(true);
-          })
-          .catch(() => {
-            setPlaying(false);
-          });
-      });
-
-    window.addEventListener(
-      "pointerdown",
-      unlockAndPlay,
-      {
-        passive: true,
-        once: true,
+    const handleTimeUpdate = () => {
+      if (!Number.isFinite(audio.duration) || audio.duration <= 0) {
+        return;
       }
-    );
 
-    window.addEventListener(
-      "touchstart",
-      unlockAndPlay,
-      {
-        passive: true,
-        once: true,
-      }
-    );
+      const fadeDuration = 2.2;
+      const fromEnd = audio.duration - audio.currentTime;
+      const edgeFactor = Math.min(
+        1,
+        audio.currentTime / fadeDuration,
+        fromEnd / fadeDuration
+      );
 
-    window.addEventListener(
-      "keydown",
-      unlockAndPlay,
-      {
-        once: true,
-      }
-    );
+      audio.volume = 0.008 + 0.067 * Math.max(0, edgeFactor);
+    };
 
-    const fadeTimer =
-      window.setInterval(() => {
-        if (
-          audio.paused ||
-          !Number.isFinite(
-            audio.duration
-          ) ||
-          audio.duration <= 0
-        ) {
-          return;
-        }
+    const tryPlay = () => {
+      audio.play().catch(() => undefined);
+    };
 
-        const now = audio.currentTime;
-        const duration = audio.duration;
-        const fade = 2.8;
+    audio.addEventListener('play', syncPlayback);
+    audio.addEventListener('pause', syncPlayback);
+    audio.addEventListener('volumechange', syncPlayback);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
 
-        if (now <= fade) {
-          const progress =
-            Math.min(
-              1,
-              now / fade
-            );
+    tryPlay();
 
-          audio.volume =
-            0.008 +
-            0.052 * progress;
-        } else if (
-          duration - now <=
-          fade
-        ) {
-          const progress =
-            Math.max(
-              0,
-              (duration - now) /
-                fade
-            );
+    window.addEventListener('pointerdown', tryPlay, {
+      once: true,
+      passive: true,
+    });
 
-          audio.volume =
-            0.008 +
-            0.052 * progress;
-        } else {
-          audio.volume = 0.06;
-        }
-      }, 200);
+    window.addEventListener('touchstart', tryPlay, {
+      once: true,
+      passive: true,
+    });
 
-    const handlePlay =
-      () => setPlaying(true);
-
-    const handlePause =
-      () => setPlaying(false);
-
-    audio.addEventListener(
-      "play",
-      handlePlay
-    );
-
-    audio.addEventListener(
-      "pause",
-      handlePause
-    );
+    window.addEventListener('keydown', tryPlay, {
+      once: true,
+    });
 
     return () => {
-      window.clearInterval(
-        fadeTimer
-      );
-
       audio.pause();
-      audio.src = "";
-
-      audio.removeEventListener(
-        "play",
-        handlePlay
-      );
-
-      audio.removeEventListener(
-        "pause",
-        handlePause
-      );
-
-      window.removeEventListener(
-        "pointerdown",
-        unlockAndPlay
-      );
-
-      window.removeEventListener(
-        "touchstart",
-        unlockAndPlay
-      );
-
-      window.removeEventListener(
-        "keydown",
-        unlockAndPlay
-      );
-
+      audio.currentTime = 0;
+      audio.removeEventListener('play', syncPlayback);
+      audio.removeEventListener('pause', syncPlayback);
+      audio.removeEventListener('volumechange', syncPlayback);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      window.removeEventListener('pointerdown', tryPlay);
+      window.removeEventListener('touchstart', tryPlay);
+      window.removeEventListener('keydown', tryPlay);
       audioRef.current = null;
     };
   }, []);
 
-  const toggleMusic = () => {
+  const togglePlayback = () => {
     const audio = audioRef.current;
-
     if (!audio) return;
 
     if (audio.paused) {
-      audio.muted = false;
-      audio.volume = 0.018;
-
-      audio.play()
-        .then(() => {
-          setMuted(false);
-          setPlaying(true);
-        })
-        .catch(() => {
-          setPlaying(false);
-        });
-
-      return;
+      audio.play().catch(() => undefined);
+    } else {
+      audio.pause();
     }
-
-    audio.pause();
-    setPlaying(false);
   };
 
   const toggleMute = () => {
     const audio = audioRef.current;
-
     if (!audio) return;
 
     audio.muted = !audio.muted;
     setMuted(audio.muted);
-
-    if (
-      !audio.muted &&
-      !audio.paused
-    ) {
-      audio.volume = 0.06;
-    }
   };
 
   return (
     <>
-      <audio
-        ref={audioRef}
-        src="/eco-music.mp3"
-        preload="auto"
-        loop
-      />
-
-      <div
-        className="
-          fixed
-          right-4
-          top-[86px]
-          z-[160]
-          hidden
-          md:block
-        "
-        aria-label="Music controls"
-      >
-        <div
-          className="
-            flex
-            items-center
-            gap-1.5
-            rounded-full
-            border
-            border-emerald-300/20
-            bg-[#06160f]/96
-            p-1.5
-            shadow-[0_14px_40px_rgba(0,0,0,0.30)]
-          "
-        >
+      <div className="fixed right-3 top-[73px] z-[450] hidden md:block sm:right-5 sm:top-[79px]">
+        <div className="music-player-shell flex items-center gap-1 rounded-full border border-emerald-300/20 bg-[#06160f]/96 p-1.5 shadow-[0_14px_38px_rgba(0,0,0,0.28)]">
           <button
             type="button"
-            onClick={toggleMusic}
+            onClick={togglePlayback}
             aria-label={
-              playing
-                ? "Pause music"
-                : "Play music"
+              playing ? 'Turn music off' : 'Turn music on'
             }
-            className="
-              relative
-              flex
-              h-11
-              w-11
-              shrink-0
-              items-center
-              justify-center
-              rounded-full
-              border
-              border-emerald-300/15
-              bg-emerald-400/10
-              text-emerald-200
-              transition-colors
-              hover:bg-emerald-400/15
-              active:bg-emerald-400/20
-            "
+            title={
+              playing ? 'Turn music off' : 'Turn music on'
+            }
+            className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-emerald-300/15 text-emerald-200 transition-colors active:scale-95 ${
+              playing
+                ? 'bg-emerald-400/15'
+                : 'bg-white/[0.035]'
+            }`}
           >
-            <span
-              className={`absolute inset-0 rounded-full border border-emerald-300/25 ${
-                playing
-                  ? "animate-ping opacity-20"
-                  : "opacity-0"
-              }`}
-            />
-
             {playing ? (
-              <span className="relative flex h-5 items-end gap-0.5">
-                <span className="h-2 w-0.5 rounded-full bg-emerald-200 [animation:musicBar_0.8s_ease-in-out_infinite]" />
-                <span className="h-4 w-0.5 rounded-full bg-emerald-200 [animation:musicBar_1.1s_ease-in-out_0.12s_infinite]" />
-                <span className="h-3 w-0.5 rounded-full bg-emerald-200 [animation:musicBar_0.9s_ease-in-out_0.2s_infinite]" />
-                <span className="h-4 w-0.5 rounded-full bg-emerald-200 [animation:musicBar_1.05s_ease-in-out_0.08s_infinite]" />
+              <span className="relative flex h-5 items-end gap-[3px]">
+                <span className="h-2 w-[3px] rounded-full bg-emerald-200 animate-[musicPulse_0.75s_ease-in-out_infinite]" />
+                <span className="h-4 w-[3px] rounded-full bg-emerald-200 animate-[musicPulse_0.95s_ease-in-out_0.08s_infinite]" />
+                <span className="h-3 w-[3px] rounded-full bg-emerald-200 animate-[musicPulse_0.8s_ease-in-out_0.18s_infinite]" />
+                <span className="h-5 w-[3px] rounded-full bg-emerald-200 animate-[musicPulse_1.05s_ease-in-out_0.04s_infinite]" />
               </span>
             ) : (
               <svg
                 viewBox="0 0 24 24"
-                className="relative h-5 w-5 fill-none stroke-current"
-                strokeWidth="1.8"
+                className="h-5 w-5 fill-none stroke-current"
+                strokeWidth="1.9"
                 aria-hidden="true"
               >
                 <path d="M9 18V6l10-2v12" />
-                <circle
-                  cx="6"
-                  cy="18"
-                  r="3"
-                />
-                <circle
-                  cx="16"
-                  cy="16"
-                  r="3"
-                />
+                <circle cx="6" cy="18" r="3" />
+                <circle cx="16" cy="16" r="3" />
               </svg>
             )}
           </button>
@@ -697,23 +525,12 @@ function MusicPlayer() {
             type="button"
             onClick={toggleMute}
             aria-label={
-              muted
-                ? "Unmute music"
-                : "Mute music"
+              muted ? 'Unmute music' : 'Mute music'
             }
-            className="
-              flex
-              h-11
-              w-11
-              shrink-0
-              items-center
-              justify-center
-              rounded-full
-              text-emerald-200/75
-              transition-colors
-              hover:bg-white/[0.04]
-              hover:text-emerald-100
-            "
+            title={
+              muted ? 'Unmute music' : 'Mute music'
+            }
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-emerald-200/70 transition-colors active:scale-95 hover:bg-white/[0.04]"
           >
             {muted ? (
               <svg
@@ -741,68 +558,42 @@ function MusicPlayer() {
       </div>
 
       <style jsx global>{`
-        @keyframes musicBar {
+        .music-player-shell {
+          opacity: 0;
+          transform: translate3d(18px, -8px, 0) scale(0.92);
+          animation: musicPlayerAppear 0.75s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+
+        @keyframes musicPlayerAppear {
+          from {
+            opacity: 0;
+            transform: translate3d(18px, -8px, 0) scale(0.92);
+          }
+          to {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
+          }
+        }
+
+        @keyframes musicPulse {
           0%,
           100% {
             transform: scaleY(0.45);
+            opacity: 0.68;
           }
           50% {
             transform: scaleY(1);
+            opacity: 1;
           }
         }
 
-        html,
-        body {
-          color-scheme: dark !important;
-          background: #06110c !important;
-        }
-
-        html.light,
-        body.light {
-          color-scheme: dark !important;
-          background: #06110c !important;
-          color: #ffffff !important;
-        }
-
-        html.light [class*="bg-white"],
-        body.light [class*="bg-white"],
-        html.light [class~="bg-slate-50"],
-        body.light [class~="bg-slate-50"],
-        html.light [class~="bg-slate-100"],
-        body.light [class~="bg-slate-100"] {
-          background-color: #0a1711 !important;
-        }
-
-        html.light [class*="border-slate-200"],
-        body.light [class*="border-slate-200"] {
-          border-color: rgba(255,255,255,0.10) !important;
-        }
-
-        html.light [class*="text-slate-900"],
-        body.light [class*="text-slate-900"],
-        html.light [class*="text-slate-800"],
-        body.light [class*="text-slate-800"] {
-          color: rgba(255,255,255,0.96) !important;
-        }
-
-        html.light [class*="text-slate-700"],
-        body.light [class*="text-slate-700"],
-        html.light [class*="text-slate-600"],
-        body.light [class*="text-slate-600"] {
-          color: rgba(226,232,240,0.92) !important;
-        }
-
-        #message [style*="touch-action"] {
-          touch-action: auto !important;
-          overscroll-behavior-x: contain !important;
-          overscroll-behavior-y: auto !important;
-        }
-
-        #message .overflow-x-auto {
-          touch-action: auto !important;
-          overscroll-behavior-x: contain !important;
-          overscroll-behavior-y: auto !important;
-          -webkit-overflow-scrolling: touch;
+        @media (prefers-reduced-motion: reduce) {
+          .music-player-shell {
+            animation: none;
+            opacity: 1;
+            transform: none;
+          }
         }
       `}</style>
     </>
@@ -1314,8 +1105,7 @@ export default function HomePage() {
   return (
     <>
       <MusicPlayer />
-
-    <main className="relative min-h-screen w-full overflow-x-hidden bg-[#06110c] text-slate-900 dark:text-white">
+      <main className="relative min-h-screen w-full overflow-x-hidden bg-[#06110c] text-slate-900 dark:text-white">
 
       <div
         aria-hidden="true"
@@ -2488,8 +2278,6 @@ export default function HomePage() {
           </Reveal>
         </div>
       </section>
-
-
 
       <AnimatePresence>
         {commentModalOpen && (
