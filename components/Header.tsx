@@ -1,4 +1,4 @@
-/* Header.tsx — dark mode locked, theme switch removed */
+/* Header.tsx — dark mode locked, theme switch removed, header fixed */
 
 "use client";
 
@@ -409,8 +409,10 @@ export default function Header() {
     <header
       ref={headerRef}
       className={`
-        sticky
+        fixed
         top-0
+        left-0
+        right-0
         z-[500]
         w-full
         transition-all
@@ -1811,5 +1813,11 @@ export default function Header() {
         )}
       </AnimatePresence>
     </header>
+
+    {/* Keep page content below the fixed header. */}
+    <div
+      aria-hidden="true"
+      className="h-[64px] sm:h-[70px]"
+    />
   );
 }
