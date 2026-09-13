@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 
 import LatestAnnouncements from "../components/LatestAnnouncements";
+import MusicButton from "../components/musicbutton";
 
 /* =========================================================
    TYPES
@@ -389,219 +390,6 @@ Delay will certainly lead to regret.
 I have joined. What about you...?`,
 };
 
-
-function MusicPlayer() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(false);
-
-  useEffect(() => {
-    const audio = new Audio('/eco-music.mp3');
-    audio.preload = 'auto';
-    audio.loop = true;
-    audio.autoplay = true;
-    audio.volume = 0.06;
-    audioRef.current = audio;
-
-    const syncPlayback = () => {
-      setPlaying(!audio.paused);
-      setMuted(audio.muted);
-    };
-
-    const handleTimeUpdate = () => {
-      if (!Number.isFinite(audio.duration) || audio.duration <= 0) {
-        return;
-      }
-
-      const fadeDuration = 2.2;
-      const fromEnd = audio.duration - audio.currentTime;
-      const edgeFactor = Math.min(
-        1,
-        audio.currentTime / fadeDuration,
-        fromEnd / fadeDuration
-      );
-
-      audio.volume = 0.008 + 0.067 * Math.max(0, edgeFactor);
-    };
-
-    const tryPlay = () => {
-      if (!audio.paused) return;
-
-      audio.play().catch(() => undefined);
-    };
-
-    audio.addEventListener('play', syncPlayback);
-    audio.addEventListener('pause', syncPlayback);
-    audio.addEventListener('volumechange', syncPlayback);
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-
-    tryPlay();
-
-    window.addEventListener('pointerdown', tryPlay, {
-      once: true,
-      passive: true,
-    });
-
-    window.addEventListener('touchstart', tryPlay, {
-      once: true,
-      passive: true,
-    });
-
-    window.addEventListener('keydown', tryPlay, {
-      once: true,
-    });
-
-    return () => {
-      audio.pause();
-      audio.currentTime = 0;
-      audio.removeEventListener('play', syncPlayback);
-      audio.removeEventListener('pause', syncPlayback);
-      audio.removeEventListener('volumechange', syncPlayback);
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      window.removeEventListener('pointerdown', tryPlay);
-      window.removeEventListener('touchstart', tryPlay);
-      window.removeEventListener('keydown', tryPlay);
-      audioRef.current = null;
-    };
-  }, []);
-
-  const togglePlayback = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (audio.paused) {
-      audio.play().catch(() => undefined);
-    } else {
-      audio.pause();
-    }
-  };
-
-  const toggleMute = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.muted = !audio.muted;
-    setMuted(audio.muted);
-  };
-
-  return (
-    <>
-      <div data-music-player className="fixed right-3 top-[73px] z-[450] hidden md:block sm:right-5 sm:top-[79px]">
-        <div className="music-player-shell flex items-center gap-1 rounded-full border border-emerald-300/20 bg-[#06160f]/96 p-1.5 shadow-[0_14px_38px_rgba(0,0,0,0.28)]">
-          <button
-            type="button"
-            onClick={togglePlayback}
-            aria-label={
-              playing ? 'Turn music off' : 'Turn music on'
-            }
-            title={
-              playing ? 'Turn music off' : 'Turn music on'
-            }
-            className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-emerald-300/15 text-emerald-200 transition-colors active:scale-95 ${
-              playing
-                ? 'bg-emerald-400/15'
-                : 'bg-white/[0.035]'
-            }`}
-          >
-            {playing ? (
-              <span className="relative flex h-5 items-end gap-[3px]">
-                <span className="h-2 w-[3px] rounded-full bg-emerald-200 animate-[musicPulse_0.75s_ease-in-out_infinite]" />
-                <span className="h-4 w-[3px] rounded-full bg-emerald-200 animate-[musicPulse_0.95s_ease-in-out_0.08s_infinite]" />
-                <span className="h-3 w-[3px] rounded-full bg-emerald-200 animate-[musicPulse_0.8s_ease-in-out_0.18s_infinite]" />
-                <span className="h-5 w-[3px] rounded-full bg-emerald-200 animate-[musicPulse_1.05s_ease-in-out_0.04s_infinite]" />
-              </span>
-            ) : (
-              <svg
-                viewBox="0 0 24 24"
-                className="h-5 w-5 fill-none stroke-current"
-                strokeWidth="1.9"
-                aria-hidden="true"
-              >
-                <path d="M9 18V6l10-2v12" />
-                <circle cx="6" cy="18" r="3" />
-                <circle cx="16" cy="16" r="3" />
-              </svg>
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={toggleMute}
-            aria-label={
-              muted ? 'Unmute music' : 'Mute music'
-            }
-            title={
-              muted ? 'Unmute music' : 'Mute music'
-            }
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-emerald-200/70 transition-colors active:scale-95 hover:bg-white/[0.04]"
-          >
-            {muted ? (
-              <svg
-                viewBox="0 0 24 24"
-                className="h-5 w-5 fill-none stroke-current"
-                strokeWidth="1.8"
-                aria-hidden="true"
-              >
-                <path d="M4 9v6h4l5 4V5L8 9H4Z" />
-                <path d="m17 9 4 6M21 9l-4 6" />
-              </svg>
-            ) : (
-              <svg
-                viewBox="0 0 24 24"
-                className="h-5 w-5 fill-none stroke-current"
-                strokeWidth="1.8"
-                aria-hidden="true"
-              >
-                <path d="M4 9v6h4l5 4V5L8 9H4Z" />
-                <path d="M17 9.5a4 4 0 0 1 0 5M19.5 7a7.5 7.5 0 0 1 0 10" />
-              </svg>
-            )}
-          </button>
-        </div>
-      </div>
-
-      <style jsx global>{`
-        .music-player-shell {
-          opacity: 0;
-          transform: translate3d(18px, -8px, 0) scale(0.92);
-          animation: musicPlayerAppear 0.75s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-          will-change: transform, opacity;
-        }
-
-        @keyframes musicPlayerAppear {
-          from {
-            opacity: 0;
-            transform: translate3d(18px, -8px, 0) scale(0.92);
-          }
-          to {
-            opacity: 1;
-            transform: translate3d(0, 0, 0) scale(1);
-          }
-        }
-
-        @keyframes musicPulse {
-          0%,
-          100% {
-            transform: scaleY(0.45);
-            opacity: 0.68;
-          }
-          50% {
-            transform: scaleY(1);
-            opacity: 1;
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .music-player-shell {
-            animation: none;
-            opacity: 1;
-            transform: none;
-          }
-        }
-      `}</style>
-    </>
-  );
-}
 
 /* =========================================================
    REVEAL
@@ -1107,8 +895,8 @@ export default function HomePage() {
 
   return (
     <>
-      <MusicPlayer />
-      <main className="relative min-h-screen w-full overflow-x-hidden bg-[#06110c] text-slate-900 dark:text-white">
+      <MusicButton />
+      <main className="relative min-h-screen w-full overflow-x-hidden bg-[#06110c] text-white">
 
       <div
         aria-hidden="true"
@@ -1150,12 +938,6 @@ export default function HomePage() {
           overflow-x: hidden;
         }
 
-        @media (prefers-reduced-motion: reduce) {
-          .music-player-shell *,
-          [data-music-player] * {
-            animation: none !important;
-          }
-        }
       `}</style>
 
       <div className="relative z-10">
@@ -1541,15 +1323,15 @@ export default function HomePage() {
         id="objectives"
         className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 sm:py-16 lg:px-10"
       >
-        <Reveal className="mx-auto w-full max-w-3xl text-center">
-          <span className="text-center text-sm font-black uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
+        <Reveal className="mx-auto flex w-full max-w-3xl flex-col items-center text-center">
+          <span className="text-center text-sm font-black uppercase tracking-[0.18em] text-emerald-400">
             {lang ===
             "si"
               ? "අපගේ අරමුණු"
               : "Our Objectives"}
           </span>
 
-          <h2 className="mt-3 text-center break-words text-[clamp(1.75rem,7vw,2.35rem)] font-black leading-tight tracking-tight sm:text-4xl">
+          <h2 className="mx-auto mt-3 max-w-3xl text-center break-words text-[clamp(1.75rem,7vw,2.35rem)] font-black leading-tight tracking-tight text-white sm:text-4xl">
             {lang ===
             "si"
               ? "ස්වභාවික සමතුලිතතාව වෙනුවෙන්"
