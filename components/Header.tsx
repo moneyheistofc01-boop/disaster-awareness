@@ -1,3 +1,5 @@
+/* Header.tsx — dark mode locked, theme switch removed */
+
 "use client";
 
 import {
@@ -12,8 +14,6 @@ import {
   ChevronDown,
   Leaf,
   Menu,
-  Moon,
-  Sun,
   X,
   ArrowRight,
   Sparkles,
@@ -114,7 +114,6 @@ export default function Header() {
 
   const {
     setTheme,
-    resolvedTheme,
   } = useTheme();
 
   const pathname =
@@ -122,11 +121,6 @@ export default function Header() {
 
   const router =
     useRouter();
-
-  const [
-    mounted,
-    setMounted,
-  ] = useState(false);
 
   const [
     isMobileOpen,
@@ -162,12 +156,14 @@ export default function Header() {
     "'Inter', 'Segoe UI', system-ui, sans-serif";
 
   /* =======================================================
-     MOUNT
+     DARK MODE LOCK
+     Theme switch UI has been completely removed.
+     Header forces the application theme to dark.
   ======================================================== */
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    setTheme("dark");
+  }, [setTheme]);
 
   /* =======================================================
      SCROLL STATE
@@ -291,20 +287,6 @@ export default function Header() {
 
       setIsExploreOpen(
         false
-      );
-    };
-
-  /* =======================================================
-     THEME
-  ======================================================== */
-
-  const toggleTheme =
-    () => {
-      setTheme(
-        resolvedTheme ===
-          "dark"
-          ? "light"
-          : "dark"
       );
     };
 
@@ -438,23 +420,16 @@ export default function Header() {
           scrolled
             ? `
               border-b
-              border-slate-200/60
-              bg-white/95
-              shadow-[0_14px_45px_rgba(15,23,42,0.08)]
+              border-white/[0.09]
+              bg-[#04100b]/96
+              shadow-[0_14px_45px_rgba(0,0,0,0.20)]
               backdrop-blur-2xl
-
-              dark:border-white/[0.09]
-              dark:bg-[#04100b]/96
-              dark:shadow-[0_14px_45px_rgba(0,0,0,0.20)]
             `
             : `
               border-b
-              border-slate-200/40
-              bg-white/90
+              border-white/[0.05]
+              bg-[#04100b]/88
               backdrop-blur-xl
-
-              dark:border-white/[0.05]
-              dark:bg-[#04100b]/88
             `
         }
       `}
@@ -527,14 +502,10 @@ export default function Header() {
               rounded-full
               border
               border-emerald-500/25
-              bg-white
+              bg-black/20
               p-1
 
               shadow-[0_0_25px_rgba(16,185,129,0.10)]
-
-              dark:border-emerald-300/30
-              dark:bg-black/20
-              dark:shadow-[0_0_28px_rgba(16,185,129,0.10)]
 
               sm:h-11
               sm:w-11
@@ -562,9 +533,7 @@ export default function Header() {
                 inset-0
                 rounded-full
                 border
-                border-emerald-500/10
-
-                dark:border-emerald-300/10
+                border-emerald-300/10
               "
             />
 
@@ -613,8 +582,7 @@ export default function Header() {
                   leading-tight
                   tracking-[-0.02em]
 
-                  text-slate-900
-                  dark:text-white
+                  text-white
 
                   sm:max-w-none
                   sm:text-xl
@@ -645,10 +613,7 @@ export default function Header() {
                 className="
                   hidden
                   shrink-0
-
-                  text-emerald-600/70
-                  dark:text-emerald-300/75
-
+                  text-emerald-300/75
                   sm:block
                 "
               />
@@ -676,8 +641,7 @@ export default function Header() {
                 uppercase
                 tracking-[0.19em]
 
-                text-emerald-700/65
-                dark:text-emerald-300/55
+                text-emerald-300/55
 
                 sm:block
                 md:text-[9px]
@@ -717,13 +681,9 @@ export default function Header() {
                   text-[12px]
                   font-semibold
 
-                  text-slate-600
-                  hover:bg-slate-100
-                  hover:text-emerald-700
-
-                  dark:text-white/62
-                  dark:hover:bg-white/[0.055]
-                  dark:hover:text-emerald-300
+                  text-white/62
+                  hover:bg-white/[0.055]
+                  hover:text-emerald-300
 
                   transition-all
                   duration-300
@@ -773,13 +733,9 @@ export default function Header() {
                 text-[12px]
                 font-semibold
 
-                text-slate-600
-                hover:bg-slate-100
-                hover:text-emerald-700
-
-                dark:text-white/62
-                dark:hover:bg-white/[0.055]
-                dark:hover:text-emerald-300
+                text-white/62
+                hover:bg-white/[0.055]
+                hover:text-emerald-300
 
                 transition-all
                 duration-300
@@ -844,16 +800,10 @@ export default function Header() {
                     overflow-hidden
                     rounded-[24px]
                     border
+                    border-white/10
+                    bg-[#07140e]/98
                     p-2
-
-                    border-slate-200
-                    bg-white
-                    shadow-[0_25px_70px_rgba(15,23,42,0.16)]
-
-                    dark:border-white/10
-                    dark:bg-[#07140e]/98
-                    dark:shadow-[0_25px_80px_rgba(0,0,0,0.38)]
-
+                    shadow-[0_25px_80px_rgba(0,0,0,0.38)]
                     backdrop-blur-2xl
                   "
                 >
@@ -864,8 +814,7 @@ export default function Header() {
                       uppercase
                       tracking-[0.22em]
 
-                      text-emerald-700/60
-                      dark:text-emerald-300/50
+                      text-emerald-300/50
                     ">
                       {lang ===
                       "si"
@@ -907,8 +856,7 @@ export default function Header() {
                               py-3
                               text-left
 
-                              hover:bg-emerald-50
-                              dark:hover:bg-emerald-400/[0.07]
+                              hover:bg-emerald-400/[0.07]
 
                               transition
                             "
@@ -922,15 +870,11 @@ export default function Header() {
                               justify-center
                               rounded-xl
 
-                              bg-emerald-50
-                              text-emerald-700
-
-                              dark:bg-emerald-400/[0.07]
-                              dark:text-emerald-300
+                              bg-emerald-400/[0.07]
+                              text-emerald-300
 
                               transition
-                              group-hover:bg-emerald-100
-                              dark:group-hover:bg-emerald-400/15
+                              group-hover:bg-emerald-400/15
                             ">
                               <Icon
                                 size={
@@ -946,9 +890,7 @@ export default function Header() {
                                   truncate
                                   text-[13px]
                                   font-semibold
-
-                                  text-slate-700
-                                  dark:text-white/82
+                                  text-white/82
                                 "
                                 style={{
                                   fontFamily:
@@ -971,14 +913,10 @@ export default function Header() {
                               }
                               className="
                                 shrink-0
-
-                                text-slate-300
-                                dark:text-white/20
-
+                                text-white/20
                                 transition-all
                                 group-hover:translate-x-1
-                                group-hover:text-emerald-500
-                                dark:group-hover:text-emerald-300
+                                group-hover:text-emerald-300
                               "
                             />
                           </motion.button>
@@ -994,6 +932,7 @@ export default function Header() {
 
         {/* =================================================
             DESKTOP CONTROLS
+            Theme switch intentionally removed.
         ================================================== */}
 
         <div className="hidden items-center gap-2 md:flex">
@@ -1019,22 +958,15 @@ export default function Header() {
                 gap-2
                 rounded-full
                 border
+                border-white/10
+                bg-white/[0.045]
                 px-3
                 py-2
                 text-[11px]
                 font-bold
+                text-white/78
                 transition
-
-                border-slate-200
-                bg-slate-100
-                text-slate-700
-
-                hover:bg-slate-200
-
-                dark:border-white/10
-                dark:bg-white/[0.045]
-                dark:text-white/78
-                dark:hover:bg-white/[0.07]
+                hover:bg-white/[0.07]
               "
               style={{
                 fontFamily:
@@ -1051,13 +983,10 @@ export default function Header() {
                 items-center
                 justify-center
                 rounded-full
-                bg-emerald-100
+                bg-emerald-400/10
                 text-[9px]
                 font-black
-                text-emerald-700
-
-                dark:bg-emerald-400/10
-                dark:text-emerald-300
+                text-emerald-300
               ">
                 {lang ===
                 "si"
@@ -1077,8 +1006,7 @@ export default function Header() {
                   13
                 }
                 className={`
-                  text-slate-400
-                  dark:text-white/40
+                  text-white/40
                   transition-transform
                   duration-300
 
@@ -1121,17 +1049,12 @@ export default function Header() {
                     overflow-hidden
                     rounded-[22px]
                     border
+                    border-white/10
+                    bg-[#07140e]/98
                     p-2
                     shadow-2xl
+                    shadow-black/35
                     backdrop-blur-2xl
-
-                    border-slate-200
-                    bg-white
-                    shadow-slate-900/10
-
-                    dark:border-white/10
-                    dark:bg-[#07140e]/98
-                    dark:shadow-black/35
                   "
                 >
                   <div className="px-3 pb-2 pt-2">
@@ -1140,9 +1063,7 @@ export default function Header() {
                       font-bold
                       uppercase
                       tracking-[0.2em]
-
-                      text-slate-400
-                      dark:text-emerald-300/50
+                      text-emerald-300/50
                     ">
                       {lang ===
                       "si"
@@ -1174,14 +1095,10 @@ export default function Header() {
                         lang ===
                         "si"
                           ? `
-                            bg-emerald-50
-
-                            dark:bg-emerald-400/[0.09]
+                            bg-emerald-400/[0.09]
                           `
                           : `
-                            hover:bg-slate-50
-
-                            dark:hover:bg-white/[0.05]
+                            hover:bg-white/[0.05]
                           `
                       }
                     `}
@@ -1201,16 +1118,12 @@ export default function Header() {
                           lang ===
                           "si"
                             ? `
-                              bg-emerald-500
-                              text-white
-                              dark:bg-emerald-400
-                              dark:text-emerald-950
+                              bg-emerald-400
+                              text-emerald-950
                             `
                             : `
-                              bg-slate-100
-                              text-slate-500
-                              dark:bg-white/[0.06]
-                              dark:text-white/60
+                              bg-white/[0.06]
+                              text-white/60
                             `
                         }
                       `}
@@ -1233,13 +1146,11 @@ export default function Header() {
                             "si"
                               ? `
                                 font-bold
-                                text-slate-900
-                                dark:text-white
+                                text-white
                               `
                               : `
                                 font-semibold
-                                text-slate-500
-                                dark:text-white/60
+                                text-white/60
                               `
                           }
                         `}
@@ -1253,8 +1164,7 @@ export default function Header() {
 
                       <span className="
                         text-[10px]
-                        text-slate-400
-                        dark:text-white/30
+                        text-white/30
                       ">
                         Sinhala
                       </span>
@@ -1262,7 +1172,7 @@ export default function Header() {
 
                     {lang ===
                       "si" && (
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 dark:bg-emerald-300" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
                     )}
                   </button>
 
@@ -1289,12 +1199,10 @@ export default function Header() {
                         lang ===
                         "en"
                           ? `
-                            bg-emerald-50
-                            dark:bg-emerald-400/[0.09]
+                            bg-emerald-400/[0.09]
                           `
                           : `
-                            hover:bg-slate-50
-                            dark:hover:bg-white/[0.05]
+                            hover:bg-white/[0.05]
                           `
                       }
                     `}
@@ -1314,16 +1222,12 @@ export default function Header() {
                           lang ===
                           "en"
                             ? `
-                              bg-emerald-500
-                              text-white
-                              dark:bg-emerald-400
-                              dark:text-emerald-950
+                              bg-emerald-400
+                              text-emerald-950
                             `
                             : `
-                              bg-slate-100
-                              text-slate-500
-                              dark:bg-white/[0.06]
-                              dark:text-white/60
+                              bg-white/[0.06]
+                              text-white/60
                             `
                         }
                       `}
@@ -1346,13 +1250,11 @@ export default function Header() {
                             "en"
                               ? `
                                 font-bold
-                                text-slate-900
-                                dark:text-white
+                                text-white
                               `
                               : `
                                 font-semibold
-                                text-slate-500
-                                dark:text-white/60
+                                text-white/60
                               `
                           }
                         `}
@@ -1366,8 +1268,7 @@ export default function Header() {
 
                       <span className="
                         text-[10px]
-                        text-slate-400
-                        dark:text-white/30
+                        text-white/30
                       ">
                         English
                       </span>
@@ -1375,107 +1276,13 @@ export default function Header() {
 
                     {lang ===
                       "en" && (
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 dark:bg-emerald-300" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
                     )}
                   </button>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
-
-          {/* Theme */}
-          <motion.button
-            type="button"
-            whileTap={{
-              scale: 0.9,
-            }}
-            onClick={
-              toggleTheme
-            }
-            aria-label={
-              lang ===
-              "si"
-                ? "තේමාව වෙනස් කරන්න"
-                : "Toggle theme"
-            }
-            className="
-              flex
-              h-9
-              w-9
-              items-center
-              justify-center
-              rounded-full
-              border
-              transition
-
-              border-slate-200
-              bg-slate-100
-              text-slate-600
-
-              hover:bg-slate-200
-
-              dark:border-white/10
-              dark:bg-white/[0.045]
-              dark:text-white/60
-              dark:hover:bg-white/[0.07]
-
-              hover:text-emerald-600
-              dark:hover:text-emerald-300
-            "
-          >
-            {mounted ? (
-              <AnimatePresence
-                mode="wait"
-                initial={false}
-              >
-                <motion.div
-                  key={
-                    resolvedTheme
-                  }
-                  initial={{
-                    opacity: 0,
-                    rotate:
-                      -45,
-                    scale:
-                      0.7,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    rotate: 0,
-                    scale: 1,
-                  }}
-                  exit={{
-                    opacity: 0,
-                    rotate:
-                      45,
-                    scale:
-                      0.7,
-                  }}
-                  transition={{
-                    duration:
-                      0.2,
-                  }}
-                >
-                  {resolvedTheme ===
-                  "dark" ? (
-                    <Sun
-                      size={
-                        16
-                      }
-                    />
-                  ) : (
-                    <Moon
-                      size={
-                        16
-                      }
-                    />
-                  )}
-                </motion.div>
-              </AnimatePresence>
-            ) : (
-              <div className="h-4 w-4" />
-            )}
-          </motion.button>
         </div>
 
         {/* =================================================
@@ -1517,16 +1324,10 @@ export default function Header() {
             justify-center
             rounded-full
             border
+            border-white/10
+            bg-white/[0.04]
+            text-white
             transition
-
-            border-slate-200
-            bg-slate-100
-            text-slate-800
-
-            dark:border-white/10
-            dark:bg-white/[0.04]
-            dark:text-white
-
             md:hidden
           "
         >
@@ -1623,13 +1424,8 @@ export default function Header() {
             className="
               overflow-hidden
               border-t
-
-              border-slate-200/70
-              bg-white/98
-
-              dark:border-white/[0.07]
-              dark:bg-[#06110c]/98
-
+              border-white/[0.07]
+              bg-[#06110c]/98
               backdrop-blur-2xl
               md:hidden
             "
@@ -1650,13 +1446,9 @@ export default function Header() {
                   px-4
                   py-3.5
                   text-left
+                  text-white
                   transition
-
-                  text-slate-900
-                  hover:bg-slate-100
-
-                  dark:text-white
-                  dark:hover:bg-white/[0.05]
+                  hover:bg-white/[0.05]
                 "
                 style={{
                   fontFamily:
@@ -1678,8 +1470,7 @@ export default function Header() {
                     16
                   }
                   className="
-                    text-emerald-600/70
-                    dark:text-emerald-300/60
+                    text-emerald-300/60
                   "
                 />
               </button>
@@ -1711,19 +1502,14 @@ export default function Header() {
                         py-3.5
                         text-left
                         transition
-
-                        hover:bg-slate-100
-
-                        dark:hover:bg-white/[0.05]
+                        hover:bg-white/[0.05]
                       "
                     >
                       <div className="flex items-center gap-3">
                         <span className="
                           text-[10px]
                           font-black
-
-                          text-emerald-600/45
-                          dark:text-emerald-300/35
+                          text-emerald-300/35
                         ">
                           {String(
                             index +
@@ -1738,9 +1524,7 @@ export default function Header() {
                           className="
                             text-[15px]
                             font-semibold
-
-                            text-slate-700
-                            dark:text-white/80
+                            text-white/80
                           "
                           style={{
                             fontFamily:
@@ -1762,8 +1546,7 @@ export default function Header() {
                           15
                         }
                         className="
-                          text-slate-300
-                          dark:text-white/20
+                          text-white/20
                         "
                       />
                     </button>
@@ -1775,10 +1558,8 @@ export default function Header() {
               <div className="
                 mt-3
                 border-t
+                border-white/[0.06]
                 pt-3
-
-                border-slate-200
-                dark:border-white/[0.06]
               ">
                 <p className="
                   px-4
@@ -1787,9 +1568,7 @@ export default function Header() {
                   font-bold
                   uppercase
                   tracking-[0.22em]
-
-                  text-emerald-700/50
-                  dark:text-emerald-300/45
+                  text-emerald-300/45
                 ">
                   {lang ===
                   "si"
@@ -1827,10 +1606,7 @@ export default function Header() {
                             py-3.5
                             text-left
                             transition
-
-                            hover:bg-emerald-50
-
-                            dark:hover:bg-emerald-400/[0.06]
+                            hover:bg-emerald-400/[0.06]
                           "
                         >
                           <span className="
@@ -1841,12 +1617,8 @@ export default function Header() {
                             items-center
                             justify-center
                             rounded-xl
-
-                            bg-emerald-50
-                            text-emerald-700
-
-                            dark:bg-emerald-400/[0.07]
-                            dark:text-emerald-300
+                            bg-emerald-400/[0.07]
+                            text-emerald-300
                           ">
                             <Icon
                               size={
@@ -1860,9 +1632,7 @@ export default function Header() {
                               flex-1
                               text-[14px]
                               font-semibold
-
-                              text-slate-700
-                              dark:text-white/75
+                              text-white/75
                             "
                             style={{
                               fontFamily:
@@ -1883,8 +1653,7 @@ export default function Header() {
                               15
                             }
                             className="
-                              text-slate-300
-                              dark:text-white/20
+                              text-white/20
                             "
                           />
                         </button>
@@ -1899,29 +1668,21 @@ export default function Header() {
                 mt-4
                 flex
                 items-center
-                justify-between
+                justify-center
                 rounded-[22px]
                 border
+                border-white/[0.06]
+                bg-white/[0.025]
                 p-3
-
-                border-slate-200
-                bg-slate-50
-
-                dark:border-white/[0.06]
-                dark:bg-white/[0.025]
               ">
-                {/* Language */}
+                {/* Language only — theme switch removed */}
                 <div className="
                   flex
                   items-center
                   gap-1
                   rounded-full
+                  bg-black/20
                   p-1
-
-                  bg-white
-                  shadow-sm
-
-                  dark:bg-black/20
                 ">
                   <button
                     type="button"
@@ -1941,16 +1702,13 @@ export default function Header() {
                         lang ===
                         "si"
                           ? `
-                            bg-emerald-500
+                            bg-emerald-400
                             font-bold
-                            text-white
-                            dark:bg-emerald-400
-                            dark:text-emerald-950
+                            text-emerald-950
                           `
                           : `
                             font-semibold
-                            text-slate-500
-                            dark:text-white/45
+                            text-white/45
                           `
                       }
                     `}
@@ -1980,16 +1738,13 @@ export default function Header() {
                         lang ===
                         "en"
                           ? `
-                            bg-emerald-500
+                            bg-emerald-400
                             font-bold
-                            text-white
-                            dark:bg-emerald-400
-                            dark:text-emerald-950
+                            text-emerald-950
                           `
                           : `
                             font-semibold
-                            text-slate-500
-                            dark:text-white/45
+                            text-white/45
                           `
                       }
                     `}
@@ -2001,57 +1756,6 @@ export default function Header() {
                     EN
                   </button>
                 </div>
-
-                {/* Theme */}
-                <button
-                  type="button"
-                  onClick={
-                    toggleTheme
-                  }
-                  aria-label={
-                    lang ===
-                    "si"
-                      ? "තේමාව වෙනස් කරන්න"
-                      : "Toggle theme"
-                  }
-                  className="
-                    flex
-                    h-10
-                    w-10
-                    items-center
-                    justify-center
-                    rounded-full
-
-                    bg-white
-                    text-slate-600
-                    shadow-sm
-
-                    dark:bg-white/[0.05]
-                    dark:text-white/65
-
-                    transition
-                    hover:bg-slate-100
-                    dark:hover:bg-white/[0.08]
-                  "
-                >
-                  {mounted &&
-                  resolvedTheme ===
-                    "dark" ? (
-                    <Sun
-                      size={
-                        18
-                      }
-                      className="text-amber-500 dark:text-amber-300"
-                    />
-                  ) : (
-                    <Moon
-                      size={
-                        18
-                      }
-                      className="text-indigo-500 dark:text-indigo-300"
-                    />
-                  )}
-                </button>
               </div>
 
               {/* CTA */}
@@ -2077,15 +1781,11 @@ export default function Header() {
                   transition
                   active:scale-[0.98]
 
-                  bg-emerald-500
-                  text-white
+                  bg-emerald-400
+                  text-emerald-950
                   shadow-[0_12px_40px_rgba(16,185,129,0.14)]
 
-                  hover:bg-emerald-400
-
-                  dark:bg-emerald-400
-                  dark:text-emerald-950
-                  dark:hover:bg-emerald-300
+                  hover:bg-emerald-300
                 "
                 style={{
                   fontFamily:
@@ -2112,4 +1812,4 @@ export default function Header() {
       </AnimatePresence>
     </header>
   );
-              }
+}
